@@ -95,7 +95,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-
         //Listen to multiple documents in a collection. adds markers of the requests in the db (docs)
         db.collection("MapsData")
                 .addSnapshotListener((value, e) -> {
@@ -139,6 +138,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             String requestId= marker.getTitle();
             databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
+                //TODO: I guess the bug might be here, that it gets pressed on other markers data changes.
+                // maybe find another function declaration for this
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     final String getRequestSubject= snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
                     final String getRequestBody= snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
@@ -147,10 +148,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     final String getRequestLongitude= String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                     Toast.makeText(Map.this, "Subject: "+getRequestSubject+"\n Body:"+ getRequestBody+"\n Contact Details: "+getContactDetails+"\n Location Longitude: "+getRequestLongitude+"\n Location Latitude: "+getRequestLatitude , Toast.LENGTH_SHORT).show();
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
                 }
             });
             return true;
