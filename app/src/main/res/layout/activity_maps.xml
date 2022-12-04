@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Map">
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:text="Add a request"
+        android:textSize="20dp"
+        android:id="@+id/btn_create_rqst_from_map"
+        android:padding="10dp"
+        android:layout_marginTop="40dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="80dp"
+        android:textColor="@color/black"
+        android:background="#8BC34A"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|top"
+        android:text="My Requests"
+        android:textSize="20dp"
+        android:id="@+id/btn_my_requests"
+        android:textColor="@color/black"
+        android:background="#FFEB3B"
+        android:padding="10dp"
+        android:layout_marginBottom="10dp"
+        android:paddingLeft="10dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_locate_me"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:text="Locate Me"
+        android:textColor="@color/white"
+        android:background="#F44336"
+        android:padding="10dp"
+        android:textSize="20dp"
+        android:paddingLeft="10dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:text="Choose Location"
+        android:padding="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/white"
+        android:background="#9C27B0"
+        android:paddingLeft="10dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/logOutBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:text="Log Out"
+        android:padding="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/white"
+        android:background="#3F51B5"
+
+        />
+
+</fragment>
