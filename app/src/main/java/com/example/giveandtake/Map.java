@@ -29,8 +29,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
@@ -38,6 +42,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
+  //  public static HashSet<String> taken_requests_ids = new HashSet<String>();
+    public static ArrayList<String> taken_requests_ids = new ArrayList<>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +51,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         String userId = thisIntent.getStringExtra("userId");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Button create_rqst_btn= findViewById(R.id.btn_create_request_from_map);
-        final Button btn_locate_me= findViewById(R.id.btn_locate_me);
-        final Button btn_my_requests= findViewById(R.id.btn_my_requests);
-        final Button log_out_btn= findViewById(R.id.logOutBtn);
+        Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
+        Button btn_locate_me= findViewById(R.id.btn_locate_me);
+        Button btn_my_requests= findViewById(R.id.btn_my_requests);
+        Button log_out_btn= findViewById(R.id.logOutBtn);
         // initializing our firebase FireStore.
         db = FirebaseFirestore.getInstance();
         Intent mIntent = getIntent();
@@ -57,10 +63,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-        create_rqst_btn.setOnClickListener(view -> {
+        create_request_btn.setOnClickListener(view -> {
             // open create request activity
             Intent myIntent = new Intent(Map.this, RequestCreation.class);
             myIntent.putExtra("userId",userId);
+            myIntent.putExtra("taken_requests_ids",taken_requests_ids);
             startActivity(myIntent);
         });
 
@@ -111,6 +118,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             LatLng location = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                             String requestId= doc.getString("requestId");
                             //resize pic to be a marker icon programmatically
+                            taken_requests_ids.add(requestId);
                             markersHashmap.put(doc.getId(), mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85)))));
                            // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
                         }
@@ -128,6 +136,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             newIntent.putExtra("userId",userId);
             newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
             newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
+            newIntent.putStringArrayListExtra("taken_requests_ids", taken_requests_ids);
             startActivity(newIntent);
         });
 
@@ -136,24 +145,28 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
             String requestId= marker.getTitle();
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                //TODO: I guess the bug might be here, that it gets pressed on other markers data changes.
-                // maybe find another function declaration for this
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    final String getRequestSubject= snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                    final String getRequestBody= snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
-                    final String getContactDetails= snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
-                    final String getRequestLatitude= String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                    final String getRequestLongitude= String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                    Toast.makeText(Map.this, "Subject: "+getRequestSubject+"\n Body:"+ getRequestBody+"\n Contact Details: "+getContactDetails+"\n Location Longitude: "+getRequestLongitude+"\n Location Latitude: "+getRequestLatitude , Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-            });
+            if(requestId!=null) {
+                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    //TODO: I guess the bug might be here, that it gets pressed on other markers data changes.
+                    // maybe find another function declaration for this
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String getRequestSubject = snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
+                        String getRequestBody = snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
+                        String getContactDetails = snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String getRequestLatitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                        String getRequestLongitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        Toast.makeText(Map.this, "Subject: " + getRequestSubject + "\n Body:" + getRequestBody + "\n Contact Details: " + getContactDetails + "\n Location Longitude: " + getRequestLongitude + "\n Location Latitude: " + getRequestLatitude, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
             return true;
         });
+
     }
 
 

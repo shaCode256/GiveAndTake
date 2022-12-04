@@ -26,22 +26,21 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        final EditText fullName = findViewById(R.id.fullname);
-        final EditText email= findViewById(R.id.email);
-        final EditText phone= findViewById(R.id.phone);
-        final EditText password= findViewById(R.id.password);
-        final EditText conPassword= findViewById(R.id.conPassword);
-        final Button registerBtn= findViewById(R.id.registerBtn);
-        final TextView loginNowBtn= findViewById(R.id.loginNow);
+        EditText fullName = findViewById(R.id.fullname);
+        EditText email= findViewById(R.id.email);
+        EditText phone= findViewById(R.id.phone);
+        EditText password= findViewById(R.id.password);
+        EditText conPassword= findViewById(R.id.conPassword);
+        Button registerBtn= findViewById(R.id.registerBtn);
+        TextView loginNowBtn= findViewById(R.id.loginNow);
 
         registerBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
-            final String fullNameTxt = fullName.getText().toString();
-            final String emailTxt = email.getText().toString();
-            final String phoneTxt = phone.getText().toString();
-            final String passwordTxt = password.getText().toString();
-            final String conPasswordTxt = conPassword.getText().toString();
+            String fullNameTxt = fullName.getText().toString();
+            String emailTxt = email.getText().toString();
+            String phoneTxt = phone.getText().toString();
+            String passwordTxt = password.getText().toString();
+            String conPasswordTxt = conPassword.getText().toString();
             //check if user fills all the fields before sending data to Firebase
             if(fullNameTxt.isEmpty() || emailTxt.isEmpty() || phoneTxt.isEmpty()){
                 Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();

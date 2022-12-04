@@ -24,11 +24,11 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        final EditText phone= findViewById(R.id.phone);
-        final EditText password= findViewById(R.id.password);
-        final Button loginBtn= findViewById(R.id.loginBtn);
-        final TextView registerNowBtn= findViewById(R.id.registerNowBtn);
-        final Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
+        EditText phone= findViewById(R.id.phone);
+        EditText password= findViewById(R.id.password);
+        Button loginBtn= findViewById(R.id.loginBtn);
+        TextView registerNowBtn= findViewById(R.id.registerNowBtn);
+        Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
        // reset password
         resetPasswordBtn.setOnClickListener(v -> {
             Toast.makeText(Login.this, "You can reset your password now", Toast.LENGTH_SHORT).show();
@@ -36,8 +36,8 @@ public class Login extends AppCompatActivity {
         });
 
     loginBtn.setOnClickListener(view -> {
-        final String phoneTxt = phone.getText().toString();
-        final String passwordTxt= password.getText().toString();
+        String phoneTxt = phone.getText().toString();
+        String passwordTxt= password.getText().toString();
 
         if(phoneTxt.isEmpty() || passwordTxt.isEmpty()){
             Toast.makeText(Login.this, "Please enter mobile number and password ", Toast.LENGTH_SHORT).show();
@@ -50,7 +50,7 @@ public class Login extends AppCompatActivity {
                     if(snapshot.hasChild(phoneTxt)){
                         //mobile num exists in db
                         // now get password of user from db and match it with the entered password
-                        final String getPassword= snapshot.child(phoneTxt).child("password").getValue(String.class);
+                        String getPassword= snapshot.child(phoneTxt).child("password").getValue(String.class);
                         assert getPassword != null;
                         if(getPassword.equals(passwordTxt)){
                             //open MapsActivity on success

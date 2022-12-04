@@ -24,14 +24,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
-
     protected Context context;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-
+    //TODO: read it from stored cloud
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +41,16 @@ public class RequestCreation extends AppCompatActivity {
         String userId = mIntent.getStringExtra("userId");
         String clickedLat = mIntent.getStringExtra("clickedLat");
         String clickedLong = mIntent.getStringExtra("clickedLong");
+//        Set<String> takenRequestsIds = (Set<String>) mIntent.getSerializableExtra(String.valueOf(taken_requests_ids));
         //Brings null if location isn't null (not long clicked from map)
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_creation);
-        final EditText subject = findViewById(R.id.create_request_input_subject);
-        final EditText body = findViewById(R.id.create_request_input_body);
+        EditText subject = findViewById(R.id.create_request_input_subject);
+        EditText body = findViewById(R.id.create_request_input_body);
         //  final EditText location = findViewById(R.id.create_rqst_input_location_details);
-        final EditText longitude_input = findViewById(R.id.longitude_input);
-        final EditText latitude_input = findViewById(R.id.latitude_input);
-        final EditText contact_details = findViewById(R.id.create_request_input_contact_details);
+        EditText longitude_input = findViewById(R.id.longitude_input);
+        EditText latitude_input = findViewById(R.id.latitude_input);
+        EditText contact_details = findViewById(R.id.create_request_input_contact_details);
         Button btnAddRequest = findViewById(R.id.button_add_request);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button addCurrLocation = findViewById(R.id.button_add_location);
@@ -57,16 +59,26 @@ public class RequestCreation extends AppCompatActivity {
             latitude_input.setText(clickedLat, TextView.BufferType.EDITABLE);
         }
         btnAddRequest.setOnClickListener(v -> {
-            final String subjectTxt = subject.getText().toString();
-            final String bodyTxt = body.getText().toString();
+            String subjectTxt = subject.getText().toString();
+            String bodyTxt = body.getText().toString();
             //  final String locationTxt = location.getText().toString();
             //TODO: deal with converting double and string, also with intents. try to avoid some conversions
-            final String longitudeTxt = longitude_input.getText().toString();
-            final String latitudeTxt = latitude_input.getText().toString();
-            final String contact_detailsTxt = contact_details.getText().toString();
-            final String getUserId = userId;
+            String longitudeTxt = longitude_input.getText().toString();
+            String latitudeTxt = latitude_input.getText().toString();
+            String contact_detailsTxt = contact_details.getText().toString();
+            String getUserId = userId;
             int randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
-            final String setRequestId = String.valueOf(randomNum);
+            String setRequestId = String.valueOf(randomNum);
+         //       HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
+            //to avoid repeating the same requestId
+            ArrayList<String> taken_requests_ids= mIntent.getStringArrayListExtra("taken_requests_ids");
+            Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
+            while (setRequestId!=null &&taken_requests_ids.contains(setRequestId)){
+                //change until it's a new request number
+                randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
+                setRequestId = String.valueOf(randomNum);
+            }
+            Toast.makeText(RequestCreation.this, "Request Num: "+setRequestId, Toast.LENGTH_SHORT).show();
             if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contact_detailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
@@ -83,6 +95,7 @@ public class RequestCreation extends AppCompatActivity {
                 user.put("geoPoint", geoPointRequest);
                 user.put("requestId", setRequestId);
                 user.put("userId", userId);
+
                 markersDb.collection("MapsData")
                         .add(user)
                         .addOnSuccessListener(documentReference -> {
@@ -91,14 +104,15 @@ public class RequestCreation extends AppCompatActivity {
                         .addOnFailureListener(e -> {
                             //         Log.w(TAG, "Error adding document", e);
                         });
+                String finalSetRequestId = setRequestId;
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //check if mobile/phone exists in db
-                        databaseReference.child("users").child(getUserId).child("requestId").child(setRequestId).child("subject").setValue(subjectTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(setRequestId).child("body").setValue(bodyTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(setRequestId).child("contact_details").setValue(contact_detailsTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(setRequestId).child("location").setValue(geoPointRequest);
+                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
+                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
+                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
+                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
                         //   }
                     }
 
@@ -137,7 +151,6 @@ public class RequestCreation extends AppCompatActivity {
             }
         });
 
-
         btnBackToMap.setOnClickListener(v -> {
             Intent myIntent = new Intent(RequestCreation.this, Map.class);
             myIntent.putExtra("userId", userId);
@@ -166,8 +179,6 @@ public class RequestCreation extends AppCompatActivity {
         }
         // Other 'case' lines to check for other
         // permissions this app might request.
-
-
     }
 
 
