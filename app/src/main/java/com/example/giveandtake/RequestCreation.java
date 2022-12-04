@@ -82,6 +82,7 @@ public class RequestCreation extends AppCompatActivity {
                 GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
                 user.put("geoPoint", geoPointRequest);
                 user.put("requestId", setRequestId);
+                user.put("userId", userId);
                 markersDb.collection("MapsData")
                         .add(user)
                         .addOnSuccessListener(documentReference -> {

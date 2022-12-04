@@ -2,12 +2,9 @@ package com.example.giveandtake;
 
 import static android.content.ContentValues.TAG;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -23,6 +20,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,20 +38,20 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
-
+    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        Intent thisIntent = getIntent();
+        String userId = thisIntent.getStringExtra("userId");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Button create_rqst_btn= findViewById(R.id.btn_create_rqst_from_map);
+        final Button create_rqst_btn= findViewById(R.id.btn_create_request_from_map);
         final Button btn_locate_me= findViewById(R.id.btn_locate_me);
         final Button btn_my_requests= findViewById(R.id.btn_my_requests);
         final Button log_out_btn= findViewById(R.id.logOutBtn);
         // initializing our firebase FireStore.
         db = FirebaseFirestore.getInstance();
         Intent mIntent = getIntent();
-        String userId = mIntent.getStringExtra("userId");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -90,11 +92,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
 
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-
 
         //Listen to multiple documents in a collection. adds markers of the requests in the db (docs)
         db.collection("MapsData")
@@ -110,8 +110,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             GeoPoint geoPoint= doc.getGeoPoint("geoPoint");
                             assert geoPoint != null;
                             LatLng location = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                            String requestId= doc.getString("requestId");
                             //resize pic to be a marker icon programmatically
-                            markersHashmap.put(doc.getId(), mMap.addMarker(new MarkerOptions().position(location).title(geoPoint.getLatitude()+", "+geoPoint.getLongitude()).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85)))));
+                            markersHashmap.put(doc.getId(), mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85)))));
                            // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
                         }
                     }
@@ -119,19 +120,40 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 );
 
         // adding on click listener to marker of google maps.
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(@NonNull LatLng latLng) {
-                //passing userId to request
-                Intent thisIntent = getIntent();
-                String userId = thisIntent.getStringExtra("userId");
-                Toast.makeText(Map.this, "Clicked location is " + latLng, Toast.LENGTH_SHORT).show();
-                Intent newIntent = new Intent(Map.this, RequestCreation.class);
-                newIntent.putExtra("userId",userId);
-                newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
-                newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
-                startActivity(newIntent);
-            }
+        mMap.setOnMapLongClickListener(latLng -> {
+            //passing userId to request
+            Intent thisIntent = getIntent();
+            String userId = thisIntent.getStringExtra("userId");
+            Toast.makeText(Map.this, "Clicked location is " + latLng, Toast.LENGTH_SHORT).show();
+            Intent newIntent = new Intent(Map.this, RequestCreation.class);
+            newIntent.putExtra("userId",userId);
+            newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
+            newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
+            startActivity(newIntent);
+        });
+
+        mMap.setOnMarkerClickListener(marker -> {
+            // marker.remove(); //removes marker by clicking on it
+            Intent thisIntent = getIntent();
+            String userId = thisIntent.getStringExtra("userId");
+            String requestId= marker.getTitle();
+            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    final String getRequestSubject= snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
+                    final String getRequestBody= snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
+                    final String getContactDetails= snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                    final String getRequestLatitude= String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                    final String getRequestLongitude= String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                    Toast.makeText(Map.this, "Subject: "+getRequestSubject+"\n Body:"+ getRequestBody+"\n Contact Details: "+getContactDetails+"\n Location Longitude: "+getRequestLongitude+"\n Location Latitude: "+getRequestLatitude , Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return true;
         });
     }
 
