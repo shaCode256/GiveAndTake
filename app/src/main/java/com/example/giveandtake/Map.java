@@ -34,7 +34,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
-    public static HashSet<String> taken_requests_ids = new HashSet<String>();
+    public static HashSet<String> taken_requests_ids = new HashSet<>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,9 +108,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             assert geoPoint != null;
                             LatLng location = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                             String requestId= doc.getString("requestId");
+                            String requestUserId= doc.getString("userId");
                             //resize pic to be a marker icon programmatically
                             taken_requests_ids.add(requestId);
-                            markersHashmap.put(doc.getId(), mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85)))));
+                            Marker newMarker= mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85))));
+                            newMarker.setTag(requestUserId);
+                            markersHashmap.put(doc.getId(),newMarker);
                            // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
                         }
                     }
@@ -130,20 +133,21 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             startActivity(newIntent);
         });
 
+        //TODO: add storing userId to marker and not only for this intent (for requests which are viewed by other users, not the creator)
         mMap.setOnMarkerClickListener(marker -> {
             // marker.remove(); //removes marker by clicking on it
             Intent thisIntent = getIntent();
-            String userId = thisIntent.getStringExtra("userId");
+            String requestUserId = marker.getTag().toString();
             String requestId= marker.getTitle();
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String getRequestSubject = snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                        String getRequestBody = snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String getContactDetails = snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
-                        String getRequestLatitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        String getRequestLongitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        String getRequestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
+                        String getRequestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
+                        String getContactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String getRequestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                        String getRequestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                         Toast.makeText(Map.this, "Subject: " + getRequestSubject + "\n Body:" + getRequestBody + "\n Contact Details: " + getContactDetails + "\n Location Longitude: " + getRequestLongitude + "\n Location Latitude: " + getRequestLatitude, Toast.LENGTH_LONG).show();
                     }
 
