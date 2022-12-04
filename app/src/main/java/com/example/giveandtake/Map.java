@@ -122,7 +122,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             //passing userId to request
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
-            Toast.makeText(Map.this, "Clicked location is " + latLng, Toast.LENGTH_SHORT).show();
             Intent newIntent = new Intent(Map.this, RequestCreation.class);
             newIntent.putExtra("userId",userId);
             newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
@@ -145,7 +144,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String getContactDetails = snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
                         String getRequestLatitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String getRequestLongitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        Toast.makeText(Map.this, "Subject: " + getRequestSubject + "\n Body:" + getRequestBody + "\n Contact Details: " + getContactDetails + "\n Location Longitude: " + getRequestLongitude + "\n Location Latitude: " + getRequestLatitude, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Map.this, "Subject: " + getRequestSubject + "\n Body:" + getRequestBody + "\n Contact Details: " + getContactDetails + "\n Location Longitude: " + getRequestLongitude + "\n Location Latitude: " + getRequestLatitude, Toast.LENGTH_LONG).show();
                     }
 
                     @Override

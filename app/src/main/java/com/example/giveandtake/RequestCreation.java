@@ -67,17 +67,17 @@ public class RequestCreation extends AppCompatActivity {
             String setRequestId = String.valueOf(randomNum);
             //to avoid repeating the same requestId
             HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
-            Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
             while (setRequestId!=null &&taken_requests_ids.contains(setRequestId)){
                 //change until it's a new request number
                 randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
                 setRequestId = String.valueOf(randomNum);
             }
-            Toast.makeText(RequestCreation.this, "Request Num: "+setRequestId, Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(RequestCreation.this, "Request Num: "+setRequestId, Toast.LENGTH_SHORT).show();
             if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contact_detailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(RequestCreation.this, "Adding your request", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(RequestCreation.this, "Adding your request", Toast.LENGTH_SHORT).show();
                 // Add a new marker with the request ID
                 //add to markersDb this location
                 // Add a new document with a generated ID
