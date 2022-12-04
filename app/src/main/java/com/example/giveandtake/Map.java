@@ -1,7 +1,6 @@
 package com.example.giveandtake;
 
 import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,10 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -28,22 +25,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
-
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
-  //  public static HashSet<String> taken_requests_ids = new HashSet<String>();
-    public static ArrayList<String> taken_requests_ids = new ArrayList<>();
+    public static HashSet<String> taken_requests_ids = new HashSet<String>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +58,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             // open create request activity
             Intent myIntent = new Intent(Map.this, RequestCreation.class);
             myIntent.putExtra("userId",userId);
-            myIntent.putExtra("taken_requests_ids",taken_requests_ids);
+            myIntent.putExtra("taken_requests_ids", taken_requests_ids);
             startActivity(myIntent);
         });
 
@@ -136,7 +127,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             newIntent.putExtra("userId",userId);
             newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
             newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
-            newIntent.putStringArrayListExtra("taken_requests_ids", taken_requests_ids);
+            newIntent.putExtra("taken_requests_ids", taken_requests_ids);
             startActivity(newIntent);
         });
 
@@ -148,8 +139,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    //TODO: I guess the bug might be here, that it gets pressed on other markers data changes.
-                    // maybe find another function declaration for this
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String getRequestSubject = snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String getRequestBody = snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);

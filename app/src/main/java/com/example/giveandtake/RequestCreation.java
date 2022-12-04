@@ -23,8 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,8 +39,6 @@ public class RequestCreation extends AppCompatActivity {
         String userId = mIntent.getStringExtra("userId");
         String clickedLat = mIntent.getStringExtra("clickedLat");
         String clickedLong = mIntent.getStringExtra("clickedLong");
-//        Set<String> takenRequestsIds = (Set<String>) mIntent.getSerializableExtra(String.valueOf(taken_requests_ids));
-        //Brings null if location isn't null (not long clicked from map)
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_creation);
         EditText subject = findViewById(R.id.create_request_input_subject);
@@ -69,9 +65,8 @@ public class RequestCreation extends AppCompatActivity {
             String getUserId = userId;
             int randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
             String setRequestId = String.valueOf(randomNum);
-         //       HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
             //to avoid repeating the same requestId
-            ArrayList<String> taken_requests_ids= mIntent.getStringArrayListExtra("taken_requests_ids");
+            HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
             Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
             while (setRequestId!=null &&taken_requests_ids.contains(setRequestId)){
                 //change until it's a new request number
