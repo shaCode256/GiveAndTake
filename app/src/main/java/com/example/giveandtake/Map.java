@@ -111,14 +111,28 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             LatLng location = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                             String requestId= doc.getString("requestId");
                             String requestUserId= doc.getString("userId");
-                            //resize pic to be a marker icon programmatically
-                            taken_requests_ids.add(requestId);
-                            Marker newMarker= mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85))));
-                            assert newMarker != null;
-                            newMarker.setTag(requestUserId);
-                            markersHashmap.put(requestId,newMarker);
-                            markersRequestToDocId.put(requestId, doc.getId());
-                           // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
+                            //to check if requestUseId is manager: change the icon
+                            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    String isManager = snapshot.child(requestUserId).child("isManager").getValue(String.class);
+                                    //resize pic to be a marker icon programmatically
+                                    String icon_name= "hand";
+                                    taken_requests_ids.add(requestId);
+                                    if(isManager.equals("1")) {
+                                        icon_name="star_icon";
+                                    }
+                                    Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(icon_name, 85, 85))));
+                                    assert newMarker != null;
+                                    newMarker.setTag(requestUserId);
+                                    markersHashmap.put(requestId,newMarker);
+                                    markersRequestToDocId.put(requestId, doc.getId());
+                                    // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                }
+                            });
                         }
                     }
                 }
