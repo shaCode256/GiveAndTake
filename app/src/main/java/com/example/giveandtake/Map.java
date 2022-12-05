@@ -137,16 +137,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             startActivity(newIntent);
         });
 
-        //TODO: add storing userId to marker and not only for this intent (for requests which are viewed by other users, not the creator)
         mMap.setOnMarkerClickListener(marker -> {
             // marker.remove(); //removes marker by clicking on it
+            String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             Intent thisIntent = getIntent();
             String isManager= thisIntent.getStringExtra("isManager");
-            if (isManager!=null &&isManager.equals("1")){
-                //show button to let manager delete the request
-                Toast.makeText(Map.this, "You are a manager. will have another option soon Be'ezrat Hashem", Toast.LENGTH_SHORT).show();
-            }
-            String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             String requestId= marker.getTitle();
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -157,7 +152,18 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String getContactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
                         String getRequestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String getRequestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        Toast.makeText(Map.this, "Subject: " + getRequestSubject + "\n Body:" + getRequestBody + "\n Contact Details: " + getContactDetails + "\n Location Longitude: " + getRequestLongitude + "\n Location Latitude: " + getRequestLatitude, Toast.LENGTH_LONG).show();
+                        // open view request activity
+                        Intent thisIntent = getIntent();
+                        String userId = thisIntent.getStringExtra("userId");
+                        Intent myIntent = new Intent(Map.this, ViewRequest.class);
+                        myIntent.putExtra("getRequestSubject",getRequestSubject);
+                        myIntent.putExtra("getRequestBody", getRequestBody);
+                        myIntent.putExtra("getContactDetails", getContactDetails);
+                        myIntent.putExtra("getRequestLatitude", getRequestLatitude);
+                        myIntent.putExtra("getRequestLongitude", getRequestLongitude);
+                        myIntent.putExtra("userId", userId);
+                        myIntent.putExtra("isManager", isManager);
+                        startActivity(myIntent);
                     }
 
                     @Override

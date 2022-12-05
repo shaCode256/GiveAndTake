@@ -63,7 +63,6 @@ public class RequestCreation extends AppCompatActivity {
             String longitudeTxt = longitude_input.getText().toString();
             String latitudeTxt = latitude_input.getText().toString();
             String contact_detailsTxt = contact_details.getText().toString();
-            String getUserId = userId;
             int randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
             String setRequestId = String.valueOf(randomNum);
             //to avoid repeating the same requestId
@@ -91,7 +90,6 @@ public class RequestCreation extends AppCompatActivity {
                 user.put("geoPoint", geoPointRequest);
                 user.put("requestId", setRequestId);
                 user.put("userId", userId);
-
                 markersDb.collection("MapsData")
                         .add(user)
                         .addOnSuccessListener(documentReference -> {
@@ -105,13 +103,12 @@ public class RequestCreation extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //check if mobile/phone exists in db
-                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
-                        databaseReference.child("users").child(getUserId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
+                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
+                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
+                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
+                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
                         //   }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
