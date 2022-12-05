@@ -62,6 +62,12 @@ public class Register extends AppCompatActivity {
                             //sending data to firebase Realtime Database
                             // we are using phone number as unique identifier of every user
                             // so all the other details of user comes under phone number
+                            if(emailTxt.endsWith("@manager.com")) {
+                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+                            }
+                            else{
+                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+                            }
                             databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
                             databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
                             //TODO: add check of university email

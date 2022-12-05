@@ -37,13 +37,14 @@ public class RequestCreation extends AppCompatActivity {
         Intent mIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
         String userId = mIntent.getStringExtra("userId");
+      //  String isManager = mIntent.getStringExtra("isManager");
         String clickedLat = mIntent.getStringExtra("clickedLat");
         String clickedLong = mIntent.getStringExtra("clickedLong");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_creation);
         EditText subject = findViewById(R.id.create_request_input_subject);
         EditText body = findViewById(R.id.create_request_input_body);
-        //  final EditText location = findViewById(R.id.create_rqst_input_location_details);
+        //  final EditText location = findViewById(R.id.create_request_input_location_details);
         EditText longitude_input = findViewById(R.id.longitude_input);
         EditText latitude_input = findViewById(R.id.latitude_input);
         EditText contact_details = findViewById(R.id.create_request_input_contact_details);
@@ -68,7 +69,7 @@ public class RequestCreation extends AppCompatActivity {
             //to avoid repeating the same requestId
             HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
           //  Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
-            while (setRequestId!=null &&taken_requests_ids.contains(setRequestId)){
+            while (taken_requests_ids.contains(setRequestId)){
                 //change until it's a new request number
                 randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
                 setRequestId = String.valueOf(randomNum);

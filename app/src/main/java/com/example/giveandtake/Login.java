@@ -55,7 +55,9 @@ public class Login extends AppCompatActivity {
                         if(getPassword.equals(passwordTxt)){
                             //open MapsActivity on success
                             Intent myIntent = new Intent(Login.this, Map.class);
+                            String isManager= snapshot.child(phoneTxt).child("isManager").getValue(String.class);
                             myIntent.putExtra("userId",phoneTxt);
+                            myIntent.putExtra("isManager",isManager);
                             //TODO: add check if a regular user or a manager, and choose which map to forward to
                             // (will reveal more buttons, forward to other activities)
                             startActivity(myIntent);

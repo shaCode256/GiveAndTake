@@ -22,7 +22,7 @@
         android:text="Create a Request"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="40dp"
+        android:textSize="40sp"
         android:padding="5dp"
         android:background="@color/black"
         android:textColor="@color/white"
@@ -34,7 +34,7 @@
         android:text="Subject:"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textStyle="bold"/>
@@ -58,7 +58,7 @@
         android:text="Body:"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textStyle="bold"/>
@@ -82,7 +82,7 @@
         android:text="Contact details:"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
-        android:textSize="20dp"
+        android:textSize="20sp"
 
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
@@ -107,13 +107,13 @@
         android:text="Location:"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textStyle="bold"/>
 
 <!--    <EditText-->
-<!--        android:id="@+id/create_rqst_input_location_details"-->
+<!--        android:id="@+id/create_request_input_location_details"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:hint=" Where?"-->
@@ -163,7 +163,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/button_add_location"
         android:text="Use Current Location"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textColor="@color/white"
         android:background="#E14242"
 
@@ -179,7 +179,7 @@
         android:text="Add request"
         android:textColor="@color/black"
         android:background="#96ECDF"
-        android:textSize="20dp"
+        android:textSize="20sp"
         />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -189,7 +189,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:text="back to Map"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:background="#4CAF50"/>

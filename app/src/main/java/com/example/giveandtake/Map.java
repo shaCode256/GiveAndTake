@@ -41,6 +41,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
+        String isManager= thisIntent.getStringExtra("isManager");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
@@ -49,7 +50,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Button log_out_btn= findViewById(R.id.logOutBtn);
         // initializing our firebase FireStore.
         db = FirebaseFirestore.getInstance();
-        Intent mIntent = getIntent();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -59,6 +59,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             // open create request activity
             Intent myIntent = new Intent(Map.this, RequestCreation.class);
             myIntent.putExtra("userId",userId);
+            myIntent.putExtra("isManager", isManager);
             myIntent.putExtra("taken_requests_ids", taken_requests_ids);
             startActivity(myIntent);
         });
@@ -113,6 +114,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             //resize pic to be a marker icon programmatically
                             taken_requests_ids.add(requestId);
                             Marker newMarker= mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85))));
+                            assert newMarker != null;
                             newMarker.setTag(requestUserId);
                             markersHashmap.put(requestId,newMarker);
                             markersRequestToDocId.put(requestId, doc.getId());
@@ -139,7 +141,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(marker -> {
             // marker.remove(); //removes marker by clicking on it
             Intent thisIntent = getIntent();
-            String requestUserId = marker.getTag().toString();
+            String isManager= thisIntent.getStringExtra("isManager");
+            if (isManager!=null &&isManager.equals("1")){
+                //show button to let manager delete the request
+                Toast.makeText(Map.this, "You are a manager. will have another option soon Be'ezrat Hashem", Toast.LENGTH_SHORT).show();
+            }
+            String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             String requestId= marker.getTitle();
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -165,12 +172,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void removeMarker(Marker marker){
         String requestId= marker.getTitle();
-        String requestUserId= marker.getTag().toString();
+        String requestUserId= Objects.requireNonNull(marker.getTag()).toString();
         //removes a marker by it's unique requestId
         //removes the docId of the marker from the db
         if(markersHashmap.get(requestId)!=null){
             Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
             String docId= markersRequestToDocId.get(requestId);
+            assert docId != null;
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
         }
         //remove requestId from usersDb

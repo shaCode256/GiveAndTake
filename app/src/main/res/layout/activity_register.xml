@@ -98,7 +98,7 @@
         android:layout_marginEnd="20dp"
         android:text= "Register"
         android:textStyle="bold"
-        android:textSize="30dp"
+        android:textSize="30sp"
         />
 
     <LinearLayout
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text= "Login Now"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textStyle= "bold" />
 
     </LinearLayout>
