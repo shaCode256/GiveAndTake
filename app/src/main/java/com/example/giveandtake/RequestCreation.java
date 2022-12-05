@@ -37,7 +37,7 @@ public class RequestCreation extends AppCompatActivity {
         Intent mIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
         String userId = mIntent.getStringExtra("userId");
-      //  String isManager = mIntent.getStringExtra("isManager");
+        String isManager = mIntent.getStringExtra("isManager");
         String clickedLat = mIntent.getStringExtra("clickedLat");
         String clickedLong = mIntent.getStringExtra("clickedLong");
         super.onCreate(savedInstanceState);
@@ -116,6 +116,7 @@ public class RequestCreation extends AppCompatActivity {
                 });
                 Intent myIntent = new Intent(RequestCreation.this, Map.class);
                 myIntent.putExtra("userId", userId);
+                myIntent.putExtra("isManager", isManager);
                 startActivity(myIntent);
             }
         });
@@ -139,14 +140,13 @@ public class RequestCreation extends AppCompatActivity {
 //                double userLat = lastKnownLocation.getLatitude();
 //                double userLong = lastKnownLocation.getLongitude();
                 Toast.makeText(RequestCreation.this, "last known location is "+lastKnownLocation, Toast.LENGTH_SHORT).show();
-                //                Toast.makeText(RequestCreation.this, "last known location is " + userLat + " " + userLong, Toast.LENGTH_SHORT).show();
-
             }
         });
 
         btnBackToMap.setOnClickListener(v -> {
             Intent myIntent = new Intent(RequestCreation.this, Map.class);
             myIntent.putExtra("userId", userId);
+            myIntent.putExtra("isManager", isManager);
             startActivity(myIntent);
         });
     }

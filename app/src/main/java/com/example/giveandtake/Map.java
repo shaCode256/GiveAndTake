@@ -36,12 +36,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> taken_requests_ids = new HashSet<>();
+    Intent thisIntent = getIntent();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent thisIntent = getIntent();
-        String userId = thisIntent.getStringExtra("userId");
-        String isManager= thisIntent.getStringExtra("isManager");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
@@ -56,6 +54,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
 
         create_request_btn.setOnClickListener(view -> {
+            Intent thisIntent = getIntent();
+            String userId = thisIntent.getStringExtra("userId");
+            String isManager= thisIntent.getStringExtra("isManager");
             // open create request activity
             Intent myIntent = new Intent(Map.this, RequestCreation.class);
             myIntent.putExtra("userId",userId);
@@ -67,7 +68,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         log_out_btn.setOnClickListener(view -> {
             // open Login activity
             Intent myIntent = new Intent(Map.this, Login.class);
-            myIntent.putExtra("userId",userId);
             startActivity(myIntent);
         });
 
@@ -129,11 +129,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             //passing userId to request
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
+            String isManager= thisIntent.getStringExtra("isManager");
             Intent newIntent = new Intent(Map.this, RequestCreation.class);
             newIntent.putExtra("userId",userId);
             newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
             newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
             newIntent.putExtra("taken_requests_ids", taken_requests_ids);
+            newIntent.putExtra("isManager", isManager);
             startActivity(newIntent);
         });
 
@@ -141,8 +143,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             // marker.remove(); //removes marker by clicking on it
             String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             Intent thisIntent = getIntent();
-            String isManager= thisIntent.getStringExtra("isManager");
             String requestId= marker.getTitle();
+            String userId = thisIntent.getStringExtra("userId");
+            String isManager= thisIntent.getStringExtra("isManager");
+            //removes a marker by it's unique requestId
+            //removes the docId of the marker from the db
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -153,8 +158,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String getRequestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String getRequestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                         // open view request activity
+                        String docId= "";
+                        if(markersHashmap.get(requestId)!=null) {
+                            Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
+                            docId = markersRequestToDocId.get(requestId);
+                        }
                         Intent thisIntent = getIntent();
-                        String userId = thisIntent.getStringExtra("userId");
                         Intent myIntent = new Intent(Map.this, ViewRequest.class);
                         myIntent.putExtra("getRequestSubject",getRequestSubject);
                         myIntent.putExtra("getRequestBody", getRequestBody);
@@ -163,6 +172,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         myIntent.putExtra("getRequestLongitude", getRequestLongitude);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);
+                        myIntent.putExtra("docId", docId);
+                        myIntent.putExtra("requestId", requestId);
                         startActivity(myIntent);
                     }
 
@@ -175,31 +186,31 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
     }
-
-    public void removeMarker(Marker marker){
-        String requestId= marker.getTitle();
-        String requestUserId= Objects.requireNonNull(marker.getTag()).toString();
-        //removes a marker by it's unique requestId
-        //removes the docId of the marker from the db
-        if(markersHashmap.get(requestId)!=null){
-            Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
-            String docId= markersRequestToDocId.get(requestId);
-            assert docId != null;
-            db.collection("MapsData").document(docId).delete(); //deletes from markersDb
-        }
-        //remove requestId from usersDb
-        if(requestId!=null) {
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-            });
-        }
-    }
+//
+//    public void removeMarker(Marker marker){
+//        String requestId= marker.getTitle();
+//        String requestUserId= Objects.requireNonNull(marker.getTag()).toString();
+//        //removes a marker by it's unique requestId
+//        //removes the docId of the marker from the db
+//        if(markersHashmap.get(requestId)!=null){
+//            Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
+//            String docId= markersRequestToDocId.get(requestId);
+//            assert docId != null;
+//            db.collection("MapsData").document(docId).delete(); //deletes from markersDb
+//        }
+//        //remove requestId from usersDb
+//        if(requestId!=null) {
+//            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
+//                }
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//                }
+//            });
+//        }
+//    }
 
 
 //    public void removeMarker(String markerId){
