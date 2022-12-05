@@ -34,6 +34,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
+    HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> taken_requests_ids = new HashSet<>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @Override
@@ -113,7 +114,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             taken_requests_ids.add(requestId);
                             Marker newMarker= mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand",85,85))));
                             newMarker.setTag(requestUserId);
-                            markersHashmap.put(doc.getId(),newMarker);
+                            markersHashmap.put(requestId,newMarker);
+                            markersRequestToDocId.put(requestId, doc.getId());
                            // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10.0f));
                         }
                     }
@@ -161,11 +163,27 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     }
 
-
-    public void removeMarker(String docId){
-        //removes a marker by it's document id
-        if(markersHashmap.get(docId)!=null){
-            Objects.requireNonNull(markersHashmap.get(docId)).remove();
+    public void removeMarker(Marker marker){
+        String requestId= marker.getTitle();
+        String requestUserId= marker.getTag().toString();
+        //removes a marker by it's unique requestId
+        //removes the docId of the marker from the db
+        if(markersHashmap.get(requestId)!=null){
+            Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
+            String docId= markersRequestToDocId.get(requestId);
+            db.collection("MapsData").document(docId).delete(); //deletes from markersDb
+        }
+        //remove requestId from usersDb
+        if(requestId!=null) {
+            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
         }
     }
 
