@@ -94,6 +94,7 @@ public class ViewMyRequests extends ListActivity {
                             myIntent.putExtra("getRequestLatitude", getRequestLatitude);
                             myIntent.putExtra("getRequestLongitude", getRequestLongitude);
                             myIntent.putExtra("userId", userId);
+                            myIntent.putExtra("getRequestUserId", userId);
                             myIntent.putExtra("isManager", isManager);
                             myIntent.putExtra("docId", docId);
                             myIntent.putExtra("requestId", requestId);
