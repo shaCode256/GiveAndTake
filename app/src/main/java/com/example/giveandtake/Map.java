@@ -189,6 +189,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         myIntent.putExtra("getContactDetails", getContactDetails);
                         myIntent.putExtra("getRequestLatitude", getRequestLatitude);
                         myIntent.putExtra("getRequestLongitude", getRequestLongitude);
+                        myIntent.putExtra("getRequestUserId", requestUserId);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);
                         myIntent.putExtra("docId", docId);

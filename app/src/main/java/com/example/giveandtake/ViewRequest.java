@@ -34,6 +34,7 @@ public class ViewRequest extends AppCompatActivity {
         String isManager= myIntent.getStringExtra("isManager");
         String subject= myIntent.getStringExtra("getRequestSubject");
         String body= myIntent.getStringExtra("getRequestBody");
+        String requestUserId= myIntent.getStringExtra("getRequestUserId");
         String contactDetails= myIntent.getStringExtra("getContactDetails");
         String latitude= myIntent.getStringExtra("getRequestLatitude");
         String longitude= myIntent.getStringExtra("getRequestLongitude");
@@ -59,7 +60,7 @@ public class ViewRequest extends AppCompatActivity {
         latitude_inputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
         longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
 
-        if (isManager!=null &&isManager.equals("1")){
+        if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId)){
             //show button to let manager delete the request
             btnDeleteRequest.setVisibility(View.VISIBLE);
             //then import the logic of delete
