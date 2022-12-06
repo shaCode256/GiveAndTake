@@ -79,10 +79,15 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         btn_my_requests.setOnClickListener(view -> {
-//            // open Login activity
-//            Intent myIntent = new Intent(Map.this, Login.class);
-//            myIntent.putExtra("userId",userId);
-//            startActivity(myIntent);
+            // open My Requests activity
+            Intent thisIntent = getIntent();
+            String userId = thisIntent.getStringExtra("userId");
+            String isManager = thisIntent.getStringExtra("isManager");
+            Intent myIntent = new Intent(Map.this, ViewMyRequests.class);
+            myIntent.putExtra("userId",userId);
+            myIntent.putExtra("isManager", isManager);
+            myIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(myIntent);
         });
     }
 
@@ -90,7 +95,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getPackageName()));
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
     }
-
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -177,6 +181,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map
                             docId = markersRequestToDocId.get(requestId);
                         }
+                        //TODO: add docId to db so we can delete
                         Intent thisIntent = getIntent();
                         Intent myIntent = new Intent(Map.this, ViewRequest.class);
                         myIntent.putExtra("getRequestSubject",getRequestSubject);

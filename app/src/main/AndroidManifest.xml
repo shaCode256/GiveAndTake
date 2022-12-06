@@ -69,6 +69,11 @@
             android:name=".Map"
             android:exported="true"
             android:label="@string/title_activity_maps" />
+
+        <activity
+            android:name=".ViewMyRequests"
+            android:exported="true"
+            android:label="@string/title_activity_maps" />
     </application>
 
 </manifest>
