@@ -16,6 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -157,12 +163,25 @@ public class RequestCreation extends AppCompatActivity {
                 Toast.makeText(RequestCreation.this, "Good for you! you have the access fine location permission already ", Toast.LENGTH_SHORT).show();
                 LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
                 String locationProvider = LocationManager.NETWORK_PROVIDER;
-                // I suppressed the missing-permission warning because this wouldn't be executed in my
+                    // I suppressed the missing-permission warning because this wouldn't be executed in my
                 // case without location services being enabled
-                  Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-//                double userLat = lastKnownLocation.getLatitude();
-//                double userLong = lastKnownLocation.getLongitude();
-                Toast.makeText(RequestCreation.this, "last known location is "+lastKnownLocation, Toast.LENGTH_SHORT).show();
+                    // Request permission for location access
+                  //  locationManager.getCurrentLocation();
+                    FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                    usedLocationClient.getLastLocation()
+                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                        latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                                    }
+                                    else{
+                                        Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
             }
         });
 
@@ -196,5 +215,6 @@ public class RequestCreation extends AppCompatActivity {
         // Other 'case' lines to check for other
         // permissions this app might request.
     }
+
 
 }
