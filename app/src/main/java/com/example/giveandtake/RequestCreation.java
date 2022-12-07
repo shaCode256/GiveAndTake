@@ -77,47 +77,70 @@ public class RequestCreation extends AppCompatActivity {
             if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contact_detailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
-               // Toast.makeText(RequestCreation.this, "Adding your request", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(RequestCreation.this, "Adding your request", Toast.LENGTH_SHORT).show();
                 // Add a new marker with the request ID
                 //add to markersDb this location
                 // Add a new document with a generated ID
                 // Create a new user with a first, middle, and last name
                 HashMap<String, Object> user = new HashMap<>();
                 //TODO: add check that this is a numeric value! the text we insert
-                double doubleLongitude = Double.parseDouble(longitudeTxt); // returns double primitive
-                double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
-                GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
-                user.put("geoPoint", geoPointRequest);
-                user.put("requestId", setRequestId);
-                user.put("userId", userId);
-                markersDb.collection("MapsData")
-                        .add(user)
-                        .addOnSuccessListener(documentReference -> {
-                            //     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                        })
-                        .addOnFailureListener(e -> {
-                            //         Log.w(TAG, "Error adding document", e);
-                        });
-                String finalSetRequestId = setRequestId;
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        //check if mobile/phone exists in db
-                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
-                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
-                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
-                        databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
-                        //   }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                boolean numeric = true;
+                try {
+                    Double num = Double.parseDouble(longitudeTxt);
+                } catch (NumberFormatException e) {
+                    numeric = false;
+                }
+                try {
+                    Double num = Double.parseDouble(latitudeTxt);
+                } catch (NumberFormatException e) {
+                    numeric = false;
+                }
+                if (numeric) {
+                    double doubleLongitude = Double.parseDouble(longitudeTxt); // returns double primitive
+                    double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
+                    if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
+                        //check valid latitude and longtitude input
+                        GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
+                        user.put("geoPoint", geoPointRequest);
+                        user.put("requestId", setRequestId);
+                        user.put("userId", userId);
+                        markersDb.collection("MapsData")
+                                .add(user)
+                                .addOnSuccessListener(documentReference -> {
+                                    //     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                })
+                                .addOnFailureListener(e -> {
+                                    //         Log.w(TAG, "Error adding document", e);
+                                });
+                        String finalSetRequestId = setRequestId;
+                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                //check if mobile/phone exists in db
+                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
+                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
+                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
+                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
+                                //   }
+                            }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                        Intent myIntent = new Intent(RequestCreation.this, Map.class);
+                        myIntent.putExtra("userId", userId);
+                        myIntent.putExtra("isManager", isManager);
+                        startActivity(myIntent);
                     }
-                });
-                Intent myIntent = new Intent(RequestCreation.this, Map.class);
-                myIntent.putExtra("userId", userId);
-                myIntent.putExtra("isManager", isManager);
-                startActivity(myIntent);
+                    else{
+                        Toast.makeText(RequestCreation.this, "Please fill in valid longtitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    Toast.makeText(RequestCreation.this, "Please fill in valid longtitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         addCurrLocation.setOnClickListener(v -> {
@@ -173,7 +196,5 @@ public class RequestCreation extends AppCompatActivity {
         // Other 'case' lines to check for other
         // permissions this app might request.
     }
-
-
 
 }
