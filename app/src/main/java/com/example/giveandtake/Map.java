@@ -1,15 +1,29 @@
 package com.example.giveandtake;
 
 import static android.content.ContentValues.TAG;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -17,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +45,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
-
+    protected Context context;
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
@@ -38,6 +53,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     public static HashSet<String> taken_requests_ids = new HashSet<>();
     Intent thisIntent = getIntent();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,11 +87,35 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             startActivity(myIntent);
         });
 
-        btn_locate_me.setOnClickListener(view -> {
-//            // open Login activity
-//            Intent myIntent = new Intent(Map.this, Login.class);
-//            myIntent.putExtra("userId",userId);
-//            startActivity(myIntent);
+        btn_locate_me.setOnClickListener(v -> {
+            //TODO: add tracking location ability
+            if (
+                    ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                            ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Toast.makeText(Map.this, "please enable permissions", Toast.LENGTH_SHORT).show();
+                ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION}, 90);
+            }
+            else{
+                Toast.makeText(Map.this, "Good for you! you have the access fine location permission already ", Toast.LENGTH_SHORT).show();
+                LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                String locationProvider = LocationManager.NETWORK_PROVIDER;
+                FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                usedLocationClient.getLastLocation()
+                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                                }
+                                else{
+                                    Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
         });
 
         btn_my_requests.setOnClickListener(view -> {
@@ -231,6 +271,28 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 //            });
 //        }
 //    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 90) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(Map.this, "permission is granted", Toast.LENGTH_SHORT).show();
+                // Permission is granted. Continue the action or workflow
+                // in your app.
+            } else {
+                Toast.makeText(Map.this, "permission is NOT granted", Toast.LENGTH_SHORT).show();
+                // Explain to the user that the feature is unavailable because
+                // the feature requires a permission that the user has denied.
+                // At the same time, respect the user's decision. Don't link to
+                // system settings in an effort to convince the user to change
+                // their decision.
+            }
+        }
+        // Other 'case' lines to check for other
+        // permissions this app might request.
+    }
 
 
 //    public void removeMarker(String markerId){

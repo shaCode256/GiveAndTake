@@ -40,6 +40,7 @@ public class RequestCreation extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //TODO: what happens when we create a request in the same place?
         Intent mIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
         String userId = mIntent.getStringExtra("userId");
@@ -149,6 +150,7 @@ public class RequestCreation extends AppCompatActivity {
                 }
             }
         });
+
         addCurrLocation.setOnClickListener(v -> {
             //TODO: add tracking location ability
                 if (
@@ -163,27 +165,24 @@ public class RequestCreation extends AppCompatActivity {
                 Toast.makeText(RequestCreation.this, "Good for you! you have the access fine location permission already ", Toast.LENGTH_SHORT).show();
                 LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
                 String locationProvider = LocationManager.NETWORK_PROVIDER;
-                    // I suppressed the missing-permission warning because this wouldn't be executed in my
-                // case without location services being enabled
-                    // Request permission for location access
-                  //  locationManager.getCurrentLocation();
-                    FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                    usedLocationClient.getLastLocation()
-                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    // Got last known location. In some rare situations this can be null.
-                                    if (location != null) {
-                                        longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                        latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
-                                    }
-                                    else{
-                                        Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                                    }
+                FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                usedLocationClient.getLastLocation()
+                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                    latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
                                 }
-                            });
+                                else{
+                                    Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
         });
+
 
         btnBackToMap.setOnClickListener(v -> {
             Intent myIntent = new Intent(RequestCreation.this, Map.class);
@@ -218,3 +217,7 @@ public class RequestCreation extends AppCompatActivity {
 
 
 }
+
+
+
+//https://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null
