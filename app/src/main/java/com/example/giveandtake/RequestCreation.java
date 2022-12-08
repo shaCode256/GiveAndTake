@@ -111,6 +111,7 @@ public class RequestCreation extends AppCompatActivity {
                         user.put("geoPoint", geoPointRequest);
                         user.put("requestId", setRequestId);
                         user.put("userId", userId);
+                        user.put("isManager", isManager);
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
@@ -162,11 +163,9 @@ public class RequestCreation extends AppCompatActivity {
                             Manifest.permission.ACCESS_FINE_LOCATION}, 90);
                 }
             else{
-                Toast.makeText(RequestCreation.this, "Good for you! you have the access fine location permission already ", Toast.LENGTH_SHORT).show();
-                LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                String locationProvider = LocationManager.NETWORK_PROVIDER;
                 FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                usedLocationClient.getLastLocation()
+                    usedLocationClient.getLastLocation();
+                    usedLocationClient.getLastLocation()
                         .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {

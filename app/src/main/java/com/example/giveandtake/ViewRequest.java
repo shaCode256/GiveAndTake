@@ -82,7 +82,7 @@ public class ViewRequest extends AppCompatActivity {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.child(userId).child("requestId").child(requestId).getRef().removeValue();
+                        snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
