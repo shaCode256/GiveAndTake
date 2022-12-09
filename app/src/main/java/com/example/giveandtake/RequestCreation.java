@@ -33,7 +33,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    //TODO: read it from stored cloud
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
