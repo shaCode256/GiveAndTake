@@ -29,6 +29,8 @@ public class ViewRequest extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_request);
         Intent myIntent = getIntent();
+        String viewer_manager_id = myIntent.getStringExtra("viewer_manager_id");
+        //TODO: fix this bug
         String userId = myIntent.getStringExtra("userId");
         String requestId = myIntent.getStringExtra("requestId");
         String isManager= myIntent.getStringExtra("isManager");
@@ -45,8 +47,10 @@ public class ViewRequest extends AppCompatActivity {
         EditText longitude_inputEditTxt = findViewById(R.id.longitude_input);
         EditText latitude_inputEditTxt = findViewById(R.id.latitude_input);
         EditText contact_detailsEditTxt = findViewById(R.id.create_request_input_contact_details);
+        EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
         subjectEditTxt.setEnabled(false);
         bodyEditTxt.setEnabled(false);
+        user_id_of_requestEditTxt.setEnabled(false);
         longitude_inputEditTxt.setEnabled(false);
         latitude_inputEditTxt.setEnabled(false);
         contact_detailsEditTxt.setEnabled(false);
@@ -59,22 +63,33 @@ public class ViewRequest extends AppCompatActivity {
         contact_detailsEditTxt.setText(contactDetails, TextView.BufferType.EDITABLE);
         latitude_inputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
         longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
-
-        if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId)){
-            //show button to let manager delete the request
+        user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
+        btnDeleteRequest.setVisibility(View.INVISIBLE);
+        if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId) )
+        {
             btnDeleteRequest.setVisibility(View.VISIBLE);
-            //then import the logic of delete
         }
         btnBackToMap.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-            mapIntent.putExtra("userId", userId);
-            mapIntent.putExtra("isManager", isManager);
+            if(viewer_manager_id==null) {
+                mapIntent.putExtra("userId", userId);
+                mapIntent.putExtra("isManager", isManager);
+            }
+            else{
+                mapIntent.putExtra("userId", viewer_manager_id);
+                mapIntent.putExtra("isManager", "1");
+            }
             startActivity(mapIntent);
         });
 
         btnDeleteRequest.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-            mapIntent.putExtra("userId", userId);
+            if(viewer_manager_id==null) {
+                mapIntent.putExtra("userId", userId);
+            }
+            else{
+                mapIntent.putExtra("userId", viewer_manager_id);
+            }
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //remove requestId from usersDb
@@ -82,6 +97,7 @@ public class ViewRequest extends AppCompatActivity {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        assert requestUserId != null;
                         snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
                     }
                     @Override

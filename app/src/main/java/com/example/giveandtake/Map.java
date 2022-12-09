@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,30 +63,47 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
         Button btn_locate_me= findViewById(R.id.btn_locate_me);
         Button btn_my_requests= findViewById(R.id.btn_my_requests);
-        Button log_out_btn= findViewById(R.id.logOutBtn);
+        Button log_out_btn= findViewById(R.id.log_out_btn);
+        Button manage_users_btn= findViewById(R.id.manage_users_btn);
         // initializing our firebase FireStore.
         db = FirebaseFirestore.getInstance();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
+        Intent myIntent = getIntent();
+        String isManager= myIntent.getStringExtra("isManager");
+        if (isManager!=null &&isManager.equals("0")){
+            //show button to let manager delete the request
+            manage_users_btn.setVisibility(View.INVISIBLE);
+            //then import the logic of delete
+        }
         create_request_btn.setOnClickListener(view -> {
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
-            String isManager= thisIntent.getStringExtra("isManager");
+          //  String isManager= thisIntent.getStringExtra("isManager");
             // open create request activity
-            Intent myIntent = new Intent(Map.this, RequestCreation.class);
-            myIntent.putExtra("userId",userId);
-            myIntent.putExtra("isManager", isManager);
-            myIntent.putExtra("taken_requests_ids", taken_requests_ids);
-            startActivity(myIntent);
+            Intent create_request_intent = new Intent(Map.this, RequestCreation.class);
+            create_request_intent.putExtra("userId",userId);
+            create_request_intent.putExtra("isManager", isManager);
+            create_request_intent.putExtra("taken_requests_ids", taken_requests_ids);
+            startActivity(create_request_intent);
         });
 
         log_out_btn.setOnClickListener(view -> {
             // open Login activity
-            Intent myIntent = new Intent(Map.this, Login.class);
-            startActivity(myIntent);
+            Intent login_intent = new Intent(Map.this, Login.class);
+            startActivity(login_intent);
+        });
+
+        manage_users_btn.setOnClickListener(view -> {
+            // open Login activity
+            Intent thisIntent = getIntent();
+            String userId = thisIntent.getStringExtra("userId");
+            Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
+            manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            manage_users_intent.putExtra("userId", userId);
+            startActivity(manage_users_intent);
         });
 
         btn_locate_me.setOnClickListener(v -> {
@@ -118,17 +136,20 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             // open My Requests activity
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
-            String isManager = thisIntent.getStringExtra("isManager");
-            Intent myIntent = new Intent(Map.this, ViewMyRequests.class);
-            myIntent.putExtra("userId",userId);
-            myIntent.putExtra("isManager", isManager);
-            myIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
-            startActivity(myIntent);
+         //   String isManager = thisIntent.getStringExtra("isManager");
+            Intent view_my_requests_intent = new Intent(Map.this, ViewMyRequests.class);
+            view_my_requests_intent.putExtra("userId",userId);
+            view_my_requests_intent.putExtra("isManager", isManager);
+            view_my_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(view_my_requests_intent);
         });
     }
 
     public Bitmap resizeBitmap(String drawableName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getPackageName()));
+        //TODO: Try to fix Warning:(149, 89) Use of this function is discouraged because resource reflection makes it
+        // harder to perform build optimizations and compile-time verification of code. It is much more efficient
+        // to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier("bar", "foo", null)`).
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
     }
 
@@ -212,7 +233,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     //        Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map. why needed?
                             String docId = markersRequestToDocId.get(requestId);
                             //TODO: add docId to db so we can delete
-                            Intent thisIntent = getIntent();
                             Intent myIntent = new Intent(Map.this, ViewRequest.class);
                             myIntent.putExtra("getRequestSubject", getRequestSubject);
                             myIntent.putExtra("getRequestBody", getRequestBody);

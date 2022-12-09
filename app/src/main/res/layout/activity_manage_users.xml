@@ -13,7 +13,7 @@
         android:layout_marginTop="30dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="My Requests"
+        android:text="Users List"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textSize="40sp"
@@ -22,32 +22,9 @@
         android:textColor="@color/white"
         android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="User Id:"
-        android:gravity="center"
-        android:fontFamily="sans-serif-condensed"
-        android:textSize="20sp"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textStyle="bold"/>
-
-    <EditText
-        android:id="@+id/user_id_of_request"
-        android:layout_width="887dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="70dp"
-        android:layout_marginTop="26dp"
-        android:layout_marginRight="70dp"
-        android:autofillHints=""
-        android:inputType="text"
-        android:padding="6dp"
-        android:textSize="20sp" />
-
     <Button
         android:id="@+id/showBtn"
-        android:text="Show requests"
+        android:text="Show users"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         />

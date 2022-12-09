@@ -8,10 +8,11 @@
     tools:context=".Login">
 
     <ImageView
-        android:layout_width="451dp"
+        android:layout_width="500dp"
+        android:layout_gravity="top|center"
         android:layout_height="222dp"
-        android:src="@drawable/login_pic"
-        android:contentDescription="@string/login_pic" />
+        android:contentDescription="@string/login_pic"
+        android:src="@drawable/login_pic" />
 
     <TextView
         android:layout_width="match_parent"
