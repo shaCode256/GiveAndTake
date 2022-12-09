@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource"
+    android:orientation="vertical"
+    android:background="@drawable/background"
+    android:gravity="center" >
+
+    <TextView
+        android:id="@+id/create_request_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:text="View Request"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="40sp"
+        android:padding="5dp"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Id:"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/user_id_of_request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:inputType="text"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints="" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Subject:"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/create_request_input_subject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:hint="What is this all about?"
+        android:inputType="text"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints="" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Body:"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/create_request_input_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints=""
+        android:hint=" Tell us more!"
+        android:inputType="text"
+        android:padding="6dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Contact details:"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/create_request_input_contact_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:hint=" Keep in touch?"
+        android:inputType="text"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints="" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location:"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold"/>
+
+    <!--    <EditText-->
+    <!--        android:id="@+id/create_request_input_location_details"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:hint=" Where?"-->
+    <!--        android:gravity="center"-->
+    <!--        android:inputType=""-->
+    <!--        android:textAlignment="center"-->
+    <!--        android:minHeight="48dp"-->
+    <!--        android:padding="6dp"-->
+    <!--        android:textSize="20sp"-->
+    <!--        android:layout_marginLeft="70dp"-->
+    <!--        android:layout_marginRight="70dp"-->
+    <!--        android:autofillHints="" />-->
+
+    <EditText
+        android:id="@+id/latitude_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint=" Insert Latitude"
+        android:gravity="center"
+        android:inputType=""
+        android:textAlignment="center"
+        android:minHeight="48dp"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints="" />
+
+    <EditText
+        android:id="@+id/longitude_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint=" Insert Longitude"
+        android:gravity="center"
+        android:inputType=""
+        android:textAlignment="center"
+        android:minHeight="48dp"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:autofillHints="" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_delete_request"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginTop="10dp"
+        android:text="Delete request"
+        android:textColor="@color/black"
+        android:background="#F44336"
+        android:textSize="20sp"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_back_to_map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="back to Map"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:background="#4CAF50"/>
+
+    <!-- //https://www.youtube.com/watch?v=EhAKZ4UXkFw&ab_channel=tanzTalks.tech-->
+</LinearLayout>
+
+

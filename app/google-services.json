@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "53942321942",
+    "project_id": "giveandtake-31249",
+    "storage_bucket": "giveandtake-31249.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53942321942:android:d2750730b23620fcce8637",
+        "android_client_info": {
+          "package_name": "com.example.giveandtake"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53942321942-bcqa3mfqbuhbvqb96jk3t3jcj5u7dl4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA34H_HU1h_5mmXss6qRnQVBZfveA0eAn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53942321942-bcqa3mfqbuhbvqb96jk3t3jcj5u7dl4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
