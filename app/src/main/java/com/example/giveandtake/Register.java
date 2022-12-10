@@ -69,6 +69,7 @@ public class Register extends AppCompatActivity {
                                 databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
                             }
                             databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+                            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
                             databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
                             //TODO: add check of university email
                             databaseReference.child("users").child(phoneTxt).child("password").setValue(passwordTxt);

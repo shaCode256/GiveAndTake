@@ -13,7 +13,7 @@
         android:layout_marginTop="30dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="My Requests"
+        android:text="View Requests"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textSize="40sp"
@@ -44,6 +44,13 @@
         android:inputType="text"
         android:padding="6dp"
         android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/blockUser"
+        android:text="Block user"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
 
     <Button
         android:id="@+id/showBtn"

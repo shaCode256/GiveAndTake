@@ -54,14 +54,19 @@ public class Login extends AppCompatActivity {
                         assert getPassword != null;
                         if(getPassword.equals(passwordTxt)){
                             //open MapsActivity on success
-                            Intent myIntent = new Intent(Login.this, Map.class);
-                            String isManager= snapshot.child(phoneTxt).child("isManager").getValue(String.class);
-                            myIntent.putExtra("userId",phoneTxt);
-                            myIntent.putExtra("isManager",isManager);
-                            //TODO: add check if a regular user or a manager, and choose which map to forward to
-                            // (will reveal more buttons, forward to other activities)
-                            startActivity(myIntent);
-                            finish();
+                            if (snapshot.child(phoneTxt).child("isBlocked").getValue(String.class).equals("1")){
+                                    Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Intent myIntent = new Intent(Login.this, Map.class);
+                                String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
+                                myIntent.putExtra("userId", phoneTxt);
+                                myIntent.putExtra("isManager", isManager);
+                                //TODO: add check if a regular user or a manager, and choose which map to forward to
+                                // (will reveal more buttons, forward to other activities)
+                                startActivity(myIntent);
+                                finish();
+                            }
                         }
                         else{
                             Toast.makeText(Login.this, "Wrong details. try again?", Toast.LENGTH_SHORT).show();
