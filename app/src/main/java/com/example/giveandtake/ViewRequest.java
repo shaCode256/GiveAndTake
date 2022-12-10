@@ -1,8 +1,5 @@
 package com.example.giveandtake;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,14 +8,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Objects;
 
 public class ViewRequest extends AppCompatActivity {
 
@@ -29,21 +27,18 @@ public class ViewRequest extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_request);
         Intent myIntent = getIntent();
-        String viewer_manager_id = myIntent.getStringExtra("viewer_manager_id");
-        //TODO: fix this bug
         String userId = myIntent.getStringExtra("userId");
         String requestId = myIntent.getStringExtra("requestId");
         String isManager= myIntent.getStringExtra("isManager");
-        String subject= myIntent.getStringExtra("getRequestSubject");
-        String body= myIntent.getStringExtra("getRequestBody");
-        String requestUserId= myIntent.getStringExtra("getRequestUserId");
-        String contactDetails= myIntent.getStringExtra("getContactDetails");
-        String latitude= myIntent.getStringExtra("getRequestLatitude");
-        String longitude= myIntent.getStringExtra("getRequestLongitude");
+        String subject= myIntent.getStringExtra("requestSubject");
+        String body= myIntent.getStringExtra("requestBody");
+        String requestUserId= myIntent.getStringExtra("requestUserId");
+        String contactDetails= myIntent.getStringExtra("contactDetails");
+        String latitude= myIntent.getStringExtra("requestLatitude");
+        String longitude= myIntent.getStringExtra("requestLongitude");
         String docId= myIntent.getStringExtra("docId");
         EditText subjectEditTxt = findViewById(R.id.create_request_input_subject);
         EditText bodyEditTxt = findViewById(R.id.create_request_input_body);
-        //  final EditText location = findViewById(R.id.create_request_input_location_details);
         EditText longitude_inputEditTxt = findViewById(R.id.longitude_input);
         EditText latitude_inputEditTxt = findViewById(R.id.latitude_input);
         EditText contact_detailsEditTxt = findViewById(R.id.create_request_input_contact_details);
@@ -54,7 +49,6 @@ public class ViewRequest extends AppCompatActivity {
         longitude_inputEditTxt.setEnabled(false);
         latitude_inputEditTxt.setEnabled(false);
         contact_detailsEditTxt.setEnabled(false);
-     //   Button btnAddRequest = findViewById(R.id.button_add_request);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
         btnDeleteRequest.setVisibility(View.GONE);
@@ -71,25 +65,14 @@ public class ViewRequest extends AppCompatActivity {
         }
         btnBackToMap.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-            if(viewer_manager_id==null) {
                 mapIntent.putExtra("userId", userId);
                 mapIntent.putExtra("isManager", isManager);
-            }
-            else{
-                mapIntent.putExtra("userId", viewer_manager_id);
-                mapIntent.putExtra("isManager", "1");
-            }
             startActivity(mapIntent);
         });
 
         btnDeleteRequest.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-            if(viewer_manager_id==null) {
                 mapIntent.putExtra("userId", userId);
-            }
-            else{
-                mapIntent.putExtra("userId", viewer_manager_id);
-            }
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //remove requestId from usersDb

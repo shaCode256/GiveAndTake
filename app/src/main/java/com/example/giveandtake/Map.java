@@ -9,14 +9,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,7 +31,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +39,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
@@ -53,7 +51,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> taken_requests_ids = new HashSet<>();
-    Intent thisIntent = getIntent();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @SuppressLint("MissingPermission")
     @Override
@@ -65,24 +62,17 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Button btn_my_requests= findViewById(R.id.btn_my_requests);
         Button log_out_btn= findViewById(R.id.log_out_btn);
         Button manage_users_btn= findViewById(R.id.manage_users_btn);
-        // initializing our firebase FireStore.
         db = FirebaseFirestore.getInstance();
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
         Intent myIntent = getIntent();
+        String userId = myIntent.getStringExtra("userId");
         String isManager= myIntent.getStringExtra("isManager");
         if (isManager!=null &&isManager.equals("0")){
-            //show button to let manager delete the request
             manage_users_btn.setVisibility(View.INVISIBLE);
-            //then import the logic of delete
         }
         create_request_btn.setOnClickListener(view -> {
-            Intent thisIntent = getIntent();
-            String userId = thisIntent.getStringExtra("userId");
-          //  String isManager= thisIntent.getStringExtra("isManager");
-            // open create request activity
             Intent create_request_intent = new Intent(Map.this, RequestCreation.class);
             create_request_intent.putExtra("userId",userId);
             create_request_intent.putExtra("isManager", isManager);
@@ -98,11 +88,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
         manage_users_btn.setOnClickListener(view -> {
             // open Login activity
-            Intent thisIntent = getIntent();
-            String userId = thisIntent.getStringExtra("userId");
             Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
             manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             manage_users_intent.putExtra("userId", userId);
+            manage_users_intent.putExtra("isManager", isManager);
             startActivity(manage_users_intent);
         });
 
@@ -133,12 +122,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         btn_my_requests.setOnClickListener(view -> {
-            // open My Requests activity
-            Intent thisIntent = getIntent();
-            String userId = thisIntent.getStringExtra("userId");
-         //   String isManager = thisIntent.getStringExtra("isManager");
             Intent view_my_requests_intent = new Intent(Map.this, ViewMyRequests.class);
             view_my_requests_intent.putExtra("userId",userId);
+            view_my_requests_intent.putExtra("requestUserId",userId);
             view_my_requests_intent.putExtra("isManager", isManager);
             view_my_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             startActivity(view_my_requests_intent);
@@ -203,6 +189,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             String isManager= thisIntent.getStringExtra("isManager");
             Intent newIntent = new Intent(Map.this, RequestCreation.class);
             newIntent.putExtra("userId",userId);
+            newIntent.putExtra("requestUserId", userId);
             newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
             newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
             newIntent.putExtra("taken_requests_ids", taken_requests_ids);
@@ -223,28 +210,28 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String getRequestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                        String getRequestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String getContactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
-                        String getRequestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        String getRequestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
+                        String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
+                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                        String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                         // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
                     //        Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map. why needed?
                             String docId = markersRequestToDocId.get(requestId);
                             //TODO: add docId to db so we can delete
-                            Intent myIntent = new Intent(Map.this, ViewRequest.class);
-                            myIntent.putExtra("getRequestSubject", getRequestSubject);
-                            myIntent.putExtra("getRequestBody", getRequestBody);
-                            myIntent.putExtra("getContactDetails", getContactDetails);
-                            myIntent.putExtra("getRequestLatitude", getRequestLatitude);
-                            myIntent.putExtra("getRequestLongitude", getRequestLongitude);
-                            myIntent.putExtra("getRequestUserId", requestUserId);
-                            myIntent.putExtra("userId", userId);
-                            myIntent.putExtra("isManager", isManager);
-                            myIntent.putExtra("docId", docId);
-                            myIntent.putExtra("requestId", requestId);
-                            startActivity(myIntent);
+                            Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
+                            viewRequestIntent.putExtra("requestSubject", requestSubject);
+                            viewRequestIntent.putExtra("requestBody", requestBody);
+                            viewRequestIntent.putExtra("contactDetails", contactDetails);
+                            viewRequestIntent.putExtra("requestLatitude", requestLatitude);
+                            viewRequestIntent.putExtra("requestLongitude", requestLongitude);
+                            viewRequestIntent.putExtra("requestUserId", requestUserId);
+                            viewRequestIntent.putExtra("userId", userId);
+                            viewRequestIntent.putExtra("isManager", isManager);
+                            viewRequestIntent.putExtra("docId", docId);
+                            viewRequestIntent.putExtra("requestId", requestId);
+                            startActivity(viewRequestIntent);
                         }
                         else{
                             Toast.makeText(Map.this, "Oops! This request isn't available", Toast.LENGTH_SHORT).show();
@@ -274,8 +261,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 // Explain to the user the importance of accepting
             }
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
     }
 }
 

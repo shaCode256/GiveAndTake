@@ -4,12 +4,9 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -21,9 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Objects;
 
 public class ManageUsers extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
@@ -44,7 +38,7 @@ public class ManageUsers extends ListActivity {
                 listItems);
         setListAdapter(adapter);
         Intent thisIntent = getIntent();
-        String viewer_userId = thisIntent.getStringExtra("userId");
+        String userId = thisIntent.getStringExtra("userId");
         String isManager = thisIntent.getStringExtra("isManager");
         HashMap<String, String> markersRequestToDocId= (HashMap<String, String>)thisIntent.getExtras().getSerializable("markersRequestToDocId");
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -66,24 +60,20 @@ public class ManageUsers extends ListActivity {
         btn_show_users.setOnClickListener(view -> {
             // open Register activity
             addItems(view);
-            //TODO: pass the isManager. or retreive it in map
+            //TODO: pass the isManager. or retrieve it in map
             btn_show_users.setVisibility(View.INVISIBLE);
         });
 
-        usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
+        usersList.setOnItemClickListener((parent, view, position, id) -> {
 
-                String userId= (String) parent.getAdapter().getItem(position);
-                Intent view_requests_intent = new Intent(ManageUsers.this, ViewMyRequests.class);
-                view_requests_intent.putExtra("userId", userId);
-                view_requests_intent.putExtra("isManager", isManager);
-                view_requests_intent.putExtra("viewer_manager_id", viewer_userId);
-                view_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
-                startActivity(view_requests_intent);
-                //               Toast.makeText(ViewMyRequests.this, "entry is: "+entry, Toast.LENGTH_SHORT).show();
-            }
+            String requestUserId= (String) parent.getAdapter().getItem(position);
+            Intent view_requests_intent = new Intent(ManageUsers.this, ViewMyRequests.class);
+            view_requests_intent.putExtra("userId", userId);
+            view_requests_intent.putExtra("isManager", isManager);
+            view_requests_intent.putExtra("requestUserId", requestUserId);
+            view_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(view_requests_intent);
+            //               Toast.makeText(ViewMyRequests.this, "entry is: "+entry, Toast.LENGTH_SHORT).show();
         });
     }
 

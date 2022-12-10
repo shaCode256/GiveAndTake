@@ -4,13 +4,11 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -22,9 +20,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Objects;
 
 public class ViewMyRequests extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
@@ -48,15 +43,15 @@ public class ViewMyRequests extends ListActivity {
         HashMap<String, String> markersRequestToDocId= (HashMap<String, String>)thisIntent.getExtras().getSerializable("markersRequestToDocId");
         String userId = thisIntent.getStringExtra("userId");
         String isManager = thisIntent.getStringExtra("isManager");
-        String viewer_manager_id= thisIntent.getStringExtra("viewer_manager_id");
+        String requestUserId= thisIntent.getStringExtra("requestUserId");
         EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
-        user_id_of_requestEditTxt.setText(userId, TextView.BufferType.EDITABLE);
+        user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
         user_id_of_requestEditTxt.setEnabled(false);
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    for(DataSnapshot d : dataSnapshot.child(userId).child("requestId").getChildren()) {
+                    for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").getChildren()) {
                         requestsIds.add(d.getKey());
                        // Toast.makeText(ViewMyRequests.this, "list is: "+requestsIds.toString(), Toast.LENGTH_SHORT).show();
                     }
@@ -72,7 +67,7 @@ public class ViewMyRequests extends ListActivity {
         btn_show_requests.setOnClickListener(view -> {
             // open Register activity
             addItems(view);
-            //TODO: pass the isManager. or retreive it in map
+            //TODO: pass the isManager. or retrieve it in map
             btn_show_requests.setVisibility(View.INVISIBLE);
                 });
 
@@ -83,33 +78,29 @@ public class ViewMyRequests extends ListActivity {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String getRequestSubject = snapshot.child(userId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                        String getRequestBody = snapshot.child(userId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String getContactDetails = snapshot.child(userId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
-                        String getRequestLatitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        String getRequestLongitude = String.valueOf(snapshot.child(userId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        Intent thisIntent1 = getIntent();
-                        Intent myIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
-                        myIntent.putExtra("getRequestSubject",getRequestSubject);
-                        myIntent.putExtra("getRequestBody", getRequestBody);
-                        myIntent.putExtra("getContactDetails", getContactDetails);
-                        myIntent.putExtra("getRequestLatitude", getRequestLatitude);
-                        myIntent.putExtra("getRequestLongitude", getRequestLongitude);
-                        myIntent.putExtra("userId", userId);
-                        myIntent.putExtra("getRequestUserId", userId);
-                        myIntent.putExtra("isManager", isManager);
-                        myIntent.putExtra("docId", docId);
-                        myIntent.putExtra("requestId", requestId);
-                        myIntent.putExtra("viewer_manager_id",viewer_manager_id);
-                        //TODO: explain or find another solution to when a manager watches other users requests
-                        startActivity(myIntent);
+                        String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
+                        String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
+                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                        String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        Intent viewRequestIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
+                        viewRequestIntent.putExtra("requestSubject",requestSubject);
+                        viewRequestIntent.putExtra("requestBody", requestBody);
+                        viewRequestIntent.putExtra("contactDetails", contactDetails);
+                        viewRequestIntent.putExtra("requestLatitude", requestLatitude);
+                        viewRequestIntent.putExtra("requestLongitude", requestLongitude);
+                        viewRequestIntent.putExtra("userId", userId);
+                        viewRequestIntent.putExtra("requestUserId", requestUserId);
+                        viewRequestIntent.putExtra("isManager", isManager);
+                        viewRequestIntent.putExtra("docId", docId);
+                        viewRequestIntent.putExtra("requestId", requestId);
+                        startActivity(viewRequestIntent);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                     }
                 });
             }
-//               Toast.makeText(ViewMyRequests.this, "entry is: "+entry, Toast.LENGTH_SHORT).show();
         });
     }
 

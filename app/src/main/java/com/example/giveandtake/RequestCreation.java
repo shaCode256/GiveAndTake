@@ -5,13 +5,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -19,9 +18,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,7 +33,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    //TODO: read it from stored cloud
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,7 @@ public class RequestCreation extends AppCompatActivity {
         Intent mIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
         String userId = mIntent.getStringExtra("userId");
+        String requestUserId = mIntent.getStringExtra("requestUserId");
         String isManager = mIntent.getStringExtra("isManager");
         String clickedLat = mIntent.getStringExtra("clickedLat");
         String clickedLong = mIntent.getStringExtra("clickedLong");
@@ -93,12 +90,12 @@ public class RequestCreation extends AppCompatActivity {
                 //TODO: add check that this is a numeric value! the text we insert
                 boolean numeric = true;
                 try {
-                    Double num = Double.parseDouble(longitudeTxt);
+                    Double.parseDouble(longitudeTxt);
                 } catch (NumberFormatException e) {
                     numeric = false;
                 }
                 try {
-                    Double num = Double.parseDouble(latitudeTxt);
+                    Double.parseDouble(latitudeTxt);
                 } catch (NumberFormatException e) {
                     numeric = false;
                 }
@@ -106,11 +103,11 @@ public class RequestCreation extends AppCompatActivity {
                     double doubleLongitude = Double.parseDouble(longitudeTxt); // returns double primitive
                     double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                     if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
-                        //check valid latitude and longtitude input
+                        //check valid latitude and longitude input
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
                         user.put("geoPoint", geoPointRequest);
                         user.put("requestId", setRequestId);
-                        user.put("userId", userId);
+                        user.put("userId", requestUserId);
                         user.put("isManager", isManager);
                         markersDb.collection("MapsData")
                                 .add(user)
@@ -125,10 +122,10 @@ public class RequestCreation extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 //check if mobile/phone exists in db
-                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
-                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
-                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
-                                databaseReference.child("users").child(userId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
                                 //   }
                             }
 
@@ -143,11 +140,11 @@ public class RequestCreation extends AppCompatActivity {
                         startActivity(myIntent);
                     }
                     else{
-                        Toast.makeText(RequestCreation.this, "Please fill in valid longtitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else{
-                    Toast.makeText(RequestCreation.this, "Please fill in valid longtitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -166,17 +163,14 @@ public class RequestCreation extends AppCompatActivity {
                 FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                     usedLocationClient.getLastLocation();
                     usedLocationClient.getLastLocation()
-                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                // Got last known location. In some rare situations this can be null.
-                                if (location != null) {
-                                    longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                    latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
-                                }
-                                else{
-                                    Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                                }
+                        .addOnSuccessListener(this, location -> {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                            }
+                            else{
+                                Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
                             }
                         });
             }
