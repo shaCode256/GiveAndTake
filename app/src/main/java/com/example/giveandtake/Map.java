@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +25,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,6 +35,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -106,16 +112,19 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         Manifest.permission.ACCESS_FINE_LOCATION}, 90);
             }
             else{
-                FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                usedLocationClient.getLastLocation();
-                usedLocationClient.getLastLocation()
-                        .addOnSuccessListener(this, location -> {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17.0f));
-                            }
-                            else{
-                                Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+                        .addOnSuccessListener(Map.this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17.0f));
+                                }
+                                else{
+                                    Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
             }
@@ -267,3 +276,4 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
 //https://firebase.google.com/docs/firestore/query-data/listen
 //https://stackoverflow.com/questions/52389072/google-maps-custom-marker-too-large
+//https://stackoverflow.com/questions/72159435/how-to-get-location-using-fusedlocationclient-getcurrentlocation-method-in-kot/74254933#74254933

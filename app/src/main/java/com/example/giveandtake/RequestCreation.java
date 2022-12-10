@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,11 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -160,19 +166,22 @@ public class RequestCreation extends AppCompatActivity {
                             Manifest.permission.ACCESS_FINE_LOCATION}, 90);
                 }
             else{
-                FusedLocationProviderClient usedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                    usedLocationClient.getLastLocation();
-                    usedLocationClient.getLastLocation()
-                        .addOnSuccessListener(this, location -> {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
-                            }
-                            else{
-                                Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+                            .addOnSuccessListener(RequestCreation.this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                        latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                                    }
+                                    else{
+                                        Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
             }
         });
 
