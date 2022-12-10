@@ -53,6 +53,13 @@
         />
 
     <Button
+        android:id="@+id/unblockUser"
+        android:text="Unblock user"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
         android:id="@+id/showBtn"
         android:text="Show requests"
         android:layout_width="fill_parent"

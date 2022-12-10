@@ -36,6 +36,7 @@ public class ViewMyRequests extends ListActivity {
         setContentView(R.layout.activity_view_my_requests);
         Button btn_show_requests= findViewById(R.id.showBtn);
         Button btn_block_user= findViewById(R.id.blockUser);
+        Button btn_unblock_user= findViewById(R.id.unblockUser);
         ListView requestsList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
@@ -48,6 +49,7 @@ public class ViewMyRequests extends ListActivity {
         String requestUserId= thisIntent.getStringExtra("requestUserId");
         if (isManager!=null &&isManager.equals("0") || requestUserId.equals(userId)){
             btn_block_user.setVisibility(View.INVISIBLE);
+            btn_unblock_user.setVisibility(View.INVISIBLE);
         }
         EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
         user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
@@ -70,15 +72,12 @@ public class ViewMyRequests extends ListActivity {
         });
 
         btn_show_requests.setOnClickListener(view -> {
-            // open Register activity
             addItems(view);
             //TODO: pass the isManager. or retrieve it in map
             btn_show_requests.setVisibility(View.INVISIBLE);
         });
 
         btn_block_user.setOnClickListener(view -> {
-                    // open Register activity
-                    //TODO: pass the isManager. or retrieve it in map
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -96,6 +95,23 @@ public class ViewMyRequests extends ListActivity {
                     });
                 });
 
+        btn_unblock_user.setOnClickListener(view -> {
+            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    //check if phone is not registered before
+                    if (snapshot.hasChild(requestUserId)) {
+                        Toast.makeText(ViewMyRequests.this, "Unblocking is done", Toast.LENGTH_SHORT).show();
+                        databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("0");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        });
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestId= (String) parent.getAdapter().getItem(position);
             String docId= markersRequestToDocId.get(requestId);
