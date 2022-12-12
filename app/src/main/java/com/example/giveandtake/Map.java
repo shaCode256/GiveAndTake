@@ -9,9 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,7 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -87,13 +83,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         log_out_btn.setOnClickListener(view -> {
-            // open Login activity
             Intent login_intent = new Intent(Map.this, Login.class);
             startActivity(login_intent);
         });
 
         manage_users_btn.setOnClickListener(view -> {
-            // open Login activity
             Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
             manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             manage_users_intent.putExtra("userId", userId);
@@ -102,7 +96,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         btn_locate_me.setOnClickListener(v -> {
-            //TODO: add tracking location ability
             if (
                     ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                             ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -115,16 +108,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
-                        .addOnSuccessListener(Map.this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                // Got last known location. In some rare situations this can be null.
-                                if (location != null) {
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17.0f));
-                                }
-                                else{
-                                    Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                                }
+                        .addOnSuccessListener(Map.this, location -> {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17.0f));
+                            }
+                            else{
+                                Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
                             }
                         });
             }
@@ -207,14 +197,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         mMap.setOnMarkerClickListener(marker -> {
-            // marker.remove(); //removes marker by clicking on it
             String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             Intent thisIntent = getIntent();
             String requestId= marker.getTitle();
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");
-            //removes a marker by it's unique requestId
-            //removes the docId of the marker from the db
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -226,9 +213,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                         // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
-                    //        Objects.requireNonNull(markersHashmap.get(requestId)).remove(); //deletes from map. why needed?
                             String docId = markersRequestToDocId.get(requestId);
-                            //TODO: add docId to db so we can delete
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
                             viewRequestIntent.putExtra("requestSubject", requestSubject);
                             viewRequestIntent.putExtra("requestBody", requestBody);

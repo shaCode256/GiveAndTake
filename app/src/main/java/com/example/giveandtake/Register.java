@@ -88,7 +88,6 @@ public class Register extends AppCompatActivity {
         });
 
         loginNowBtn.setOnClickListener(view -> {
-            // open Register activity
             startActivity(new Intent(Register.this, Login.class));
         });
     }

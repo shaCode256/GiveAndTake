@@ -16,6 +16,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class Login extends AppCompatActivity {
 
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
@@ -54,7 +56,7 @@ public class Login extends AppCompatActivity {
                         assert getPassword != null;
                         if(getPassword.equals(passwordTxt)){
                             //open MapsActivity on success
-                            if (snapshot.child(phoneTxt).child("isBlocked").getValue(String.class).equals("1")){
+                            if (Objects.requireNonNull(snapshot.child(phoneTxt).child("isBlocked").getValue(String.class)).equals("1")){
                                     Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show();
                             }
                             else {
@@ -62,8 +64,6 @@ public class Login extends AppCompatActivity {
                                 String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
                                 myIntent.putExtra("userId", phoneTxt);
                                 myIntent.putExtra("isManager", isManager);
-                                //TODO: add check if a regular user or a manager, and choose which map to forward to
-                                // (will reveal more buttons, forward to other activities)
                                 startActivity(myIntent);
                                 finish();
                             }

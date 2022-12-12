@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,10 +19,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +50,6 @@ public class RequestCreation extends AppCompatActivity {
         setContentView(R.layout.activity_request_creation);
         EditText subject = findViewById(R.id.create_request_input_subject);
         EditText body = findViewById(R.id.create_request_input_body);
-        //  final EditText location = findViewById(R.id.create_request_input_location_details);
         EditText longitude_input = findViewById(R.id.longitude_input);
         EditText latitude_input = findViewById(R.id.latitude_input);
         EditText contact_details = findViewById(R.id.create_request_input_contact_details);
@@ -68,7 +63,6 @@ public class RequestCreation extends AppCompatActivity {
         btnAddRequest.setOnClickListener(v -> {
             String subjectTxt = subject.getText().toString();
             String bodyTxt = body.getText().toString();
-            //  final String locationTxt = location.getText().toString();
             //TODO: deal with converting double and string, also with intents. try to avoid some conversions
             String longitudeTxt = longitude_input.getText().toString();
             String latitudeTxt = latitude_input.getText().toString();
@@ -77,23 +71,19 @@ public class RequestCreation extends AppCompatActivity {
             String setRequestId = String.valueOf(randomNum);
             //to avoid repeating the same requestId
             HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
-          //  Toast.makeText(RequestCreation.this, "Our HashSet: "+taken_requests_ids.toString(), Toast.LENGTH_SHORT).show();
             while (taken_requests_ids.contains(setRequestId)){
                 //change until it's a new request number
                 randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
                 setRequestId = String.valueOf(randomNum);
             }
-         //   Toast.makeText(RequestCreation.this, "Request Num: "+setRequestId, Toast.LENGTH_SHORT).show();
             if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contact_detailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
-                // Toast.makeText(RequestCreation.this, "Adding your request", Toast.LENGTH_SHORT).show();
                 // Add a new marker with the request ID
                 //add to markersDb this location
                 // Add a new document with a generated ID
                 // Create a new user with a first, middle, and last name
                 HashMap<String, Object> user = new HashMap<>();
-                //TODO: add check that this is a numeric value! the text we insert
                 boolean numeric = true;
                 try {
                     Double.parseDouble(longitudeTxt);
@@ -118,10 +108,8 @@ public class RequestCreation extends AppCompatActivity {
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
-                                    //     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                                 })
                                 .addOnFailureListener(e -> {
-                                    //         Log.w(TAG, "Error adding document", e);
                                 });
                         String finalSetRequestId = setRequestId;
                         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -156,7 +144,6 @@ public class RequestCreation extends AppCompatActivity {
         });
 
         addCurrLocation.setOnClickListener(v -> {
-            //TODO: add tracking location ability
                 if (
                         ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                                 ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -169,17 +156,14 @@ public class RequestCreation extends AppCompatActivity {
                     FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                     CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                     fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
-                            .addOnSuccessListener(RequestCreation.this, new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    // Got last known location. In some rare situations this can be null.
-                                    if (location != null) {
-                                        longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                        latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
-                                    }
-                                    else{
-                                        Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                                    }
+                            .addOnSuccessListener(RequestCreation.this, location -> {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                    latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                                }
+                                else{
+                                    Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
                                 }
                             });
             }

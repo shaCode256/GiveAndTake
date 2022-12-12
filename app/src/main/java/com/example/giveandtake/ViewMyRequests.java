@@ -60,7 +60,6 @@ public class ViewMyRequests extends ListActivity {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").getChildren()) {
                         requestsIds.add(d.getKey());
-                       // Toast.makeText(ViewMyRequests.this, "list is: "+requestsIds.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }//onDataChange
@@ -77,41 +76,37 @@ public class ViewMyRequests extends ListActivity {
             btn_show_requests.setVisibility(View.INVISIBLE);
         });
 
-        btn_block_user.setOnClickListener(view -> {
-                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            //check if phone is not registered before
-                            if (snapshot.hasChild(requestUserId)) {
-                                Toast.makeText(ViewMyRequests.this, "Blocking is done", Toast.LENGTH_SHORT).show();
-                                databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("1");
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                });
-
-        btn_unblock_user.setOnClickListener(view -> {
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    //check if phone is not registered before
-                    if (snapshot.hasChild(requestUserId)) {
-                        Toast.makeText(ViewMyRequests.this, "Unblocking is done", Toast.LENGTH_SHORT).show();
-                        databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("0");
-                    }
+        btn_block_user.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //check if phone is not registered before
+                if (snapshot.hasChild(requestUserId)) {
+                    Toast.makeText(ViewMyRequests.this, "Blocking is done", Toast.LENGTH_SHORT).show();
+                    databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("1");
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        }));
+
+        btn_unblock_user.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //check if phone is not registered before
+                if (snapshot.hasChild(requestUserId)) {
+                    Toast.makeText(ViewMyRequests.this, "Unblocking is done", Toast.LENGTH_SHORT).show();
+                    databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("0");
                 }
-            });
-        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        }));
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestId= (String) parent.getAdapter().getItem(position);
             String docId= markersRequestToDocId.get(requestId);
