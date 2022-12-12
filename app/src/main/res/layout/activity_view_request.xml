@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:fillViewport="false">
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -133,21 +139,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textStyle="bold"/>
 
-    <!--    <EditText-->
-    <!--        android:id="@+id/create_request_input_location_details"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:hint=" Where?"-->
-    <!--        android:gravity="center"-->
-    <!--        android:inputType=""-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:minHeight="48dp"-->
-    <!--        android:padding="6dp"-->
-    <!--        android:textSize="20sp"-->
-    <!--        android:layout_marginLeft="70dp"-->
-    <!--        android:layout_marginRight="70dp"-->
-    <!--        android:autofillHints="" />-->
-
     <EditText
         android:id="@+id/latitude_input"
         android:layout_width="wrap_content"
@@ -203,7 +194,43 @@
         android:textColor="@color/white"
         android:background="#4CAF50"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_view_joiners"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="View joiners"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:background="#2196F3"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_join_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Join request"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:background="#2196F3"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_unjoin_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Unjoin request"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:background="#2196F3"/>
+
     <!-- //https://www.youtube.com/watch?v=EhAKZ4UXkFw&ab_channel=tanzTalks.tech-->
 </LinearLayout>
-
+    </ScrollView>
 

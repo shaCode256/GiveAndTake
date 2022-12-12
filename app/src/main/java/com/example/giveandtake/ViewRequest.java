@@ -50,6 +50,9 @@ public class ViewRequest extends AppCompatActivity {
         contact_detailsEditTxt.setEnabled(false);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
+        Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
+        Button btnJoinRequest = findViewById(R.id.btn_join_request);
+        Button btnUnjoinRequest = findViewById(R.id.btn_unjoin_request);
         btnDeleteRequest.setVisibility(View.GONE);
         subjectEditTxt.setText(subject, TextView.BufferType.EDITABLE);
         bodyEditTxt.setText(body, TextView.BufferType.EDITABLE);
@@ -58,10 +61,19 @@ public class ViewRequest extends AppCompatActivity {
         longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
         user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
         btnDeleteRequest.setVisibility(View.INVISIBLE);
+        btnViewJoiners.setVisibility(View.INVISIBLE);
         if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId) )
         {
+            //if I'm a manager, or it's my request
             btnDeleteRequest.setVisibility(View.VISIBLE);
+            btnViewJoiners.setVisibility(View.VISIBLE);
+
+            if(requestUserId!=null && requestUserId.equals(userId)){
+            btnUnjoinRequest.setVisibility(View.INVISIBLE);
+            btnJoinRequest.setVisibility(View.INVISIBLE);
         }
+        }
+
         btnBackToMap.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
                 mapIntent.putExtra("userId", userId);
@@ -71,7 +83,7 @@ public class ViewRequest extends AppCompatActivity {
 
         btnDeleteRequest.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-                mapIntent.putExtra("userId", userId);
+            mapIntent.putExtra("userId", userId);
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //remove requestId from usersDb
@@ -88,6 +100,44 @@ public class ViewRequest extends AppCompatActivity {
                 });
             }
             startActivity(mapIntent);
+        });
+
+        btnJoinRequest.setOnClickListener(v -> {
+                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        assert requestUserId != null;
+                       // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
+                        String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
+                        //TODO: maybe add contact details
+                        databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contact_details").setValue(joinerContactDetails);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+        });
+
+        btnUnjoinRequest.setOnClickListener(v -> {
+            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    assert requestUserId != null;
+                    databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        });
+
+        btnViewJoiners.setOnClickListener(v -> {
+            Intent viewJoinersIntent = new Intent(ViewRequest.this, ViewJoiners.class);
+            viewJoinersIntent.putExtra("requestUserId", requestUserId);
+            viewJoinersIntent.putExtra("requestId", requestId);
+            viewJoinersIntent.putExtra("userId", userId);
+            viewJoinersIntent.putExtra("isManager", isManager);
+            startActivity(viewJoinersIntent);
         });
     }
 }
