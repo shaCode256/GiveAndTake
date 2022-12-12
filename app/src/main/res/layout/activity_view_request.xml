@@ -216,7 +216,7 @@
         android:textSize="20sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
-        android:background="#2196F3"/>
+        android:background="#9C27B0"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_unjoin_request"
@@ -228,7 +228,7 @@
         android:textSize="20sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
-        android:background="#2196F3"/>
+        android:background="#FF9800"/>
 
     <!-- //https://www.youtube.com/watch?v=EhAKZ4UXkFw&ab_channel=tanzTalks.tech-->
 </LinearLayout>

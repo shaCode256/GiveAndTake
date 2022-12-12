@@ -68,7 +68,7 @@ public class ViewJoiners extends ListActivity {
         btn_show_joiners.setOnClickListener(view -> {
             addItems(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_joiners.setVisibility(View.INVISIBLE);
+            btn_show_joiners.setVisibility(View.GONE);
         });
     }
 

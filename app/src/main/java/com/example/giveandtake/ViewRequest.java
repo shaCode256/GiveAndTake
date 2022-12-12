@@ -60,8 +60,8 @@ public class ViewRequest extends AppCompatActivity {
         latitude_inputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
         longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
         user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
-        btnDeleteRequest.setVisibility(View.INVISIBLE);
-        btnViewJoiners.setVisibility(View.INVISIBLE);
+        btnDeleteRequest.setVisibility(View.GONE);
+        btnViewJoiners.setVisibility(View.GONE);
         if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId) )
         {
             //if I'm a manager, or it's my request
@@ -69,8 +69,8 @@ public class ViewRequest extends AppCompatActivity {
             btnViewJoiners.setVisibility(View.VISIBLE);
 
             if(requestUserId!=null && requestUserId.equals(userId)){
-            btnUnjoinRequest.setVisibility(View.INVISIBLE);
-            btnJoinRequest.setVisibility(View.INVISIBLE);
+            btnUnjoinRequest.setVisibility(View.GONE);
+            btnJoinRequest.setVisibility(View.GONE);
         }
         }
 

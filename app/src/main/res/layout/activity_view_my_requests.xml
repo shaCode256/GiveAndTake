@@ -45,18 +45,20 @@
         android:padding="6dp"
         android:textSize="20sp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/blockUser"
         android:text="Block user"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="#FF5722"
         />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/unblockUser"
         android:text="Unblock user"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="#8BC34A"
         />
 
     <Button

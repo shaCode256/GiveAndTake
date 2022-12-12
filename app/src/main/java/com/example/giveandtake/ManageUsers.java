@@ -60,7 +60,7 @@ public class ManageUsers extends ListActivity {
         btn_show_users.setOnClickListener(view -> {
             // open Register activity
             addItems(view);
-            btn_show_users.setVisibility(View.INVISIBLE);
+            btn_show_users.setVisibility(View.GONE);
         });
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {

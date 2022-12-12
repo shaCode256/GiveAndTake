@@ -72,7 +72,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         String userId = myIntent.getStringExtra("userId");
         String isManager= myIntent.getStringExtra("isManager");
         if (isManager!=null &&isManager.equals("0")){
-            manage_users_btn.setVisibility(View.INVISIBLE);
+            manage_users_btn.setVisibility(View.GONE);
         }
         create_request_btn.setOnClickListener(view -> {
             Intent create_request_intent = new Intent(Map.this, RequestCreation.class);

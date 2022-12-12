@@ -48,8 +48,8 @@ public class ViewMyRequests extends ListActivity {
         String isManager = thisIntent.getStringExtra("isManager");
         String requestUserId= thisIntent.getStringExtra("requestUserId");
         if (isManager!=null &&isManager.equals("0") || requestUserId.equals(userId)){
-            btn_block_user.setVisibility(View.INVISIBLE);
-            btn_unblock_user.setVisibility(View.INVISIBLE);
+            btn_block_user.setVisibility(View.GONE);
+            btn_unblock_user.setVisibility(View.GONE);
         }
         EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
         user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
@@ -73,7 +73,7 @@ public class ViewMyRequests extends ListActivity {
         btn_show_requests.setOnClickListener(view -> {
             addItems(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_requests.setVisibility(View.INVISIBLE);
+            btn_show_requests.setVisibility(View.GONE);
         });
 
         btn_block_user.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {

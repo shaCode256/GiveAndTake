@@ -111,21 +111,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textStyle="bold"/>
 
-<!--    <EditText-->
-<!--        android:id="@+id/create_request_input_location_details"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:hint=" Where?"-->
-<!--        android:gravity="center"-->
-<!--        android:inputType=""-->
-<!--        android:textAlignment="center"-->
-<!--        android:minHeight="48dp"-->
-<!--        android:padding="6dp"-->
-<!--        android:textSize="20sp"-->
-<!--        android:layout_marginLeft="70dp"-->
-<!--        android:layout_marginRight="70dp"-->
-<!--        android:autofillHints="" />-->
-
     <EditText
         android:id="@+id/latitude_input"
         android:layout_width="wrap_content"
