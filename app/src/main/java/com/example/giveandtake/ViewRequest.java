@@ -17,6 +17,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+
 public class ViewRequest extends AppCompatActivity {
 
     @Override
@@ -86,13 +88,33 @@ public class ViewRequest extends AppCompatActivity {
             mapIntent.putExtra("userId", userId);
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
-            //remove requestId from usersDb
+            //remove this request from all it's joiners list of joined requests
             if(requestId!=null) {
+                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            //go through all joiners of this request
+                            for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("joiners").getChildren()) {
+                                String joinerId= (d.getKey());
+                                //delete requestId from joiner's list
+                                databaseReference.child("users").child(joinerId).child("requestsUserJoined").child(requestId).getRef().removeValue();
+                            }
+                        }
+                    }//onDataChange
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }//onCancelled
+                });
+                //remove requestId from usersDb
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         assert requestUserId != null;
                         snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
+
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -125,7 +147,7 @@ public class ViewRequest extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     assert requestUserId != null;
                     databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
-                    databaseReference.child("users").child(userId).child("RequestsUserJoined").child(requestId).getRef().removeValue();
+                    databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).getRef().removeValue();
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {

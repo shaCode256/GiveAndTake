@@ -35,7 +35,6 @@ public class ViewJoiners extends ListActivity {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_joiners);
         Button btn_show_joiners= findViewById(R.id.showBtn);
-        ListView requestsList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 listItems);
