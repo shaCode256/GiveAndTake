@@ -111,6 +111,7 @@ public class ViewRequest extends AppCompatActivity {
                         String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
                         //TODO: maybe add contact details
                         databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contact_details").setValue(joinerContactDetails);
+                        databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -124,6 +125,7 @@ public class ViewRequest extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     assert requestUserId != null;
                     databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
+                    databaseReference.child("users").child(userId).child("RequestsUserJoined").child(requestId).getRef().removeValue();
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {

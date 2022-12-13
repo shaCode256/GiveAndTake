@@ -58,21 +58,19 @@ public class ManageUsers extends ListActivity {
         });
 
         btn_show_users.setOnClickListener(view -> {
-            // open Register activity
             addItems(view);
             btn_show_users.setVisibility(View.GONE);
         });
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {
-
             String requestUserId= (String) parent.getAdapter().getItem(position);
             Intent view_requests_intent = new Intent(ManageUsers.this, ViewMyRequests.class);
             view_requests_intent.putExtra("userId", userId);
             view_requests_intent.putExtra("isManager", isManager);
+            view_requests_intent.putExtra("managerWatching", "1");
             view_requests_intent.putExtra("requestUserId", requestUserId);
             view_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             startActivity(view_requests_intent);
-            //               Toast.makeText(ViewMyRequests.this, "entry is: "+entry, Toast.LENGTH_SHORT).show();
         });
     }
 

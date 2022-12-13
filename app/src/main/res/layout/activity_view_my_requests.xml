@@ -62,8 +62,15 @@
         />
 
     <Button
-        android:id="@+id/showBtn"
-        android:text="Show requests"
+        android:id="@+id/showMyOpenRequestsBtn"
+        android:text="Show my open requests"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/showRequestsIJoinedBtn"
+        android:text="Show requests I joined"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         />
