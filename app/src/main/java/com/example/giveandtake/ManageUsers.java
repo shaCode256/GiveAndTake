@@ -25,7 +25,8 @@ public class ManageUsers extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    ArrayList<String> usersIds= new ArrayList<>();
+    ArrayList<String> usersInfo= new ArrayList<>();
+    HashMap<String, String> usersInfoToId= new HashMap<>();
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -46,7 +47,8 @@ public class ManageUsers extends ListActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot d : dataSnapshot.getChildren()) {
-                        usersIds.add(d.getKey());
+                        usersInfo.add("Name: "+dataSnapshot.child(d.getKey()).child("fullName").getValue().toString()+" | Phone number: "+d.getKey());
+                        usersInfoToId.put("Name: "+dataSnapshot.child(d.getKey()).child("fullName").getValue().toString()+" | Phone number: "+d.getKey(), d.getKey());
                     }
                 }
             }//onDataChange
@@ -63,7 +65,8 @@ public class ManageUsers extends ListActivity {
         });
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {
-            String requestUserId= (String) parent.getAdapter().getItem(position);
+            String requestUserInfo= (String) parent.getAdapter().getItem(position);
+            String requestUserId= usersInfoToId.get(requestUserInfo);
             Intent view_requests_intent = new Intent(ManageUsers.this, ViewMyRequests.class);
             view_requests_intent.putExtra("userId", userId);
             view_requests_intent.putExtra("isManager", isManager);
@@ -79,7 +82,7 @@ public class ManageUsers extends ListActivity {
     public void addItems(View v) {
         //bug that addEventListener executes after this listItem.AddAll,
         // is fixed by putting addEventListener on create function
-        listItems.addAll(usersIds);
+        listItems.addAll(usersInfo);
         adapter.notifyDataSetChanged();
     }
 }

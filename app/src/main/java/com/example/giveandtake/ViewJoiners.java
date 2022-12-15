@@ -28,8 +28,7 @@ public class ViewJoiners extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    ArrayList<String> requestsIds= new ArrayList<>();
-
+    ArrayList<String> joinersInfo= new ArrayList<>();
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -53,7 +52,7 @@ public class ViewJoiners extends ListActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("joiners").getChildren()) {
-                        requestsIds.add(d.getKey());
+                        joinersInfo.add("Name: "+dataSnapshot.child(d.getKey()).child("fullName").getValue().toString()+" | Phone number: "+d.getKey());
                     }
                 }
             }//onDataChange
@@ -71,12 +70,11 @@ public class ViewJoiners extends ListActivity {
         });
     }
 
-
     //METHOD WHICH WILL HANDLE DYNAMIC INSERTION
     public void addItems(View v) {
         //bug that addEventListener executes after this listItem.AddAll,
         // is fixed by putting addEventListener on create function
-        listItems.addAll(requestsIds);
+        listItems.addAll(joinersInfo);
         adapter.notifyDataSetChanged();
     }
 }

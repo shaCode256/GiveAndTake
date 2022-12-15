@@ -4,22 +4,23 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Register extends AppCompatActivity {
-
-    //create object of DatabaseReference class to access firebase's Realtime Database
-
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     @Override
@@ -41,6 +42,10 @@ public class Register extends AppCompatActivity {
             String phoneTxt = phone.getText().toString();
             String passwordTxt = password.getText().toString();
             String conPasswordTxt = conPassword.getText().toString();
+            // check valid email is given
+            String regex = "^(.+)@(.+)$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher emailMatcher = pattern.matcher(emailTxt);
             //check if user fills all the fields before sending data to Firebase
             if(fullNameTxt.isEmpty() || emailTxt.isEmpty() || phoneTxt.isEmpty()){
                 Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
@@ -49,6 +54,12 @@ public class Register extends AppCompatActivity {
             //if not matching, show a toast message
             else if(!passwordTxt.equals(conPasswordTxt)){
                 Toast.makeText(Register.this, "Passwords are not matching", Toast.LENGTH_SHORT).show();
+            }
+            else if (!emailMatcher.matches()) {
+                Toast.makeText(Register.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+            }
+            else if(!phoneTxt.matches("[0-9]+")){
+                Toast.makeText(Register.this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
             }
             else{
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -62,10 +73,20 @@ public class Register extends AppCompatActivity {
                             //sending data to firebase Realtime Database
                             // we are using phone number as unique identifier of every user
                             // so all the other details of user comes under phone number
-                            if(emailTxt.endsWith("@manager.com")) {
-                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+                            int leftLimit = 97; // letter 'a'
+                            int rightLimit = 122; // letter 'z'
+                            int targetStringLength = 10;
+                            Random random = new Random();
+                            String generatedString = null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                generatedString = random.ints(leftLimit, rightLimit + 1)
+                                        .limit(targetStringLength)
+                                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                                        .toString();
                             }
-                            else{
+                            if (emailTxt.endsWith("@manager.com")) {
+                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+                            } else {
                                 databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
                             }
                             databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
@@ -77,7 +98,8 @@ public class Register extends AppCompatActivity {
                             Toast.makeText(Register.this, "user registered successfully.", Toast.LENGTH_SHORT).show();
                             finish();
                         }
-                    }
+                        }
+
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
