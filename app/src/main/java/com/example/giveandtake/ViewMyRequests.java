@@ -28,10 +28,11 @@ public class ViewMyRequests extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    ArrayList<String> myOpenRequestsIds= new ArrayList<>();
-    ArrayList<String> requestsUserJoinedIds= new ArrayList<>();
+    ArrayList<String> myOpenRequestsInfos= new ArrayList<>();
+    ArrayList<String> requestsUserJoinedInfos= new ArrayList<>();
+    HashMap<String, String> requestsInfosToId= new HashMap<>();
+
     int openOrJoinedFlag=0;
-    int managerWatching=0;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -63,10 +64,22 @@ public class ViewMyRequests extends ListActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").getChildren()) {
-                        myOpenRequestsIds.add(d.getKey());
+                        String requestId= d.getKey();
+                        assert requestId != null;
+                        if( dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue()!=null) {
+                            String requestSubject = dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue().toString();
+                            myOpenRequestsInfos.add("Subject: " + requestSubject + " | Request Id: " + requestId);
+                            requestsInfosToId.put("Subject: " + requestSubject + " | Request Id: " + requestId, requestId);
+                        }
                     }
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestsUserJoined").getChildren()) {
-                        requestsUserJoinedIds.add(d.getKey());
+                        String requestId= d.getKey();
+                        if(dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue()!=null) {
+                            String creator_of_request_user_joined = dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue().toString();
+                            String requestSubject = dataSnapshot.child(creator_of_request_user_joined).child("requestId").child(requestId).child("subject").getValue().toString();
+                            requestsUserJoinedInfos.add("Subject: "+requestSubject + " | Request Id: " + requestId);
+                            requestsInfosToId.put("Subject: "+requestSubject + " | Request Id: " + requestId, requestId);
+                        }
                     }
                 }
             }//onDataChange
@@ -123,7 +136,8 @@ public class ViewMyRequests extends ListActivity {
             }
         }));
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
-            String requestId= (String) parent.getAdapter().getItem(position);
+            String requestInfo= (String) parent.getAdapter().getItem(position);
+            String requestId= requestsInfosToId.get(requestInfo);
             String docId= markersRequestToDocId.get(requestId);
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -142,6 +156,7 @@ public class ViewMyRequests extends ListActivity {
                         }
                         //else, it's open requests of a user, that the user opened, and it's requestUserId
                         //TODO: fix this messy implementation
+                        assert finalRequestUserId != null;
                         String requestSubject = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String requestBody = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
                         String contactDetails = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
@@ -175,7 +190,7 @@ public class ViewMyRequests extends ListActivity {
         // is fixed by putting addEventListener on create function
         openOrJoinedFlag=0;
         listItems.clear();
-        listItems.addAll(myOpenRequestsIds);
+        listItems.addAll(myOpenRequestsInfos);
         adapter.notifyDataSetChanged();
     }
 
@@ -184,7 +199,7 @@ public class ViewMyRequests extends ListActivity {
         // is fixed by putting addEventListener on create function
         openOrJoinedFlag=1;
         listItems.clear();
-        listItems.addAll(requestsUserJoinedIds);
+        listItems.addAll(requestsUserJoinedInfos);
         adapter.notifyDataSetChanged();
     }
 }
