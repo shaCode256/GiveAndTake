@@ -11,6 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,7 +29,7 @@ import java.util.regex.Pattern;
 
 public class Register extends AppCompatActivity {
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-
+    private FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +41,7 @@ public class Register extends AppCompatActivity {
         EditText conPassword= findViewById(R.id.conPassword);
         Button registerBtn= findViewById(R.id.registerBtn);
         TextView loginNowBtn= findViewById(R.id.loginNow);
+        auth= FirebaseAuth.getInstance();
 
         registerBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
@@ -70,33 +78,8 @@ public class Register extends AppCompatActivity {
                             Toast.makeText(Register.this, "Phone is already registered", Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            //sending data to firebase Realtime Database
-                            // we are using phone number as unique identifier of every user
-                            // so all the other details of user comes under phone number
-                            int leftLimit = 97; // letter 'a'
-                            int rightLimit = 122; // letter 'z'
-                            int targetStringLength = 10;
-                            Random random = new Random();
-                            String generatedString = null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                generatedString = random.ints(leftLimit, rightLimit + 1)
-                                        .limit(targetStringLength)
-                                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                                        .toString();
-                            }
-                            if (emailTxt.endsWith("@manager.com")) {
-                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
-                            } else {
-                                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
-                            }
-                            databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
-                            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
-                            databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
-                            //TODO: add check of university email
-                            databaseReference.child("users").child(phoneTxt).child("password").setValue(passwordTxt);
+                            registerUser(emailTxt, passwordTxt, phoneTxt, fullNameTxt);
                             //show a success message and then finish the activity
-                            Toast.makeText(Register.this, "user registered successfully.", Toast.LENGTH_SHORT).show();
-                            finish();
                         }
                         }
 
@@ -111,6 +94,43 @@ public class Register extends AppCompatActivity {
 
         loginNowBtn.setOnClickListener(view -> {
             startActivity(new Intent(Register.this, Login.class));
+        });
+    }
+
+    private void registerUser(String emailTxt, String passwordTxt, String phoneTxt, String fullNameTxt) {
+        auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                //add listener if failed or not and if yes then change.
+                //send verificationLink
+                auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                if (emailTxt.endsWith("@manager.com")) {
+                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+                } else {
+                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+                }
+                databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+                databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
+                databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
+                //TODO: add check of university email
+                Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

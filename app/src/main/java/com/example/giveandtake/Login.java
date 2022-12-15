@@ -10,6 +10,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +26,7 @@ import java.util.Objects;
 public class Login extends AppCompatActivity {
 
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,8 @@ public class Login extends AppCompatActivity {
         Button loginBtn= findViewById(R.id.loginBtn);
         TextView registerNowBtn= findViewById(R.id.registerNowBtn);
         Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
-       // reset password
+        auth = FirebaseAuth.getInstance();
+        // reset password
         resetPasswordBtn.setOnClickListener(v -> {
             Toast.makeText(Login.this, "You can reset your password now", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Login.this, ResetPassword.class));
@@ -51,32 +58,20 @@ public class Login extends AppCompatActivity {
                     //check if mobile/phone exists in db
                     if(snapshot.hasChild(phoneTxt)){
                         //mobile num exists in db
-                        // now get password of user from db and match it with the entered password
-                        String getPassword= snapshot.child(phoneTxt).child("password").getValue(String.class);
-                        assert getPassword != null;
-                        if(getPassword.equals(passwordTxt)){
                             //open MapsActivity on success
-                            if (Objects.requireNonNull(snapshot.child(phoneTxt).child("isBlocked").getValue(String.class)).equals("1")){
+                        String emailTxt= snapshot.child(phoneTxt).child("email").getValue().toString();
+                        if (Objects.requireNonNull(snapshot.child(phoneTxt).child("isBlocked").getValue(String.class)).equals("1")){
                                     Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show();
                             }
                             else {
-                                Intent myIntent = new Intent(Login.this, Map.class);
-                                String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
-                                myIntent.putExtra("userId", phoneTxt);
-                                myIntent.putExtra("isManager", isManager);
-                                startActivity(myIntent);
-                                finish();
+                                loginUser(emailTxt, passwordTxt, phoneTxt, snapshot);
                             }
                         }
                         else{
                             Toast.makeText(Login.this, "Wrong details. try again?", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                    else{
-                        Toast.makeText(Login.this, "Wrong details. try again?", Toast.LENGTH_SHORT).show();
-
-                    }
                 }
+
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -86,9 +81,34 @@ public class Login extends AppCompatActivity {
         }
     });
 
+
+
     registerNowBtn.setOnClickListener(view -> {
         // open Register activity
         startActivity(new Intent(Login.this, Register.class));
     });
+
+
+    }
+
+    private void loginUser(String emailTxt, String passwordTxt, String phoneTxt, DataSnapshot snapshot) {
+        auth.signInWithEmailAndPassword(emailTxt , passwordTxt).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    Intent myIntent = new Intent(Login.this, Map.class);
+                    String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
+                    myIntent.putExtra("userId", phoneTxt);
+                    myIntent.putExtra("isManager", isManager);
+                    startActivity(myIntent);
+                    finish();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
