@@ -100,12 +100,17 @@ public class Login extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
-                    Intent myIntent = new Intent(Login.this, Map.class);
-                    String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
-                    myIntent.putExtra("userId", phoneTxt);
-                    myIntent.putExtra("isManager", isManager);
-                    startActivity(myIntent);
-                    finish();
+                    if (auth.getCurrentUser().isEmailVerified()) {
+                        Intent myIntent = new Intent(Login.this, Map.class);
+                        String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
+                        myIntent.putExtra("userId", phoneTxt);
+                        myIntent.putExtra("isManager", isManager);
+                        startActivity(myIntent);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(Login.this, "Please click on the verification link sent to your email", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
