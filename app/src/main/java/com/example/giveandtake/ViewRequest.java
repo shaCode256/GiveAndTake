@@ -55,6 +55,7 @@ public class ViewRequest extends AppCompatActivity {
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
         Button btnJoinRequest = findViewById(R.id.btn_join_request);
         Button btnUnjoinRequest = findViewById(R.id.btn_unjoin_request);
+a        Button btnReportRequest = findViewById(R.id.btn_report_request);
         btnDeleteRequest.setVisibility(View.GONE);
         subjectEditTxt.setText(subject, TextView.BufferType.EDITABLE);
         bodyEditTxt.setText(body, TextView.BufferType.EDITABLE);
@@ -162,6 +163,10 @@ public class ViewRequest extends AppCompatActivity {
             viewJoinersIntent.putExtra("userId", userId);
             viewJoinersIntent.putExtra("isManager", isManager);
             startActivity(viewJoinersIntent);
+        });
+
+        btnReportRequest.setOnClickListener(v -> {
+         //   databaseReference.child("reported_requests_ids").child(requestId).child("reporters").child(userId);
         });
     }
 }

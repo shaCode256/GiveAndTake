@@ -230,6 +230,18 @@
         android:textColor="@color/white"
         android:background="#FF9800"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_report_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Report request"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:background="#870F35"/>
+
     <!-- //https://www.youtube.com/watch?v=EhAKZ4UXkFw&ab_channel=tanzTalks.tech-->
 </LinearLayout>
     </ScrollView>
