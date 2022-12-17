@@ -55,7 +55,7 @@ public class ViewRequest extends AppCompatActivity {
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
         Button btnJoinRequest = findViewById(R.id.btn_join_request);
         Button btnUnjoinRequest = findViewById(R.id.btn_unjoin_request);
-a        Button btnReportRequest = findViewById(R.id.btn_report_request);
+        Button btnReportRequest = findViewById(R.id.btn_report_request);
         btnDeleteRequest.setVisibility(View.GONE);
         subjectEditTxt.setText(subject, TextView.BufferType.EDITABLE);
         bodyEditTxt.setText(body, TextView.BufferType.EDITABLE);
