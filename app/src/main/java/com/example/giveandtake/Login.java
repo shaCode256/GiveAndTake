@@ -37,6 +37,7 @@ public class Login extends AppCompatActivity {
         Button loginBtn= findViewById(R.id.loginBtn);
         TextView registerNowBtn= findViewById(R.id.registerNowBtn);
         Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
+        String numericRegex= "[0-9]+";
         auth = FirebaseAuth.getInstance();
         // reset password
         resetPasswordBtn.setOnClickListener(v -> {
@@ -50,6 +51,9 @@ public class Login extends AppCompatActivity {
 
         if(phoneTxt.isEmpty() || passwordTxt.isEmpty()){
             Toast.makeText(Login.this, "Please enter mobile number and password ", Toast.LENGTH_SHORT).show();
+        }
+        else if(!phoneTxt.matches(numericRegex)){
+            Toast.makeText(Login.this, "Please enter a valid numeric number ", Toast.LENGTH_SHORT).show();
         }
         else{
             databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {

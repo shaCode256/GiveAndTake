@@ -50,10 +50,6 @@ public class Register extends AppCompatActivity {
             String phoneTxt = phone.getText().toString();
             String passwordTxt = password.getText().toString();
             String conPasswordTxt = conPassword.getText().toString();
-            // check valid email is given
-            String regex = "^(.+)@(.+)$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher emailMatcher = pattern.matcher(emailTxt);
             //check if user fills all the fields before sending data to Firebase
             if(fullNameTxt.isEmpty() || emailTxt.isEmpty() || phoneTxt.isEmpty()){
                 Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
@@ -62,9 +58,6 @@ public class Register extends AppCompatActivity {
             //if not matching, show a toast message
             else if(!passwordTxt.equals(conPasswordTxt)){
                 Toast.makeText(Register.this, "Passwords are not matching", Toast.LENGTH_SHORT).show();
-            }
-            else if (!emailMatcher.matches()) {
-                Toast.makeText(Register.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
             }
             else if(!phoneTxt.matches("[0-9]+")){
                 Toast.makeText(Register.this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
