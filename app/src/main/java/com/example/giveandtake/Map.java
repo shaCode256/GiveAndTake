@@ -57,6 +57,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+       // mMap.setMyLocationEnabled(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
@@ -141,6 +142,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+        double lat= 32.107193634412475;
+        double lang= 35.20542059093714;
+        LatLng defaultLocation = new LatLng(lat, lang);
+        float DEFAULT_ZOOM= 15;
+        mMap.moveCamera(CameraUpdateFactory
+                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
         new Thread(){
             @Override
             public void run(){

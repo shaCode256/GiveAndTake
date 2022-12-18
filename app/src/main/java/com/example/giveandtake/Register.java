@@ -16,14 +16,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,6 +101,8 @@ public class Register extends AppCompatActivity {
             public void onSuccess(AuthResult authResult) {
                 //add listener if failed or not and if yes then change.
                 //send verificationLink
+
+
                 auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -106,6 +113,8 @@ public class Register extends AppCompatActivity {
                         }
                     }
                 });
+
+
 
                 if (emailTxt.endsWith("@manager.com")) {
                     databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
@@ -125,5 +134,9 @@ public class Register extends AppCompatActivity {
                 Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+        //Add verify phone number
+
+
     }
 }
