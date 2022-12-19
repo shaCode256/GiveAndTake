@@ -10,6 +10,7 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 ## Features:
 
 1
+
 The system will display a map, by interacting with a map service
 
  2
