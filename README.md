@@ -7,7 +7,7 @@ that allows users to open and maintain requests, watch open requests of others, 
 
 Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our product allows users to manage the requests on a targeted system to Ariel students only, enabling wide distribution and location filtering by combining requests management and a map.
 
-![map](readme_pictures/map.jpeg)
+![map](readme_pictures/map.jpeg =250x250)
 
 ## Features:
 
@@ -44,8 +44,8 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 14) The requests appears in the form of dedicated icons on the map that
     are visible to all users.
     
-![login](readme_pictures/login.jpeg)
-![watch_request](readme_pictures/watch_request.jpeg)
+![login](readme_pictures/login.jpeg =250x250)
+![watch_request](readme_pictures/watch_request.jpeg =250x250)
 
 ## Installation (Readme in building proccess... ) 
 
