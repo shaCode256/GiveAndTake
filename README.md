@@ -1,6 +1,6 @@
 # Give And Take 
 
-For Ariel university students/staff that are smartphone users, who want to ask for help or give help to their peers: 
+For Ariel university students | staff that are smartphone users, who want to ask for help or give help to their peers: 
 
 the Give and Take Android application is a sharing social application
 that allows users to open and maintain requests, watch open requests of others, and to communicate to offer their help, with an option of filtering based on location, visualization and placing requests on a map, to see for instance who’s nearby.
