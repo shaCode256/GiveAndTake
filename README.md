@@ -11,62 +11,65 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 
 1
 
-The system will display a map, by interacting with a map service
+The system displays a map, by interacting with a map service
 
  2
 
-The application will allow saving information of requests and events in the database
+The application allows saving information of requests and events in the database
 
  3
 
-The system will allow users to create requests
+The system allows users to create requests
 
  4
 
-The application will display really convenient and clear to the user.  It will be easy to distinguish the different actions
+The application displays real convenient and clear to the user.  It will be easy to distinguish the different actions
 
  5
 
-Will allow an admin user to block users
+The app allows an admin user to block users
 
  6
 
-The administrator will be given the option to add an event with a special icon
+The administrator is given the option to add an event with a special icon
 
 
-The application will display a notification on the phone about a new request or event (according to the user's preferences).
+The application displays a notification on the phone about a new request or event (according to the user's preferences).
 
  7
 
-Will enable users to report other users
+The app enables users to report other users
 
  8
 
-The system will require a university email to register users
+The system requires a university email to register users
 
  9
 
-Admins will be able to remove user posts
+Admins are able to remove user posts
 
  10
 
-To enable communication between the users of the application so that they can answer requests
+The app enables communication between the users of the application 
+so that they can answer requests
 
  11
 
-The system will allow user registration and login according to verified details, which will be saved in the system
+The system allows user registration and login according to verified details, which will be saved in the system
 
  12
 
-A user will be able to delete his request from the map
+A user is able to delete his request from the map
 
  13
 
-Managing the requests and viewing them on the map will be reliable, users at the same time will see the same map
+Managing the requests and viewing them on the map is reliable,
+all users at the same time will see the same map
 
  14
 
-The requests will appear in the form of dedicated icons on the map that will be visible to all users.
+The requests appears in the form of dedicated icons on the map that
+are visible to all users.
 
 ## Installation (Readme in building proccess... ) 
 
