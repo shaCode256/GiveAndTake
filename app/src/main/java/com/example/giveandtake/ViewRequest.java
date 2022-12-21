@@ -93,14 +93,15 @@ public class ViewRequest extends AppCompatActivity {
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //remove this request from all it's joiners list of joined requests
             if(requestId!=null) {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             //go through all joiners of this request
-                            for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("joiners").getChildren()) {
+                            for(DataSnapshot d : dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").getChildren()) {
                                 String joinerId= (d.getKey());
                                 //delete requestId from joiner's list
+                                databaseReference.child("reportedRequests").child(requestId).removeValue();
                                 databaseReference.child("users").child(joinerId).child("requestsUserJoined").child(requestId).getRef().removeValue();
                             }
                         }
