@@ -56,6 +56,7 @@ public class ViewRequest extends AppCompatActivity {
         Button btnJoinRequest = findViewById(R.id.btn_join_request);
         Button btnUnjoinRequest = findViewById(R.id.btn_unjoin_request);
         Button btnReportRequest = findViewById(R.id.btn_report_request);
+        Button btnUnReportRequest = findViewById(R.id.btn_unreport_request);
         btnDeleteRequest.setVisibility(View.GONE);
         subjectEditTxt.setText(subject, TextView.BufferType.EDITABLE);
         bodyEditTxt.setText(body, TextView.BufferType.EDITABLE);
@@ -76,6 +77,7 @@ public class ViewRequest extends AppCompatActivity {
             btnUnjoinRequest.setVisibility(View.GONE);
             btnJoinRequest.setVisibility(View.GONE);
             btnReportRequest.setVisibility(View.GONE);
+            btnUnReportRequest.setVisibility(View.GONE);
         }
         }
 
@@ -169,8 +171,12 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnReportRequest.setOnClickListener(v -> {
-          databaseReference.child("reportedRequests").child(requestId).child("reporters").child("userId").setValue(userId);
+          databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).setValue(userId);
           databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
+        });
+
+        btnUnReportRequest.setOnClickListener(v -> {
+            databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).removeValue();
         });
     }
 }
