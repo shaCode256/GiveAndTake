@@ -63,6 +63,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
         Button btn_locate_me= findViewById(R.id.btn_locate_me);
         Button btn_my_requests= findViewById(R.id.btn_my_requests);
+        Button btn_request_reports= findViewById(R.id.btn_watch_request_reports);
         Button log_out_btn= findViewById(R.id.log_out_btn);
         Button manage_users_btn= findViewById(R.id.manage_users_btn);
         db = FirebaseFirestore.getInstance();
@@ -72,9 +73,20 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent myIntent = getIntent();
         String userId = myIntent.getStringExtra("userId");
         String isManager= myIntent.getStringExtra("isManager");
+        // if the user is not a manager
         if (isManager!=null &&isManager.equals("0")){
             manage_users_btn.setVisibility(View.GONE);
+            btn_request_reports.setVisibility(View.GONE);
         }
+
+        btn_request_reports.setOnClickListener(view -> {
+            Intent watch_request_reports_intent = new Intent(Map.this, ViewReportedRequests.class);
+            watch_request_reports_intent.putExtra("userId",userId);
+            watch_request_reports_intent.putExtra("isManager", isManager);
+            watch_request_reports_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(watch_request_reports_intent);
+        });
+
         create_request_btn.setOnClickListener(view -> {
             Intent create_request_intent = new Intent(Map.this, RequestCreation.class);
             create_request_intent.putExtra("userId",userId);

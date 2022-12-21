@@ -71,9 +71,11 @@ public class ViewRequest extends AppCompatActivity {
             btnDeleteRequest.setVisibility(View.VISIBLE);
             btnViewJoiners.setVisibility(View.VISIBLE);
 
+            //if it's my request
             if(requestUserId!=null && requestUserId.equals(userId)){
             btnUnjoinRequest.setVisibility(View.GONE);
             btnJoinRequest.setVisibility(View.GONE);
+            btnReportRequest.setVisibility(View.GONE);
         }
         }
 
@@ -166,7 +168,8 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnReportRequest.setOnClickListener(v -> {
-         //   databaseReference.child("reported_requests_ids").child(requestId).child("reporters").child(userId);
+          databaseReference.child("reportedRequests").child(requestId).child("reporters").child("userId").setValue(userId);
+          databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
         });
     }
 }

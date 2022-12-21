@@ -73,7 +73,21 @@
         android:textSize="20sp"
         android:textColor="@color/white"
         android:background="#3F51B5"
+        />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_watch_request_reports"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:text="Watch Reports"
+        android:padding="10dp"
+        android:layout_marginTop="50dp"
+        android:paddingLeft="10dp"
+        android:layout_marginBottom="80dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:background="#E91E63"
         />
 
 </fragment>
