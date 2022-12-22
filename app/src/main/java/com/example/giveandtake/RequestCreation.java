@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,9 +29,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+// important import statements
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
@@ -115,7 +122,11 @@ public class RequestCreation extends AppCompatActivity {
                         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                //check if mobile/phone exists in db
+                                //add the request in the db
+                                //get currTime
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creation_time").setValue(LocalDateTime.now().toString());
+                                }
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);

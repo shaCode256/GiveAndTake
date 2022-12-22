@@ -230,6 +230,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
                         String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        String creationTime = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("creation_time").getValue(String.class));
                         // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
@@ -244,6 +245,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             viewRequestIntent.putExtra("isManager", isManager);
                             viewRequestIntent.putExtra("docId", docId);
                             viewRequestIntent.putExtra("requestId", requestId);
+                            viewRequestIntent.putExtra("creationTime", creationTime);
                             startActivity(viewRequestIntent);
                         }
                         else{

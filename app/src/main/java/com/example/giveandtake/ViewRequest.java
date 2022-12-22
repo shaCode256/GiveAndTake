@@ -38,11 +38,13 @@ public class ViewRequest extends AppCompatActivity {
         String latitude= myIntent.getStringExtra("requestLatitude");
         String longitude= myIntent.getStringExtra("requestLongitude");
         String docId= myIntent.getStringExtra("docId");
+        String creationTime= myIntent.getStringExtra("creationTime");
         EditText subjectEditTxt = findViewById(R.id.create_request_input_subject);
         EditText bodyEditTxt = findViewById(R.id.create_request_input_body);
         EditText longitude_inputEditTxt = findViewById(R.id.longitude_input);
         EditText latitude_inputEditTxt = findViewById(R.id.latitude_input);
         EditText contact_detailsEditTxt = findViewById(R.id.create_request_input_contact_details);
+        EditText creation_timeEditTxt = findViewById(R.id.creation_time);
         EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
         subjectEditTxt.setEnabled(false);
         bodyEditTxt.setEnabled(false);
@@ -50,6 +52,7 @@ public class ViewRequest extends AppCompatActivity {
         longitude_inputEditTxt.setEnabled(false);
         latitude_inputEditTxt.setEnabled(false);
         contact_detailsEditTxt.setEnabled(false);
+        creation_timeEditTxt.setEnabled(false);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
@@ -63,6 +66,7 @@ public class ViewRequest extends AppCompatActivity {
         contact_detailsEditTxt.setText(contactDetails, TextView.BufferType.EDITABLE);
         latitude_inputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
         longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
+        creation_timeEditTxt.setText(creationTime, TextView.BufferType.EDITABLE);
         user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
         btnDeleteRequest.setVisibility(View.GONE);
         btnViewJoiners.setVisibility(View.GONE);
