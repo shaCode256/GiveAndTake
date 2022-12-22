@@ -177,6 +177,22 @@ public class ViewRequest extends AppCompatActivity {
 
         btnUnReportRequest.setOnClickListener(v -> {
             databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).removeValue();
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    //if after deleting this report, there are no more reporting: remove this request from reported requests
+                    //or if the unreporter is a manager (meaning the manager checked and approved the request)
+                    if (dataSnapshot.exists() && ( !dataSnapshot.child("reportedRequests").child(requestId).child("reporters").hasChildren()
+                            || isManager.equals("1"))) {
+                        databaseReference.child("reportedRequests").child(requestId).removeValue();
+                    }
+                }//onDataChange
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }//onCancelled
+            });
         });
     }
 }
