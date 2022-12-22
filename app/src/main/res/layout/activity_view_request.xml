@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
     android:fillViewport="false">
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="MissingDefaultResource"
@@ -206,53 +206,57 @@
         android:textColor="@color/white"
         android:background="#2196F3"/>
 
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_join_request"
-        android:layout_width="match_parent"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Join request"
-        android:textSize="20sp"
+        android:background="#9C27B0"
         android:layout_marginTop="10dp"
+
+        android:text="Join request"
         android:textColor="@color/white"
-        android:background="#9C27B0"/>
+        android:textSize="18sp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_unjoin_request"
-        android:layout_width="match_parent"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:text="Unjoin request"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:background="#FF9800"/>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_report_request"
-        android:layout_width="match_parent"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:text="Report request"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:background="#870F35"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_unreport_request"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:text="Unreport request"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:background="#B1949D"/>
+
+    </TableRow>
 
     <!-- //https://www.youtube.com/watch?v=EhAKZ4UXkFw&ab_channel=tanzTalks.tech-->
 </LinearLayout>
