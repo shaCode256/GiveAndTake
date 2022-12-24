@@ -107,11 +107,16 @@ public class RequestCreation extends AppCompatActivity {
                     double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                     if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
                         //check valid latitude and longitude input
+                        String creation_time= "";
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            creation_time = LocalDateTime.now().toString();
+                        }
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
                         user.put("geoPoint", geoPointRequest);
                         user.put("requestId", setRequestId);
                         user.put("userId", requestUserId);
                         user.put("isManager", isManager);
+                        user.put("creationTime", creation_time);
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
@@ -119,13 +124,14 @@ public class RequestCreation extends AppCompatActivity {
                                 .addOnFailureListener(e -> {
                                 });
                         String finalSetRequestId = setRequestId;
+                        String finalCreation_time = creation_time;
                         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 //add the request in the db
                                 //get currTime
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creation_time").setValue(LocalDateTime.now().toString());
+                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creation_time").setValue(finalCreation_time);
                                 }
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);

@@ -1,7 +1,6 @@
 package com.example.giveandtake;
 
 import static android.content.ContentValues.TAG;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -12,13 +11,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -48,6 +48,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
@@ -71,6 +74,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
        // mMap.setMyLocationEnabled(true);
         super.onCreate(savedInstanceState);
+        createNotification();
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
         Button btn_locate_me= findViewById(R.id.btn_locate_me);
@@ -85,6 +89,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent myIntent = getIntent();
         String userId = myIntent.getStringExtra("userId");
         String isManager= myIntent.getStringExtra("isManager");
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String lastTimeSeenMap= LocalDateTime.now().toString();
+            databaseReference.child("users").child(userId).child("lastTimeSeenMap").setValue(lastTimeSeenMap);
+        }
         // if the user is not a manager
         if (isManager!=null &&isManager.equals("0")){
             manage_users_btn.setVisibility(View.GONE);
@@ -113,7 +121,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         manage_users_btn.setOnClickListener(view -> {
-            createNotification();
             Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
             manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             manage_users_intent.putExtra("userId", userId);
@@ -156,6 +163,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
     }
 
+
     public Bitmap resizeBitmap(String drawableName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getPackageName()));
         //TODO: Try to fix Warning:(149, 89) Use of this function is discouraged because resource reflection makes it
@@ -195,13 +203,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                                             String requestId= doc.getString("requestId");
                                             String requestUserId= doc.getString("userId");
                                             String isManager= doc.getString("isManager");
+                                            String creation_time= doc.getString("creationTime");
                                             //to check if requestUseId is manager: change the icon
                                             BitmapDescriptor selected_icon= handIcon;
                                             taken_requests_ids.add(requestId);
                                             if(isManager!=null && isManager.equals("1")) {
                                                 selected_icon= starIcon;
                                             }
-                                            Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(selected_icon));
+                                            Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(selected_icon).snippet(creation_time));
                                             assert newMarker != null;
                                             newMarker.setTag(requestUserId);
                                             markersHashmap.put(requestId,newMarker);
@@ -291,22 +300,82 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void createNotification() {
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, Map.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
-                .setSmallIcon(R.drawable.star_icon)
-                .setContentTitle("New Requests!")
-                .setContentText("Hello World!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(MapIntent)
-                .setAutoCancel(true);
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(Map.this);
-        managerCompat.notify(1, builder.build());
+        if (
+                ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        )
+        {
+            Toast.makeText(Map.this, "please enable permissions", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION}, 90);
+        }
+        else{
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+                    .addOnSuccessListener(Map.this, location -> {
+                        if (location != null) {
+                            Intent thisIntent = getIntent();
+                            String userId = thisIntent.getStringExtra("userId");
+                            String lastTimeSeenMapStr= null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                lastTimeSeenMapStr = LocalDateTime.now().toString();
+                            }
+                            //databaseReference.child("users").child(userId).child("lastTimeSeenMap").toString();
+                            showMarkersClose(location, 20000000000000000f, lastTimeSeenMapStr);
+                        }
+                        else{
+                            Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
+
+    private void showMarkersClose(Location location, float distanceInMeteters, String lastTimeSeenMapStr) {
+        for(Marker marker : markersHashmap.values()) {
+            LatLng markerPosition= marker.getPosition();
+            double markerLat= markerPosition.latitude;
+            double markerLong= markerPosition.longitude;
+            Location markerLocation = new Location(LocationManager.GPS_PROVIDER);
+            markerLocation.setLatitude(markerLat);
+            markerLocation.setLongitude(markerLong);
+            String markerCreationTime= marker.getSnippet();
+            //convert string to time
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
+                LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime lastTimeSeenMap= LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                if (location.distanceTo(markerLocation) <= distanceInMeteters &&
+                        markerDateTime.isBefore(lastTimeSeenMap)) {
+                    // Create an explicit intent for an Activity in your app
+                    Toast.makeText(Map.this, "yay"  , Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, Map.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
+                            .setSmallIcon(R.drawable.star_icon)
+                            .setContentTitle("New Requests!")
+                            .setContentText("in your area!")
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            // Set the intent that will fire when the user taps the notification
+                            .setContentIntent(MapIntent)
+                            .setAutoCancel(true);
+                    NotificationManagerCompat managerCompat = NotificationManagerCompat.from(Map.this);
+                    managerCompat.notify(1, builder.build());
+                }
+            }
+        }
+    }
+
+//    private double computeDistanceBetween(LatLng position, LatLng location) {
+//        double markerLat= position.latitude;
+//        double markerLong= position.longitude;
+//        double locationLat= location.latitude;
+//        double locationLong= location.longitude;
+//        double distance= Math.sqrt((locationLong-markerLong)*(locationLong-markerLong) + (locationLat-markerLat)*(locationLat-markerLat));
+//        return distance;
+//    }
 }
 
 
