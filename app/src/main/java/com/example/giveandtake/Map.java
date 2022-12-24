@@ -312,4 +312,5 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
 //https://firebase.google.com/docs/firestore/query-data/listen
 //https://stackoverflow.com/questions/52389072/google-maps-custom-marker-too-large
+//https://www.youtube.com/watch?v=4BuRMScaaI4 //How to create Notification in Android tutorial
 //https://stackoverflow.com/questions/72159435/how-to-get-location-using-fusedlocationclient-getcurrentlocation-method-in-kot/74254933#74254933
