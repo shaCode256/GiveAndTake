@@ -368,14 +368,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-//    private double computeDistanceBetween(LatLng position, LatLng location) {
-//        double markerLat= position.latitude;
-//        double markerLong= position.longitude;
-//        double locationLat= location.latitude;
-//        double locationLong= location.longitude;
-//        double distance= Math.sqrt((locationLong-markerLong)*(locationLong-markerLong) + (locationLat-markerLat)*(locationLat-markerLat));
-//        return distance;
-//    }
 }
 
 
