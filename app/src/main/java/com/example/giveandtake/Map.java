@@ -317,8 +317,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
                     .addOnSuccessListener(Map.this, location -> {
                         if (location != null) {
-                            Intent thisIntent = getIntent();
-                            String userId = thisIntent.getStringExtra("userId");
                             String lastTimeSeenMapStr= null;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                                 lastTimeSeenMapStr = LocalDateTime.now().toString();
@@ -350,9 +348,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         markerDateTime.isBefore(lastTimeSeenMap)) {
                     // Create an explicit intent for an Activity in your app
                     Toast.makeText(Map.this, "yay"  , Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, Map.class);
+                    Intent intent = new Intent(Map.this, Map.class);
+                    Intent thisIntent = getIntent();
+                    String userId = thisIntent.getStringExtra("userId");
+                    String isManager= thisIntent.getStringExtra("isManager");
+                    intent.putExtra("userId", userId);
+                    intent.putExtra("isManager", isManager);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                    PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
                             .setSmallIcon(R.drawable.star_icon)
                             .setContentTitle("New Requests!")
