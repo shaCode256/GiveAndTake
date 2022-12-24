@@ -4,11 +4,15 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -57,6 +63,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel= new NotificationChannel("My notification", "My notification",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager= getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
        // mMap.setMyLocationEnabled(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -101,6 +113,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         manage_users_btn.setOnClickListener(view -> {
+            createNotification();
             Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
             manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             manage_users_intent.putExtra("userId", userId);
@@ -276,6 +289,23 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 // Explain to the user the importance of accepting
             }
         }
+    }
+
+    private void createNotification() {
+        // Create an explicit intent for an Activity in your app
+        Intent intent = new Intent(this, Map.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
+                .setSmallIcon(R.drawable.star_icon)
+                .setContentTitle("New Requests!")
+                .setContentText("Hello World!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(MapIntent)
+                .setAutoCancel(true);
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(Map.this);
+        managerCompat.notify(1, builder.build());
     }
 }
 
