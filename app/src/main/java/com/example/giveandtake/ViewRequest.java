@@ -1,11 +1,13 @@
 package com.example.giveandtake;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,7 +53,6 @@ public class ViewRequest extends AppCompatActivity {
         user_id_of_requestEditTxt.setEnabled(false);
         longitude_inputEditTxt.setEnabled(false);
         latitude_inputEditTxt.setEnabled(false);
-        contact_detailsEditTxt.setEnabled(false);
         creation_timeEditTxt.setEnabled(false);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
@@ -84,6 +85,13 @@ public class ViewRequest extends AppCompatActivity {
             btnUnReportRequest.setVisibility(View.GONE);
         }
         }
+
+        contact_detailsEditTxt.setOnClickListener(v -> {
+            Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
+            phoneIntent.setData(Uri.parse("tel:" + contactDetails));
+            startActivity(phoneIntent);
+        });
+
 
         btnBackToMap.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
