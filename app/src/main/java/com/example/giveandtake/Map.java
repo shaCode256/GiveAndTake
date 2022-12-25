@@ -8,6 +8,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SearchRecentSuggestionsProvider;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -76,6 +77,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Button btn_my_requests= findViewById(R.id.btn_my_requests);
         Button btn_request_reports= findViewById(R.id.btn_watch_request_reports);
         Button log_out_btn= findViewById(R.id.log_out_btn);
+        Button settings_btn= findViewById(R.id.btn_settings);
         Button manage_users_btn= findViewById(R.id.manage_users_btn);
         db = FirebaseFirestore.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -156,6 +158,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             view_my_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
             startActivity(view_my_requests_intent);
         });
+
+        settings_btn.setOnClickListener(view -> {
+            Intent view_my_requests_intent = new Intent(Map.this, Settings.class);
+            view_my_requests_intent.putExtra("userId",userId);
+            view_my_requests_intent.putExtra("isManager", isManager);
+            startActivity(view_my_requests_intent);
+        });
     }
 
 
@@ -216,6 +225,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         );
             }
         }.run();
+
         startService();
 
         // adding on click listener to marker of google maps.
@@ -301,10 +311,25 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
-        String isManager= thisIntent.getStringExtra("isManager");
-        serviceIntent.putExtra("userId", userId);
-        serviceIntent.putExtra("isManager", isManager);
-        ContextCompat.startForegroundService(this, serviceIntent);
+        //check if notifications are turned on in this user's settings
+        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child(userId).child("settings").child("notifications").child("turned_on").getValue()!=null) {
+                    String notifications_turned_on = snapshot.child(userId).child("settings").child("notifications").child("turned_on").getValue().toString();
+                    if (notifications_turned_on.equals("1")) {
+                        String isManager = thisIntent.getStringExtra("isManager");
+                        serviceIntent.putExtra("userId", userId);
+                        serviceIntent.putExtra("isManager", isManager);
+                        ContextCompat.startForegroundService(Map.this, serviceIntent);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void stopService() {

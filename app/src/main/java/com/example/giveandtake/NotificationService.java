@@ -162,8 +162,6 @@ public class NotificationService extends Service {
                             .setContentIntent(MapIntent)
                             .setAutoCancel(true);
                     startForeground(1, builder.build());
-//                    NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
-//                    managerCompat.notify(1, builder.build());
                 }
             }
             }
