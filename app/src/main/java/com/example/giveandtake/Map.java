@@ -113,6 +113,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         log_out_btn.setOnClickListener(view -> {
+            stopService();
             Intent login_intent = new Intent(Map.this, Login.class);
             startActivity(login_intent);
         });

@@ -41,7 +41,6 @@ public class Login extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         // reset password
         resetPasswordBtn.setOnClickListener(v -> {
-            Toast.makeText(Login.this, "You can reset your password now", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Login.this, ResetPassword.class));
         });
 
