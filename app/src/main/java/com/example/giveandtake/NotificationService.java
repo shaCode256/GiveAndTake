@@ -138,7 +138,7 @@ public class NotificationService extends Service {
                                             }
                                             setLocation.set(location);
                                             if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
-                                                float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString());
+                                                float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
                                                 showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
                                             }
                                             else{
@@ -161,7 +161,7 @@ public class NotificationService extends Service {
                         location.setLatitude(Float.parseFloat(specified_longitude_str));
                         setLocation.set(location);
                         if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
-                            float distanceSpecified= (float) snapshot.child(userId).child("settings").child("notifications").child("distance").getValue();
+                            float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
                             showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
                         }
                         else{
