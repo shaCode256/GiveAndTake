@@ -1,28 +1,25 @@
 package com.example.giveandtake;
 
 import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -49,8 +46,6 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
@@ -74,7 +69,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
        // mMap.setMyLocationEnabled(true);
         super.onCreate(savedInstanceState);
-        createNotification();
+//        createNotification();
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
         Button btn_locate_me= findViewById(R.id.btn_locate_me);
@@ -219,6 +214,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                                     }
                                 }
                         );
+
+                startService();
             }
         }.run();
         // adding on click listener to marker of google maps.
@@ -300,75 +297,93 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private void createNotification() {
-        if (
-                ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        )
-        {
-            Toast.makeText(Map.this, "please enable permissions", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, 90);
-        }
-        else{
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
-                    .addOnSuccessListener(Map.this, location -> {
-                        if (location != null) {
-                            String lastTimeSeenMapStr= null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                lastTimeSeenMapStr = LocalDateTime.now().toString();
-                            }
-                            //databaseReference.child("users").child(userId).child("lastTimeSeenMap").toString();
-                            showMarkersClose(location, 20000000000000000f, lastTimeSeenMapStr);
-                        }
-                        else{
-                            Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+//    @SuppressLint("MissingPermission")
+//    private void createNotification() {
+//        if (
+//                ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+//                        ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//        )
+//        {
+//            Toast.makeText(Map.this, "please enable permissions", Toast.LENGTH_SHORT).show();
+//            ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+//                    Manifest.permission.ACCESS_FINE_LOCATION}, 90);
+//        }
+//        else{
+//            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+//            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+//                    .addOnSuccessListener(Map.this, location -> {
+//                        if (location != null) {
+//                            String lastTimeSeenMapStr= null;
+//                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                                lastTimeSeenMapStr = LocalDateTime.now().toString();
+//                            }
+//                            //databaseReference.child("users").child(userId).child("lastTimeSeenMap").toString();
+//                            showMarkersClose(location, 20000000000000000f, lastTimeSeenMapStr);
+//                        }
+//                        else{
+//                            Toast.makeText(Map.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//        }
+//    }
+//
+//    private void showMarkersClose(Location location, float distanceInMeteters, String lastTimeSeenMapStr) {
+//        for(Marker marker : markersHashmap.values()) {
+//            LatLng markerPosition= marker.getPosition();
+//            double markerLat= markerPosition.latitude;
+//            double markerLong= markerPosition.longitude;
+//            Location markerLocation = new Location(LocationManager.GPS_PROVIDER);
+//            markerLocation.setLatitude(markerLat);
+//            markerLocation.setLongitude(markerLong);
+//            String markerCreationTime= marker.getSnippet();
+//            //convert string to time
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
+//                LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//                LocalDateTime lastTimeSeenMap= LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//                if (location.distanceTo(markerLocation) <= distanceInMeteters &&
+//                        markerDateTime.isBefore(lastTimeSeenMap)) {
+//                    // Create an explicit intent for an Activity in your app
+//                    Toast.makeText(Map.this, "yay"  , Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(Map.this, Map.class);
+//                    Intent thisIntent = getIntent();
+//                    String userId = thisIntent.getStringExtra("userId");
+//                    String isManager= thisIntent.getStringExtra("isManager");
+//                    intent.putExtra("userId", userId);
+//                    intent.putExtra("isManager", isManager);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//                    NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
+//                            .setSmallIcon(R.drawable.star_icon)
+//                            .setContentTitle("New Requests!")
+//                            .setContentText("in your area!")
+//                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                            // Set the intent that will fire when the user taps the notification
+//                            .setContentIntent(MapIntent)
+//                            .setAutoCancel(true);
+//                    NotificationManagerCompat managerCompat = NotificationManagerCompat.from(Map.this);
+//                    managerCompat.notify(1, builder.build());
+//                }
+//            }
+//        }
+//    }
+
+
+    public void startService() {
+        Intent serviceIntent = new Intent(this, NotificationService.class);
+        Intent thisIntent = getIntent();
+        String userId = thisIntent.getStringExtra("userId");
+        String isManager= thisIntent.getStringExtra("isManager");
+        serviceIntent.putExtra("userId", userId);
+        serviceIntent.putExtra("isManager", isManager);
+        Toast.makeText(this, "markersHashmapKeyset"+markersHashmap.keySet(), Toast.LENGTH_SHORT).show();
+        serviceIntent.putExtra("markersHashmap", markersHashmap);
+        ContextCompat.startForegroundService(this, serviceIntent);
     }
 
-    private void showMarkersClose(Location location, float distanceInMeteters, String lastTimeSeenMapStr) {
-        for(Marker marker : markersHashmap.values()) {
-            LatLng markerPosition= marker.getPosition();
-            double markerLat= markerPosition.latitude;
-            double markerLong= markerPosition.longitude;
-            Location markerLocation = new Location(LocationManager.GPS_PROVIDER);
-            markerLocation.setLatitude(markerLat);
-            markerLocation.setLongitude(markerLong);
-            String markerCreationTime= marker.getSnippet();
-            //convert string to time
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
-                LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                LocalDateTime lastTimeSeenMap= LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (location.distanceTo(markerLocation) <= distanceInMeteters &&
-                        markerDateTime.isBefore(lastTimeSeenMap)) {
-                    // Create an explicit intent for an Activity in your app
-                    Toast.makeText(Map.this, "yay"  , Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(Map.this, Map.class);
-                    Intent thisIntent = getIntent();
-                    String userId = thisIntent.getStringExtra("userId");
-                    String isManager= thisIntent.getStringExtra("isManager");
-                    intent.putExtra("userId", userId);
-                    intent.putExtra("isManager", isManager);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent MapIntent = PendingIntent.getActivity(Map.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(Map.this, "My notification")
-                            .setSmallIcon(R.drawable.star_icon)
-                            .setContentTitle("New Requests!")
-                            .setContentText("in your area!")
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            // Set the intent that will fire when the user taps the notification
-                            .setContentIntent(MapIntent)
-                            .setAutoCancel(true);
-                    NotificationManagerCompat managerCompat = NotificationManagerCompat.from(Map.this);
-                    managerCompat.notify(1, builder.build());
-                }
-            }
-        }
+    public void stopService() {
+        Intent serviceIntent = new Intent(this, NotificationService.class);
+        stopService(serviceIntent);
     }
 
 }
