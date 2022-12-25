@@ -308,6 +308,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public void startService() {
+        stopService();
         Intent serviceIntent = new Intent(this, NotificationService.class);
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
@@ -321,6 +322,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String isManager = thisIntent.getStringExtra("isManager");
                         serviceIntent.putExtra("userId", userId);
                         serviceIntent.putExtra("isManager", isManager);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            serviceIntent.putExtra("lastTimeSeenMapStr",  LocalDateTime.now().toString());
+                        }
                         ContextCompat.startForegroundService(Map.this, serviceIntent);
                     }
                 }

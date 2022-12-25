@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -30,13 +36,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class NotificationService extends Service {
 
     String userId= "";
     String isManager="";
+    String lastTimeSeenMapStr;
     HashMap<String, HashMap<LatLng, String>> markersHashmap = new HashMap<>();
+    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     public void onCreate(Intent intents, int flags, int startId) {
         super.onCreate();
@@ -61,6 +70,7 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         userId = intent.getStringExtra("userId");
         isManager = intent.getStringExtra("isManager");
+        lastTimeSeenMapStr = intent.getStringExtra("lastTimeSeenMapStr");
         intent.putExtra("userId", userId);
         intent.putExtra("isManager", isManager);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -98,37 +108,80 @@ public class NotificationService extends Service {
                             }
                         }
                 );
-        createNotification(userId, isManager, 20000000000000000f );
+        createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f );
         return START_NOT_STICKY;
     }
 
     @SuppressLint("MissingPermission")
-    private void createNotification(String userId, String isManager, float distance) {
-        if (
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        )
-        {
-            Toast.makeText(this, "please enable location permissions", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
-                    .addOnSuccessListener(location -> {
-                        if (location != null) {
-                            String lastTimeSeenMapStr= null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                lastTimeSeenMapStr = LocalDateTime.now().toString();
-                            }
-                            //databaseReference.child("users").child(userId).child("lastTimeSeenMap").toString();
-                            showMarkersClose(location, distance, lastTimeSeenMapStr, userId, isManager);
+    private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance) {
+        AtomicReference<Location> setLocation= new AtomicReference<>();
+        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child(userId).child("settings").child("notifications").child("auto_detect_location").getValue()!=null) {
+                    String auto_detect_location = snapshot.child(userId).child("settings").child("notifications").child("auto_detect_location").getValue().toString();
+                    if (auto_detect_location.equals("1") || snapshot.child(userId).child("settings").child("notifications").child("specific_location").getValue() == null) {
+                        if (
+                                ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            Toast.makeText(NotificationService.this, "please enable location permissions", Toast.LENGTH_SHORT).show();
+                        } else {
+                            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(NotificationService.this);
+                            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+                                    .addOnSuccessListener(location -> {
+                                        if (location != null) {
+                                            String lastTimeSeenMapStr = null;
+                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                                lastTimeSeenMapStr = LocalDateTime.now().toString();
+                                            }
+                                            setLocation.set(location);
+                                            if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
+                                                float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString());
+                                                showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
+                                            }
+                                            else{
+                                                if(setLocation.get()!=null) {
+                                                    showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager);
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(NotificationService.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    }
+                    else{
+                        //get the specific location
+                        String specified_latitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("latitude").getValue().toString();
+                        String specified_longitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("longitude").getValue().toString();
+                        Location location= new Location(LocationManager.GPS_PROVIDER);
+                        location.setLongitude(Float.parseFloat(specified_longitude_str));
+                        location.setLatitude(Float.parseFloat(specified_longitude_str));
+                        setLocation.set(location);
+                        if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
+                            float distanceSpecified= (float) snapshot.child(userId).child("settings").child("notifications").child("distance").getValue();
+                            showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
                         }
                         else{
-                            Toast.makeText(this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                            if(setLocation.get()!=null) {
+                                showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager);
+                            }
                         }
-                    });
-        }
+                    }
+
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
     }
 
     private void showMarkersClose(Location location, float distanceInMeteters, String lastTimeSeenMapStr, String userId, String isManager) {
@@ -141,11 +194,11 @@ public class NotificationService extends Service {
             markerLocation.setLatitude(markerLat);
             markerLocation.setLongitude(markerLong);
             String markerCreationTime= marker.get(markerPosition);
-            //convert string to time
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
+                //convert string to time
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
                 LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 LocalDateTime lastTimeSeenMap = LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (location.distanceTo(markerLocation) <= distanceInMeteters &&
+                if (location!=null && markerLocation!=null && location.distanceTo(markerLocation) <= distanceInMeteters &&
                         markerDateTime.isBefore(lastTimeSeenMap)) {
                     // Create an explicit intent for an Activity in your app
                     Intent intent = new Intent(this, Map.class);
