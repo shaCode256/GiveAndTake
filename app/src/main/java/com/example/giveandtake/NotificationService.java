@@ -36,6 +36,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -44,7 +46,6 @@ public class NotificationService extends Service {
     String userId= "";
     String isManager="";
     String lastTimeSeenMapStr;
-    HashMap<String, HashMap<LatLng, String>> markersHashmap = new HashMap<>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     public void onCreate(Intent intents, int flags, int startId) {
@@ -74,7 +75,7 @@ public class NotificationService extends Service {
         intent.putExtra("userId", userId);
         intent.putExtra("isManager", isManager);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
                 .setSmallIcon(R.drawable.star_icon)
                 .setContentTitle("Searching for Requests...!")
@@ -84,36 +85,44 @@ public class NotificationService extends Service {
                 .setContentIntent(MapIntent)
                 .setAutoCancel(true);
         startForeground(1, builder.build());
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("MapsData")
-                .addSnapshotListener((value, e) -> {
-                            if (e != null) {
-                                Log.w(TAG, "Listen failed.", e);
-                                return;
-                            }
-                            assert value != null;
-                            for (QueryDocumentSnapshot doc : value) {
-                                if (doc.get("geoPoint") != null) {
-                                    //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
-                                    GeoPoint geoPoint = doc.getGeoPoint("geoPoint");
-                                    assert geoPoint != null;
-                                    LatLng locationn = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                                    String requestId = doc.getString("requestId");
-                                    String requestUserId = doc.getString("userId");
-                                    String creation_time = doc.getString("creationTime");
-                                    //to check if requestUseId is manager: change the icon
-                                    markersHashmap.put(requestId, new HashMap<LatLng, String>());
-                                    markersHashmap.get(requestId).put(locationn, creation_time);
+        Timer myTimer = new Timer ();
+        TimerTask myTask = new TimerTask () {
+            @Override
+            public void run() {
+                HashMap<String, HashMap<LatLng, String>> markersHashmap = new HashMap<>();
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("MapsData")
+                        .addSnapshotListener((value, e) -> {
+                                    if (e != null) {
+                                        Log.w(TAG, "Listen failed.", e);
+                                        return;
+                                    }
+                                    assert value != null;
+                                    for (QueryDocumentSnapshot doc : value) {
+                                        if (doc.get("geoPoint") != null) {
+                                            //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
+                                            GeoPoint geoPoint = doc.getGeoPoint("geoPoint");
+                                            assert geoPoint != null;
+                                            LatLng locationn = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                                            String requestId = doc.getString("requestId");
+                                            String requestUserId = doc.getString("userId");
+                                            String creation_time = doc.getString("creationTime");
+                                            //to check if requestUseId is manager: change the icon
+                                            markersHashmap.put(requestId, new HashMap<LatLng, String>());
+                                            markersHashmap.get(requestId).put(locationn, creation_time);
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                );
-        createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f );
+                        );
+                createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f, markersHashmap);
+            }
+        };
+        myTimer.scheduleAtFixedRate(myTask, 0l, 1 * (60*1000)); // Runs every 1 min
         return START_NOT_STICKY;
     }
 
     @SuppressLint("MissingPermission")
-    private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance) {
+    private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance, HashMap<String, HashMap<LatLng, String>> markersHashmap) {
         AtomicReference<Location> setLocation= new AtomicReference<>();
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -132,41 +141,39 @@ public class NotificationService extends Service {
                             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
                                     .addOnSuccessListener(location -> {
                                         if (location != null) {
-                                            String lastTimeSeenMapStr = null;
-                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                                lastTimeSeenMapStr = LocalDateTime.now().toString();
-                                            }
                                             setLocation.set(location);
                                             if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
                                                 float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
-                                                showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
+                                                showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                                             }
                                             else{
                                                 if(setLocation.get()!=null) {
-                                                    showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager);
+                                                    showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                                                 }
                                             }
                                         } else {
                                             Toast.makeText(NotificationService.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                            // Get the location manager
+                                            //showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                                         }
                                     });
                         }
                     }
                     else{
-                        //get the specific location
+                        //get the specific location2
                         String specified_latitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("latitude").getValue().toString();
                         String specified_longitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("longitude").getValue().toString();
                         Location location= new Location(LocationManager.GPS_PROVIDER);
-                        location.setLongitude(Float.parseFloat(specified_longitude_str));
+                        location.setLongitude(Float.parseFloat(specified_latitude_str));
                         location.setLatitude(Float.parseFloat(specified_longitude_str));
                         setLocation.set(location);
                         if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
                             float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
-                            showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager);
+                            showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                         }
                         else{
                             if(setLocation.get()!=null) {
-                                showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager);
+                                showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                             }
                         }
                     }
@@ -184,7 +191,7 @@ public class NotificationService extends Service {
 
     }
 
-    private void showMarkersClose(Location location, float distanceInMeteters, String lastTimeSeenMapStr, String userId, String isManager) {
+    private void showMarkersClose(Location location, float distance, String lastTimeSeenMapStr, String userId, String isManager,   HashMap<String, HashMap<LatLng, String>> markersHashmap) {
         //Listen to multiple documents in a collection. adds markers of the requests in the db (docs)
         for(HashMap<LatLng, String> marker : markersHashmap.values()) {
             for(LatLng markerPosition : marker.keySet()){
@@ -198,8 +205,8 @@ public class NotificationService extends Service {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
                 LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 LocalDateTime lastTimeSeenMap = LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (location!=null && markerLocation!=null && location.distanceTo(markerLocation) <= distanceInMeteters &&
-                        markerDateTime.isBefore(lastTimeSeenMap)) {
+                if (location!=null && markerLocation!=null && location.distanceTo(markerLocation) <= distance &&
+                        markerDateTime.isAfter(lastTimeSeenMap)) {
                     // Create an explicit intent for an Activity in your app
                     Intent intent = new Intent(this, Map.class);
                     intent.putExtra("userId", userId);
