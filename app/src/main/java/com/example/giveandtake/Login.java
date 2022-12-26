@@ -1,8 +1,5 @@
 package com.example.giveandtake;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -10,10 +7,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,9 +36,7 @@ public class Login extends AppCompatActivity {
         String numericRegex= "[0-9]+";
         auth = FirebaseAuth.getInstance();
         // reset password
-        resetPasswordBtn.setOnClickListener(v -> {
-            startActivity(new Intent(Login.this, ResetPassword.class));
-        });
+        resetPasswordBtn.setOnClickListener(v -> startActivity(new Intent(Login.this, ResetPassword.class)));
 
     loginBtn.setOnClickListener(view -> {
         String phoneTxt = phone.getText().toString();
@@ -61,7 +55,7 @@ public class Login extends AppCompatActivity {
                     //check if mobile/phone exists in db
                     if(snapshot.hasChild(phoneTxt)){
                         //mobile num exists in db
-                            //open MapsActivity on success
+                        //open MapsActivity on success
                         String emailTxt= snapshot.child(phoneTxt).child("email").getValue().toString();
                         if (Objects.requireNonNull(snapshot.child(phoneTxt).child("isBlocked").getValue(String.class)).equals("1")){
                                     Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show();
@@ -95,28 +89,20 @@ public class Login extends AppCompatActivity {
     }
 
     private void loginUser(String emailTxt, String passwordTxt, String phoneTxt, DataSnapshot snapshot) {
-        auth.signInWithEmailAndPassword(emailTxt , passwordTxt).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()){
-                    if (auth.getCurrentUser().isEmailVerified()) {
-                        Intent myIntent = new Intent(Login.this, Map.class);
-                        String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
-                        myIntent.putExtra("userId", phoneTxt);
-                        myIntent.putExtra("isManager", isManager);
-                        startActivity(myIntent);
-                        finish();
-                    }
-                    else{
-                        Toast.makeText(Login.this, "Please click on the verification link sent to your email", Toast.LENGTH_SHORT).show();
-                    }
+        auth.signInWithEmailAndPassword(emailTxt , passwordTxt).addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                if (auth.getCurrentUser().isEmailVerified()) {
+                    Intent myIntent = new Intent(Login.this, Map.class);
+                    String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
+                    myIntent.putExtra("userId", phoneTxt);
+                    myIntent.putExtra("isManager", isManager);
+                    startActivity(myIntent);
+                    finish();
+                }
+                else{
+                    Toast.makeText(Login.this, "Please click on the verification link sent to your email", Toast.LENGTH_SHORT).show();
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }).addOnFailureListener(e -> Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

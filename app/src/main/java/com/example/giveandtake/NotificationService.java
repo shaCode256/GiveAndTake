@@ -103,13 +103,13 @@ public class NotificationService extends Service {
                                             //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
                                             GeoPoint geoPoint = doc.getGeoPoint("geoPoint");
                                             assert geoPoint != null;
-                                            LatLng locationn = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                                            LatLng markerLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                                             String requestId = doc.getString("requestId");
-                                            String requestUserId = doc.getString("userId");
+                                       //     String requestUserId = doc.getString("userId");
                                             String creation_time = doc.getString("creationTime");
                                             //to check if requestUseId is manager: change the icon
-                                            markersHashmap.put(requestId, new HashMap<LatLng, String>());
-                                            markersHashmap.get(requestId).put(locationn, creation_time);
+                                            markersHashmap.put(requestId, new HashMap<>());
+                                            markersHashmap.get(requestId).put(markerLocation, creation_time);
                                         }
                                     }
                                 }
@@ -153,6 +153,7 @@ public class NotificationService extends Service {
                                             }
                                         } else {
                                             Toast.makeText(NotificationService.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                         //TODO: fix logic
                                             // Get the location manager
                                             //showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                                         }

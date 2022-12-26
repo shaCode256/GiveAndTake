@@ -28,9 +28,9 @@ public class ViewMyRequests extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    ArrayList<String> myOpenRequestsInfos= new ArrayList<>();
-    ArrayList<String> requestsUserJoinedInfos= new ArrayList<>();
-    HashMap<String, String> requestsInfosToId= new HashMap<>();
+    ArrayList<String> myOpenRequestsInfo = new ArrayList<>();
+    ArrayList<String> requestsUserJoinedInfo = new ArrayList<>();
+    HashMap<String, String> requestsInfoToId = new HashMap<>();
 
     int openOrJoinedFlag=0;
 
@@ -68,8 +68,8 @@ public class ViewMyRequests extends ListActivity {
                         assert requestId != null;
                         if( dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue()!=null) {
                             String requestSubject = dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue().toString();
-                            myOpenRequestsInfos.add("Subject: " + requestSubject + " | Request Id: " + requestId);
-                            requestsInfosToId.put("Subject: " + requestSubject + " | Request Id: " + requestId, requestId);
+                            myOpenRequestsInfo.add("Subject: " + requestSubject + " | Request Id: " + requestId);
+                            requestsInfoToId.put("Subject: " + requestSubject + " | Request Id: " + requestId, requestId);
                         }
                     }
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestsUserJoined").getChildren()) {
@@ -77,8 +77,8 @@ public class ViewMyRequests extends ListActivity {
                         if(dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue()!=null) {
                             String creator_of_request_user_joined = dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue().toString();
                             String requestSubject = dataSnapshot.child(creator_of_request_user_joined).child("requestId").child(requestId).child("subject").getValue().toString();
-                            requestsUserJoinedInfos.add("Subject: "+requestSubject + " | Request Id: " + requestId);
-                            requestsInfosToId.put("Subject: "+requestSubject + " | Request Id: " + requestId, requestId);
+                            requestsUserJoinedInfo.add("Subject: "+requestSubject + " | Request Id: " + requestId);
+                            requestsInfoToId.put("Subject: "+requestSubject + " | Request Id: " + requestId, requestId);
                         }
                     }
                 }
@@ -137,7 +137,7 @@ public class ViewMyRequests extends ListActivity {
         }));
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestInfo= (String) parent.getAdapter().getItem(position);
-            String requestId= requestsInfosToId.get(requestInfo);
+            String requestId= requestsInfoToId.get(requestInfo);
             String docId= markersRequestToDocId.get(requestId);
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -193,7 +193,7 @@ public class ViewMyRequests extends ListActivity {
         // is fixed by putting addEventListener on create function
         openOrJoinedFlag=0;
         listItems.clear();
-        listItems.addAll(myOpenRequestsInfos);
+        listItems.addAll(myOpenRequestsInfo);
         adapter.notifyDataSetChanged();
     }
 
@@ -202,7 +202,7 @@ public class ViewMyRequests extends ListActivity {
         // is fixed by putting addEventListener on create function
         openOrJoinedFlag=1;
         listItems.clear();
-        listItems.addAll(requestsUserJoinedInfos);
+        listItems.addAll(requestsUserJoinedInfo);
         adapter.notifyDataSetChanged();
     }
 }

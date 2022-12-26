@@ -6,10 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -28,8 +25,8 @@ public class ViewReportedRequests extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-    ArrayList<String> reportedRequestsInfos= new ArrayList<>();
-    HashMap<String, String[]> reportedRequestsInfosToId= new HashMap<>();
+    ArrayList<String> reportedRequestsInfo = new ArrayList<>();
+    HashMap<String, String[]> reportedRequestsInfoToId = new HashMap<>();
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -56,8 +53,8 @@ public class ViewReportedRequests extends ListActivity {
                         assert requestId != null;
                         if( dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("subject").getValue()!=null) {
                             String requestSubject = dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("subject").getValue().toString();
-                            reportedRequestsInfos.add("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters);
-                            reportedRequestsInfosToId.put("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters, new String[] {requestId, requestUserId});
+                            reportedRequestsInfo.add("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters);
+                            reportedRequestsInfoToId.put("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters, new String[] {requestId, requestUserId});
                         }
                     }
                 }
@@ -77,14 +74,13 @@ public class ViewReportedRequests extends ListActivity {
 
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestInfo= (String) parent.getAdapter().getItem(position);
-            String requestId= reportedRequestsInfosToId.get(requestInfo)[0];
-            String requestUserId=  reportedRequestsInfosToId.get(requestInfo)[1];
+            String requestId= reportedRequestsInfoToId.get(requestInfo)[0];
+            String requestUserId=  reportedRequestsInfoToId.get(requestInfo)[1];
             String docId= markersRequestToDocId.get(requestId);
             if(requestId!=null) {
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String managerWatching= thisIntent.getStringExtra("managerWatching");
                         //else, it's open requests of a user, that the user opened, and it's requestUserId
                         //TODO: fix this messy implementation
                         assert requestUserId != null;
@@ -120,7 +116,7 @@ public class ViewReportedRequests extends ListActivity {
         //bug that addEventListener executes after this listItem.AddAll,
         // is fixed by putting addEventListener on create function
         listItems.clear();
-        listItems.addAll(reportedRequestsInfos);
+        listItems.addAll(reportedRequestsInfo);
         adapter.notifyDataSetChanged();
     }
 

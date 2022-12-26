@@ -29,15 +29,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
-// important import statements
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class RequestCreation extends AppCompatActivity {
     protected Context context;

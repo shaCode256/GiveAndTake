@@ -1,51 +1,30 @@
 package com.example.giveandtake;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.GeoPoint;
-
-import java.time.LocalDateTime;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Settings extends AppCompatActivity {
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
@@ -72,7 +51,6 @@ public class Settings extends AppCompatActivity {
 
 
         applyKmBtn.setOnClickListener(view -> {
-            // get data from EditText into String variable
             String distance = distanceEditText.getText().toString();
             if(distance.isEmpty()){
                 Toast.makeText(Settings.this, "Please fill in valid distance in km", Toast.LENGTH_SHORT).show();
@@ -92,18 +70,16 @@ public class Settings extends AppCompatActivity {
         });
 
 
-        turnOnAutoDetectLocationBtn.setOnClickListener(view -> {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("auto_detect_location").setValue(1);
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+        turnOnAutoDetectLocationBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("auto_detect_location").setValue(1);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
-        });
+            }
+        }));
 
         useSpecifiedLocationBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
@@ -149,31 +125,27 @@ public class Settings extends AppCompatActivity {
             startActivity(newIntent);
         });
 
-        turnOnNotificationsBtn.setOnClickListener(view -> {
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(1);
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+        turnOnNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(1);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-        });
+            }
+        }));
 
-        turnOffNotificationsBtn.setOnClickListener(view -> {
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(0);
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+        turnOffNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(0);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-        });
+            }
+        }));
 
         useCurrLocationBtn.setOnClickListener(view -> {
             // get curr location

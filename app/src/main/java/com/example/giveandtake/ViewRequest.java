@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +17,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
 
 public class ViewRequest extends AppCompatActivity {
 
@@ -150,36 +147,32 @@ public class ViewRequest extends AppCompatActivity {
             startActivity(mapIntent);
         });
 
-        btnJoinRequest.setOnClickListener(v -> {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        assert requestUserId != null;
-                       // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
-                        String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
-                        //TODO: maybe add contact details
-                        databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contact_details").setValue(joinerContactDetails);
-                        databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
-        });
+        btnJoinRequest.setOnClickListener(v -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                assert requestUserId != null;
+               // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
+                String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
+                //TODO: maybe add contact details
+                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contact_details").setValue(joinerContactDetails);
+                databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        }));
 
-        btnUnjoinRequest.setOnClickListener(v -> {
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    assert requestUserId != null;
-                    databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
-                    databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).getRef().removeValue();
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-            });
-        });
+        btnUnjoinRequest.setOnClickListener(v -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                assert requestUserId != null;
+                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
+                databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).getRef().removeValue();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        }));
 
         btnViewJoiners.setOnClickListener(v -> {
             Intent viewJoinersIntent = new Intent(ViewRequest.this, ViewJoiners.class);

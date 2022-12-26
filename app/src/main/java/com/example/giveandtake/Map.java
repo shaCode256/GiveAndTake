@@ -8,7 +8,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -68,9 +67,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             NotificationManager notificationManager= getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-       // mMap.setMyLocationEnabled(true);
         super.onCreate(savedInstanceState);
-//        createNotification();
         setContentView(R.layout.activity_maps);
         Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
         Button btn_locate_me= findViewById(R.id.btn_locate_me);

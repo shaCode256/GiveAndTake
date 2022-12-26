@@ -1,36 +1,21 @@
 package com.example.giveandtake;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Register extends AppCompatActivity {
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
@@ -90,52 +75,39 @@ public class Register extends AppCompatActivity {
             }
         });
 
-        loginNowBtn.setOnClickListener(view -> {
-            startActivity(new Intent(Register.this, Login.class));
-        });
+        loginNowBtn.setOnClickListener(view -> startActivity(new Intent(Register.this, Login.class)));
     }
 
     private void registerUser(String emailTxt, String passwordTxt, String phoneTxt, String fullNameTxt) {
-        auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                //add listener if failed or not and if yes then change.
-                //send verificationLink
+        auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
+            //add listener if failed or not and if yes then change.
+            //send verificationLink
 
 
-                auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
-
-
-                if (emailTxt.endsWith("@manager.com")) {
-                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
                 } else {
-                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+                    Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
-                databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
-                databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
-                databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
-                //TODO: add check of university email
-                Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
 
-        //Add verify phone number
+
+
+            if (emailTxt.endsWith("@manager.com")) {
+                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+            } else {
+                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+            }
+            databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+            databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
+            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
+            //TODO: add check of university email
+            Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
+            finish();
+        }).addOnFailureListener(e -> Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+
+        //TODO: Add verify phone number
 
 
     }

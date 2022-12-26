@@ -7,9 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -20,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ViewJoiners extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
@@ -39,9 +36,6 @@ public class ViewJoiners extends ListActivity {
                 listItems);
         setListAdapter(adapter);
         Intent thisIntent = getIntent();
-        HashMap<String, String> markersRequestToDocId= (HashMap<String, String>)thisIntent.getExtras().getSerializable("markersRequestToDocId");
-        String userId = thisIntent.getStringExtra("userId");
-        String isManager = thisIntent.getStringExtra("isManager");
         String requestUserId= thisIntent.getStringExtra("requestUserId");
         String requestId= thisIntent.getStringExtra("requestId");
         EditText request_idEditTxt = findViewById(R.id.request_id);
