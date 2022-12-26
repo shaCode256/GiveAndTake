@@ -32,7 +32,7 @@ public class ManageUsers extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_manage_users);
-        Button btn_show_users= findViewById(R.id.showBtn);
+        Button btnShowUsers= findViewById(R.id.showBtn);
         ListView usersList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
@@ -59,21 +59,21 @@ public class ManageUsers extends ListActivity {
             }//onCancelled
         });
 
-        btn_show_users.setOnClickListener(view -> {
+        btnShowUsers.setOnClickListener(view -> {
             addItems(view);
-            btn_show_users.setVisibility(View.GONE);
+            btnShowUsers.setVisibility(View.GONE);
         });
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {
             String requestUserInfo= (String) parent.getAdapter().getItem(position);
             String requestUserId= usersInfoToId.get(requestUserInfo);
-            Intent view_requests_intent = new Intent(ManageUsers.this, ViewMyRequests.class);
-            view_requests_intent.putExtra("userId", userId);
-            view_requests_intent.putExtra("isManager", isManager);
-            view_requests_intent.putExtra("managerWatching", "1");
-            view_requests_intent.putExtra("requestUserId", requestUserId);
-            view_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
-            startActivity(view_requests_intent);
+            Intent viewRequestsIntent = new Intent(ManageUsers.this, ViewMyRequests.class);
+            viewRequestsIntent.putExtra("userId", userId);
+            viewRequestsIntent.putExtra("isManager", isManager);
+            viewRequestsIntent.putExtra("managerWatching", "1");
+            viewRequestsIntent.putExtra("requestUserId", requestUserId);
+            viewRequestsIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(viewRequestsIntent);
         });
     }
 

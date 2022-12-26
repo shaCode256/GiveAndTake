@@ -32,7 +32,7 @@ public class ViewReportedRequests extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_reported_requests);
-        Button btn_show_reported_requests= findViewById(R.id.showReportedRequestsBtn);
+        Button btnShowReportedRequests= findViewById(R.id.showReportedRequestsBtn);
         ListView requestsList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
@@ -66,10 +66,10 @@ public class ViewReportedRequests extends ListActivity {
             }//onCancelled
         });
 
-        btn_show_reported_requests.setOnClickListener(view -> {
+        btnShowReportedRequests.setOnClickListener(view -> {
             addReportedRequests(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_reported_requests.setVisibility(View.GONE);
+            btnShowReportedRequests.setVisibility(View.GONE);
         });
 
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
@@ -86,7 +86,7 @@ public class ViewReportedRequests extends ListActivity {
                         assert requestUserId != null;
                         String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
                         String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
                         Intent viewRequestIntent = new Intent(ViewReportedRequests.this, ViewRequest.class);

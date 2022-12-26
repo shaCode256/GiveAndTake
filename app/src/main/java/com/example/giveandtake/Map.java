@@ -56,7 +56,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
-    public static HashSet<String> taken_requests_ids = new HashSet<>();
+    public static HashSet<String> takenRequestsIds = new HashSet<>();
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @SuppressLint("MissingPermission")
     @Override
@@ -69,61 +69,62 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        Button create_request_btn= findViewById(R.id.btn_create_request_from_map);
-        Button btn_locate_me= findViewById(R.id.btn_locate_me);
-        Button btn_my_requests= findViewById(R.id.btn_my_requests);
-        Button btn_request_reports= findViewById(R.id.btn_watch_request_reports);
-        Button log_out_btn= findViewById(R.id.log_out_btn);
-        Button settings_btn= findViewById(R.id.btn_settings);
-        Button manage_users_btn= findViewById(R.id.manage_users_btn);
+        Button createRequestBtn= findViewById(R.id.btn_create_request_from_map);
+        Button btnLocateMe= findViewById(R.id.btn_locate_me);
+        Button btnMyRequests= findViewById(R.id.btn_my_requests);
+        Button btnRequestReports= findViewById(R.id.btn_watch_request_reports);
+        Button logOutBtn= findViewById(R.id.log_out_btn);
+        Button settingsBtn= findViewById(R.id.btn_settings);
+        Button manageUsersBtn= findViewById(R.id.manage_users_btn);
         db = FirebaseFirestore.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-        Intent myIntent = getIntent();
-        String userId = myIntent.getStringExtra("userId");
-        String isManager= myIntent.getStringExtra("isManager");
+        Intent thisIntent = getIntent();
+        String userId = thisIntent.getStringExtra("userId");
+        String isManager= thisIntent.getStringExtra("isManager");
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             String lastTimeSeenMap= LocalDateTime.now().toString();
             databaseReference.child("users").child(userId).child("lastTimeSeenMap").setValue(lastTimeSeenMap);
         }
         // if the user is not a manager
         if (isManager!=null &&isManager.equals("0")){
-            manage_users_btn.setVisibility(View.GONE);
-            btn_request_reports.setVisibility(View.GONE);
+            manageUsersBtn.setVisibility(View.GONE);
+            btnRequestReports.setVisibility(View.GONE);
         }
 
-        btn_request_reports.setOnClickListener(view -> {
-            Intent watch_request_reports_intent = new Intent(Map.this, ViewReportedRequests.class);
-            watch_request_reports_intent.putExtra("userId",userId);
-            watch_request_reports_intent.putExtra("isManager", isManager);
-            watch_request_reports_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
-            startActivity(watch_request_reports_intent);
+        btnRequestReports.setOnClickListener(view -> {
+            Intent watchRequestReportsIntent = new Intent(Map.this, ViewReportedRequests.class);
+            watchRequestReportsIntent.putExtra("userId",userId);
+            watchRequestReportsIntent.putExtra("isManager", isManager);
+            watchRequestReportsIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(watchRequestReportsIntent);
         });
 
-        create_request_btn.setOnClickListener(view -> {
-            Intent create_request_intent = new Intent(Map.this, RequestCreation.class);
-            create_request_intent.putExtra("userId",userId);
-            create_request_intent.putExtra("isManager", isManager);
-            create_request_intent.putExtra("taken_requests_ids", taken_requests_ids);
-            startActivity(create_request_intent);
+        createRequestBtn.setOnClickListener(view -> {
+            Intent createRequestIntent = new Intent(Map.this, RequestCreation.class);
+            createRequestIntent.putExtra("userId",userId);
+            createRequestIntent.putExtra("isManager", isManager);
+            createRequestIntent.putExtra("requestUserId", userId);
+            createRequestIntent.putExtra("takenRequestsIds", takenRequestsIds);
+            startActivity(createRequestIntent);
         });
 
-        log_out_btn.setOnClickListener(view -> {
-            stopService();
-            Intent login_intent = new Intent(Map.this, Login.class);
-            startActivity(login_intent);
+        logOutBtn.setOnClickListener(view -> {
+            stopNotificationService();
+            Intent loginIntent = new Intent(Map.this, Login.class);
+            startActivity(loginIntent);
         });
 
-        manage_users_btn.setOnClickListener(view -> {
-            Intent manage_users_intent = new Intent(Map.this, ManageUsers.class);
-            manage_users_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
-            manage_users_intent.putExtra("userId", userId);
-            manage_users_intent.putExtra("isManager", isManager);
-            startActivity(manage_users_intent);
+        manageUsersBtn.setOnClickListener(view -> {
+            Intent manageUsersIntent = new Intent(Map.this, ManageUsers.class);
+            manageUsersIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            manageUsersIntent.putExtra("userId", userId);
+            manageUsersIntent.putExtra("isManager", isManager);
+            startActivity(manageUsersIntent);
         });
 
-        btn_locate_me.setOnClickListener(v -> {
+        btnLocateMe.setOnClickListener(v -> {
             if (
                     ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                             ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -148,20 +149,20 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         });
 
-        btn_my_requests.setOnClickListener(view -> {
-            Intent view_my_requests_intent = new Intent(Map.this, ViewMyRequests.class);
-            view_my_requests_intent.putExtra("userId",userId);
-            view_my_requests_intent.putExtra("requestUserId",userId);
-            view_my_requests_intent.putExtra("isManager", isManager);
-            view_my_requests_intent.putExtra("markersRequestToDocId", markersRequestToDocId);
-            startActivity(view_my_requests_intent);
+        btnMyRequests.setOnClickListener(view -> {
+            Intent viewMyRequestsIntent = new Intent(Map.this, ViewMyRequests.class);
+            viewMyRequestsIntent.putExtra("userId",userId);
+            viewMyRequestsIntent.putExtra("requestUserId",userId);
+            viewMyRequestsIntent.putExtra("isManager", isManager);
+            viewMyRequestsIntent.putExtra("markersRequestToDocId", markersRequestToDocId);
+            startActivity(viewMyRequestsIntent);
         });
 
-        settings_btn.setOnClickListener(view -> {
-            Intent view_my_requests_intent = new Intent(Map.this, Settings.class);
-            view_my_requests_intent.putExtra("userId",userId);
-            view_my_requests_intent.putExtra("isManager", isManager);
-            startActivity(view_my_requests_intent);
+        settingsBtn.setOnClickListener(view -> {
+            Intent viewMyRequestsIntent = new Intent(Map.this, Settings.class);
+            viewMyRequestsIntent.putExtra("userId",userId);
+            viewMyRequestsIntent.putExtra("isManager", isManager);
+            startActivity(viewMyRequestsIntent);
         });
     }
 
@@ -205,14 +206,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                                             String requestId= doc.getString("requestId");
                                             String requestUserId= doc.getString("userId");
                                             String isManager= doc.getString("isManager");
-                                            String creation_time= doc.getString("creationTime");
+                                            String creationTime= doc.getString("creationTime");
                                             //to check if requestUseId is manager: change the icon
-                                            BitmapDescriptor selected_icon= handIcon;
-                                            taken_requests_ids.add(requestId);
+                                            BitmapDescriptor selectedIcon= handIcon;
+                                            takenRequestsIds.add(requestId);
                                             if(isManager!=null && isManager.equals("1")) {
-                                                selected_icon= starIcon;
+                                                selectedIcon= starIcon;
                                             }
-                                            Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(selected_icon).snippet(creation_time));
+                                            Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(selectedIcon).snippet(creationTime));
                                             assert newMarker != null;
                                             newMarker.setTag(requestUserId);
                                             markersHashmap.put(requestId,newMarker);
@@ -224,7 +225,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         }.run();
 
-        startService();
+        startNotificationService();
 
         // adding on click listener to marker of google maps.
         mMap.setOnMapLongClickListener(latLng -> {
@@ -232,14 +233,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");
-            Intent newIntent = new Intent(Map.this, RequestCreation.class);
-            newIntent.putExtra("userId",userId);
-            newIntent.putExtra("requestUserId", userId);
-            newIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
-            newIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
-            newIntent.putExtra("taken_requests_ids", taken_requests_ids);
-            newIntent.putExtra("isManager", isManager);
-            startActivity(newIntent);
+            Intent createRequestIntent = new Intent(Map.this, RequestCreation.class);
+            createRequestIntent.putExtra("userId",userId);
+            createRequestIntent.putExtra("requestUserId", userId);
+            createRequestIntent.putExtra("clickedLat", String.valueOf(latLng.latitude));
+            createRequestIntent.putExtra("clickedLong",String.valueOf(latLng.longitude));
+            createRequestIntent.putExtra("takenRequestsIds", takenRequestsIds);
+            createRequestIntent.putExtra("isManager", isManager);
+            startActivity(createRequestIntent);
         });
 
         mMap.setOnMarkerClickListener(marker -> {
@@ -254,10 +255,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
                         String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        String creationTime = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("creation_time").getValue(String.class));
+                        String creationTime = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class));
                         // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
@@ -305,8 +306,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    public void startService() {
-        stopService();
+    public void startNotificationService() {
+        stopNotificationService();
         Intent serviceIntent = new Intent(this, NotificationService.class);
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
@@ -314,9 +315,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(userId).child("settings").child("notifications").child("turned_on").getValue()!=null) {
-                    String notifications_turned_on = snapshot.child(userId).child("settings").child("notifications").child("turned_on").getValue().toString();
-                    if (notifications_turned_on.equals("1")) {
+                if(snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue()!=null) {
+                    String notificationsTurnedOn = snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue().toString();
+                    if (notificationsTurnedOn.equals("1")) {
                         String isManager = thisIntent.getStringExtra("isManager");
                         serviceIntent.putExtra("userId", userId);
                         serviceIntent.putExtra("isManager", isManager);
@@ -334,7 +335,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
     }
 
-    public void stopService() {
+    public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         stopService(serviceIntent);
     }

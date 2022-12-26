@@ -30,7 +30,7 @@ public class ViewJoiners extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_joiners);
-        Button btn_show_joiners= findViewById(R.id.showBtn);
+        Button btnShowJoiners = findViewById(R.id.showBtn);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 listItems);
@@ -38,9 +38,9 @@ public class ViewJoiners extends ListActivity {
         Intent thisIntent = getIntent();
         String requestUserId= thisIntent.getStringExtra("requestUserId");
         String requestId= thisIntent.getStringExtra("requestId");
-        EditText request_idEditTxt = findViewById(R.id.request_id);
-        request_idEditTxt.setText(requestId, TextView.BufferType.EDITABLE);
-        request_idEditTxt.setEnabled(false);
+        EditText requestIdEditTxt = findViewById(R.id.request_id);
+        requestIdEditTxt.setText(requestId, TextView.BufferType.EDITABLE);
+        requestIdEditTxt.setEnabled(false);
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -57,10 +57,10 @@ public class ViewJoiners extends ListActivity {
             }//onCancelled
         });
 
-        btn_show_joiners.setOnClickListener(view -> {
+        btnShowJoiners.setOnClickListener(view -> {
             addItems(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_joiners.setVisibility(View.GONE);
+            btnShowJoiners.setVisibility(View.GONE);
         });
     }
 

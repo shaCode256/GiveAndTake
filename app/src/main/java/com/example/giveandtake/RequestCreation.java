@@ -41,44 +41,44 @@ public class RequestCreation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //TODO: what happens when we create a request in the same place?
-        Intent mIntent = getIntent();
+        Intent thisIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
-        String userId = mIntent.getStringExtra("userId");
-        String requestUserId = mIntent.getStringExtra("requestUserId");
-        String isManager = mIntent.getStringExtra("isManager");
-        String clickedLat = mIntent.getStringExtra("clickedLat");
-        String clickedLong = mIntent.getStringExtra("clickedLong");
+        String userId = thisIntent.getStringExtra("userId");
+        String requestUserId = thisIntent.getStringExtra("requestUserId");
+        String isManager = thisIntent.getStringExtra("isManager");
+        String clickedLat = thisIntent.getStringExtra("clickedLat");
+        String clickedLong = thisIntent.getStringExtra("clickedLong");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_creation);
         EditText subject = findViewById(R.id.create_request_input_subject);
         EditText body = findViewById(R.id.create_request_input_body);
-        EditText longitude_input = findViewById(R.id.longitude_input);
-        EditText latitude_input = findViewById(R.id.latitude_input);
-        EditText contact_details = findViewById(R.id.create_request_input_contact_details);
+        EditText longitudeInput = findViewById(R.id.longitude_input);
+        EditText latitudeInput = findViewById(R.id.latitude_input);
+        EditText contactDetails = findViewById(R.id.create_request_input_contact_details);
         Button btnAddRequest = findViewById(R.id.button_add_request);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button addCurrLocation = findViewById(R.id.button_add_location);
         if (clickedLat != null && clickedLong != null) {
-            longitude_input.setText(clickedLong, TextView.BufferType.EDITABLE);
-            latitude_input.setText(clickedLat, TextView.BufferType.EDITABLE);
+            longitudeInput.setText(clickedLong, TextView.BufferType.EDITABLE);
+            latitudeInput.setText(clickedLat, TextView.BufferType.EDITABLE);
         }
         btnAddRequest.setOnClickListener(v -> {
             String subjectTxt = subject.getText().toString();
             String bodyTxt = body.getText().toString();
             //TODO: deal with converting double and string, also with intents. try to avoid some conversions
-            String longitudeTxt = longitude_input.getText().toString();
-            String latitudeTxt = latitude_input.getText().toString();
-            String contact_detailsTxt = contact_details.getText().toString();
+            String longitudeTxt = longitudeInput.getText().toString();
+            String latitudeTxt = latitudeInput.getText().toString();
+            String contactDetailsTxt = contactDetails.getText().toString();
             int randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
             String setRequestId = String.valueOf(randomNum);
             //to avoid repeating the same requestId
-            HashSet<String> taken_requests_ids= (HashSet<String>)mIntent.getExtras().getSerializable("taken_requests_ids");
-            while (taken_requests_ids.contains(setRequestId)){
+            HashSet<String> takenRequestsIds= (HashSet<String>)thisIntent.getExtras().getSerializable("takenRequestsIds");
+            while (takenRequestsIds.contains(setRequestId)){
                 //change until it's a new request number
                 randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
                 setRequestId = String.valueOf(randomNum);
             }
-            if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contact_detailsTxt.isEmpty()) {
+            if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contactDetailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
                 // Add a new marker with the request ID
@@ -102,16 +102,16 @@ public class RequestCreation extends AppCompatActivity {
                     double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                     if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
                         //check valid latitude and longitude input
-                        String creation_time= "";
+                        String creationTime= "";
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                            creation_time = LocalDateTime.now().toString();
+                            creationTime = LocalDateTime.now().toString();
                         }
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
                         user.put("geoPoint", geoPointRequest);
                         user.put("requestId", setRequestId);
                         user.put("userId", requestUserId);
                         user.put("isManager", isManager);
-                        user.put("creationTime", creation_time);
+                        user.put("creationTime", creationTime);
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
@@ -119,18 +119,18 @@ public class RequestCreation extends AppCompatActivity {
                                 .addOnFailureListener(e -> {
                                 });
                         String finalSetRequestId = setRequestId;
-                        String finalCreation_time = creation_time;
+                        String finalCreationTime = creationTime;
                         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 //add the request in the db
                                 //get currTime
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creation_time").setValue(finalCreation_time);
+                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creationTime").setValue(finalCreationTime);
                                 }
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("contact_details").setValue(contact_detailsTxt);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("contactDetails").setValue(contactDetailsTxt);
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
                                 //   }
                             }
@@ -171,8 +171,8 @@ public class RequestCreation extends AppCompatActivity {
                             .addOnSuccessListener(RequestCreation.this, location -> {
                                 // Got last known location. In some rare situations this can be null.
                                 if (location != null) {
-                                    longitude_input.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                    latitude_input.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                                    longitudeInput.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                    latitudeInput.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
                                 }
                                 else{
                                     Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();

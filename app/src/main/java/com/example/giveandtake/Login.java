@@ -92,11 +92,11 @@ public class Login extends AppCompatActivity {
         auth.signInWithEmailAndPassword(emailTxt , passwordTxt).addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 if (auth.getCurrentUser().isEmailVerified()) {
-                    Intent myIntent = new Intent(Login.this, Map.class);
+                    Intent thisIntent = new Intent(Login.this, Map.class);
                     String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
-                    myIntent.putExtra("userId", phoneTxt);
-                    myIntent.putExtra("isManager", isManager);
-                    startActivity(myIntent);
+                    thisIntent.putExtra("userId", phoneTxt);
+                    thisIntent.putExtra("isManager", isManager);
+                    startActivity(thisIntent);
                     finish();
                 }
                 else{

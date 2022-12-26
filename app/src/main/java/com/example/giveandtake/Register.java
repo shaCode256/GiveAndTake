@@ -34,7 +34,6 @@ public class Register extends AppCompatActivity {
         auth= FirebaseAuth.getInstance();
 
         registerBtn.setOnClickListener(view -> {
-            // get data from EditTexts into String variables
             String fullNameTxt = fullName.getText().toString();
             String emailTxt = email.getText().toString();
             String phoneTxt = phone.getText().toString();

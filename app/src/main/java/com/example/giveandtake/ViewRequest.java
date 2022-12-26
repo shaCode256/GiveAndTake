@@ -40,17 +40,17 @@ public class ViewRequest extends AppCompatActivity {
         String creationTime= myIntent.getStringExtra("creationTime");
         EditText subjectEditTxt = findViewById(R.id.create_request_input_subject);
         EditText bodyEditTxt = findViewById(R.id.create_request_input_body);
-        EditText longitude_inputEditTxt = findViewById(R.id.longitude_input);
-        EditText latitude_inputEditTxt = findViewById(R.id.latitude_input);
-        EditText contact_detailsEditTxt = findViewById(R.id.create_request_input_contact_details);
-        EditText creation_timeEditTxt = findViewById(R.id.creation_time);
-        EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
+        EditText longitudeInputEditTxt = findViewById(R.id.longitude_input);
+        EditText latitudeInputEditTxt = findViewById(R.id.latitude_input);
+        EditText contactDetailsEditTxt = findViewById(R.id.create_request_input_contact_details);
+        EditText creationTimeEditTxt = findViewById(R.id.creation_time);
+        EditText userIdOfRequestEditTxt = findViewById(R.id.user_id_of_request);
         subjectEditTxt.setEnabled(false);
         bodyEditTxt.setEnabled(false);
-        user_id_of_requestEditTxt.setEnabled(false);
-        longitude_inputEditTxt.setEnabled(false);
-        latitude_inputEditTxt.setEnabled(false);
-        creation_timeEditTxt.setEnabled(false);
+        userIdOfRequestEditTxt.setEnabled(false);
+        longitudeInputEditTxt.setEnabled(false);
+        latitudeInputEditTxt.setEnabled(false);
+        creationTimeEditTxt.setEnabled(false);
         Button btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
@@ -61,11 +61,11 @@ public class ViewRequest extends AppCompatActivity {
         btnDeleteRequest.setVisibility(View.GONE);
         subjectEditTxt.setText(subject, TextView.BufferType.EDITABLE);
         bodyEditTxt.setText(body, TextView.BufferType.EDITABLE);
-        contact_detailsEditTxt.setText(contactDetails, TextView.BufferType.EDITABLE);
-        latitude_inputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
-        longitude_inputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
-        creation_timeEditTxt.setText(creationTime, TextView.BufferType.EDITABLE);
-        user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
+        contactDetailsEditTxt.setText(contactDetails, TextView.BufferType.EDITABLE);
+        latitudeInputEditTxt.setText(latitude, TextView.BufferType.EDITABLE);
+        longitudeInputEditTxt.setText(longitude, TextView.BufferType.EDITABLE);
+        creationTimeEditTxt.setText(creationTime, TextView.BufferType.EDITABLE);
+        userIdOfRequestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
         btnDeleteRequest.setVisibility(View.GONE);
         btnViewJoiners.setVisibility(View.GONE);
         if (isManager!=null &&isManager.equals("1") || requestUserId!=null && requestUserId.equals(userId) )
@@ -83,13 +83,13 @@ public class ViewRequest extends AppCompatActivity {
         }
         }
 
-        contact_detailsEditTxt.setOnClickListener(v -> {
+        contactDetailsEditTxt.setOnClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
             phoneIntent.setData(Uri.parse("tel:" + contactDetails));
             startActivity(phoneIntent);
         });
 
-        contact_detailsEditTxt.setOnLongClickListener(v -> {
+        contactDetailsEditTxt.setOnLongClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
             phoneIntent.setData(Uri.parse("tel:" + contactDetails));
             startActivity(phoneIntent);
@@ -154,7 +154,7 @@ public class ViewRequest extends AppCompatActivity {
                // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
                 String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
                 //TODO: maybe add contact details
-                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contact_details").setValue(joinerContactDetails);
+                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contactDetails").setValue(joinerContactDetails);
                 databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
             }
             @Override

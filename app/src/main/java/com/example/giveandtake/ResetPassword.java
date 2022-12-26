@@ -21,7 +21,6 @@ public class ResetPassword extends AppCompatActivity {
         inputEmail = findViewById(R.id.editText_password_reset_email);
         Button btnReset = findViewById(R.id.button_password_reset);
         Button returnToLogin = findViewById(R.id.loginBtn);
-
         returnToLogin.setOnClickListener(v -> startActivity(new Intent(ResetPassword.this, Login.class)));
         btnReset.setOnClickListener(v -> {
             String emailTxt= inputEmail.getText().toString();

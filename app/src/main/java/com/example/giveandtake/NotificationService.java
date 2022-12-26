@@ -48,13 +48,13 @@ public class NotificationService extends Service {
     String lastTimeSeenMapStr;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
-    public void onCreate(Intent intents, int flags, int startId) {
+    public void onCreate(Intent intent, int flags, int startId) {
         super.onCreate();
-        Intent intent = new Intent(this, Map.class);
-        intent.putExtra("userId", userId);
-        intent.putExtra("isManager", isManager);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent mapIntent = new Intent(this, Map.class);
+        mapIntent.putExtra("userId", userId);
+        mapIntent.putExtra("isManager", isManager);
+        mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
                 .setSmallIcon(R.drawable.star_icon)
                 .setContentTitle("New notification- onCreate!")
@@ -106,10 +106,10 @@ public class NotificationService extends Service {
                                             LatLng markerLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                                             String requestId = doc.getString("requestId");
                                        //     String requestUserId = doc.getString("userId");
-                                            String creation_time = doc.getString("creationTime");
+                                            String creationTime = doc.getString("creationTime");
                                             //to check if requestUseId is manager: change the icon
                                             markersHashmap.put(requestId, new HashMap<>());
-                                            markersHashmap.get(requestId).put(markerLocation, creation_time);
+                                            markersHashmap.get(requestId).put(markerLocation, creationTime);
                                         }
                                     }
                                 }
@@ -127,9 +127,9 @@ public class NotificationService extends Service {
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(userId).child("settings").child("notifications").child("auto_detect_location").getValue()!=null) {
-                    String auto_detect_location = snapshot.child(userId).child("settings").child("notifications").child("auto_detect_location").getValue().toString();
-                    if (auto_detect_location.equals("1") || snapshot.child(userId).child("settings").child("notifications").child("specific_location").getValue() == null) {
+                if(snapshot.child(userId).child("settings").child("notifications").child("autoDetectLocation").getValue()!=null) {
+                    String autoDetectLocation = snapshot.child(userId).child("settings").child("notifications").child("autoDetectLocation").getValue().toString();
+                    if (autoDetectLocation.equals("1") || snapshot.child(userId).child("settings").child("notifications").child("specificLocation").getValue() == null) {
                         if (
                                 ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -162,11 +162,11 @@ public class NotificationService extends Service {
                     }
                     else{
                         //get the specific location2
-                        String specified_latitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("latitude").getValue().toString();
-                        String specified_longitude_str = snapshot.child(userId).child("settings").child("notifications").child("specific_location").child("longitude").getValue().toString();
+                        String specifiedLatitudeStr = snapshot.child(userId).child("settings").child("notifications").child("specificLocation").child("latitude").getValue().toString();
+                        String specifiedLongitudeStr = snapshot.child(userId).child("settings").child("notifications").child("specificLocation").child("longitude").getValue().toString();
                         Location location= new Location(LocationManager.GPS_PROVIDER);
-                        location.setLongitude(Float.parseFloat(specified_latitude_str));
-                        location.setLatitude(Float.parseFloat(specified_longitude_str));
+                        location.setLongitude(Float.parseFloat(specifiedLatitudeStr));
+                        location.setLatitude(Float.parseFloat(specifiedLongitudeStr));
                         setLocation.set(location);
                         if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
                             float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
@@ -209,11 +209,11 @@ public class NotificationService extends Service {
                 if (location!=null && markerLocation!=null && location.distanceTo(markerLocation) <= distance &&
                         markerDateTime.isAfter(lastTimeSeenMap)) {
                     // Create an explicit intent for an Activity in your app
-                    Intent intent = new Intent(this, Map.class);
-                    intent.putExtra("userId", userId);
-                    intent.putExtra("isManager", isManager);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent MapIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    Intent mapIntent = new Intent(this, Map.class);
+                    mapIntent.putExtra("userId", userId);
+                    mapIntent.putExtra("isManager", isManager);
+                    mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent MapIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
                             .setSmallIcon(R.drawable.star_icon)
                             .setContentTitle("New Requests!")

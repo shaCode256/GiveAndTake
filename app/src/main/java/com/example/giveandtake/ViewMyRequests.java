@@ -38,10 +38,10 @@ public class ViewMyRequests extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_my_requests);
-        Button btn_show_my_open_requests= findViewById(R.id.showMyOpenRequestsBtn);
-        Button btn_show_requests_i_joined= findViewById(R.id.showRequestsIJoinedBtn);
-        Button btn_block_user= findViewById(R.id.blockUser);
-        Button btn_unblock_user= findViewById(R.id.unblockUser);
+        Button btnShowMyOpenRequests= findViewById(R.id.showMyOpenRequestsBtn);
+        Button btnShowRequestsIJoined= findViewById(R.id.showRequestsIJoinedBtn);
+        Button btnBlockUser= findViewById(R.id.blockUser);
+        Button btnUnblockUser= findViewById(R.id.unblockUser);
         ListView requestsList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
@@ -53,12 +53,12 @@ public class ViewMyRequests extends ListActivity {
         String isManager = thisIntent.getStringExtra("isManager");
         String requestUserId= thisIntent.getStringExtra("requestUserId");
         if (isManager!=null &&isManager.equals("0") || requestUserId.equals(userId)){
-            btn_block_user.setVisibility(View.GONE);
-            btn_unblock_user.setVisibility(View.GONE);
+            btnBlockUser.setVisibility(View.GONE);
+            btnUnblockUser.setVisibility(View.GONE);
         }
-        EditText user_id_of_requestEditTxt = findViewById(R.id.user_id_of_request);
-        user_id_of_requestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
-        user_id_of_requestEditTxt.setEnabled(false);
+        EditText userIdOfRequestEditTxt = findViewById(R.id.user_id_of_request);
+        userIdOfRequestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
+        userIdOfRequestEditTxt.setEnabled(false);
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -75,8 +75,8 @@ public class ViewMyRequests extends ListActivity {
                     for(DataSnapshot d : dataSnapshot.child(requestUserId).child("requestsUserJoined").getChildren()) {
                         String requestId= d.getKey();
                         if(dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue()!=null) {
-                            String creator_of_request_user_joined = dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue().toString();
-                            String requestSubject = dataSnapshot.child(creator_of_request_user_joined).child("requestId").child(requestId).child("subject").getValue().toString();
+                            String creatorOfRequestUserJoined = dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue().toString();
+                            String requestSubject = dataSnapshot.child(creatorOfRequestUserJoined).child("requestId").child(requestId).child("subject").getValue().toString();
                             requestsUserJoinedInfo.add("Subject: "+requestSubject + " | Request Id: " + requestId);
                             requestsInfoToId.put("Subject: "+requestSubject + " | Request Id: " + requestId, requestId);
                         }
@@ -90,21 +90,21 @@ public class ViewMyRequests extends ListActivity {
             }//onCancelled
         });
 
-        btn_show_my_open_requests.setOnClickListener(view -> {
+        btnShowMyOpenRequests.setOnClickListener(view -> {
             addMyOpenRequests(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_my_open_requests.setVisibility(View.GONE);
-            btn_show_requests_i_joined.setVisibility(View.VISIBLE);
+            btnShowMyOpenRequests.setVisibility(View.GONE);
+            btnShowRequestsIJoined.setVisibility(View.VISIBLE);
         });
 
-        btn_show_requests_i_joined.setOnClickListener(view -> {
+        btnShowRequestsIJoined.setOnClickListener(view -> {
             addRequestsUserJoined(view);
             //TODO: pass the isManager. or retrieve it in map
-            btn_show_my_open_requests.setVisibility(View.VISIBLE);
-            btn_show_requests_i_joined.setVisibility(View.GONE);
+            btnShowMyOpenRequests.setVisibility(View.VISIBLE);
+            btnShowRequestsIJoined.setVisibility(View.GONE);
         });
 
-        btn_block_user.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        btnBlockUser.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //check if phone is not registered before
@@ -120,7 +120,7 @@ public class ViewMyRequests extends ListActivity {
             }
         }));
 
-        btn_unblock_user.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        btnUnblockUser.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //check if phone is not registered before
@@ -159,10 +159,10 @@ public class ViewMyRequests extends ListActivity {
                         assert finalRequestUserId != null;
                         String requestSubject = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String requestBody = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String contactDetails = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("contact_details").getValue(String.class);
+                        String contactDetails = snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
                         String requestLatitude = String.valueOf(snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String requestLongitude = String.valueOf(snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        String creationTime = String.valueOf(snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("creation_time").getValue(String.class));
+                        String creationTime = String.valueOf(snapshot.child(finalRequestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class));
                         Intent viewRequestIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
                         viewRequestIntent.putExtra("requestSubject",requestSubject);
                         viewRequestIntent.putExtra("requestBody", requestBody);

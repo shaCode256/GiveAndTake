@@ -35,8 +35,8 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         EditText distanceEditText = findViewById(R.id.closeRaidus);
-        EditText latitude_input= findViewById(R.id.latitude_input);
-        EditText longitude_input= findViewById(R.id.longitude_input);
+        EditText latitudeInput= findViewById(R.id.latitude_input);
+        EditText longitudeInput= findViewById(R.id.longitude_input);
         Button turnOnAutoDetectLocationBtn= findViewById(R.id.btn_turn_on_auto_detect_location);
         Button turnOffNotificationsBtn= findViewById(R.id.btn_turn_off_notification);
         Button turnOnNotificationsBtn= findViewById(R.id.btn_turn_on_notification);
@@ -45,10 +45,9 @@ public class Settings extends AppCompatActivity {
         Button backToMapBtn= findViewById(R.id.backToMap);
         Button applyKmBtn= findViewById(R.id.applyKmBtn);
         auth= FirebaseAuth.getInstance();
-        Intent myIntent= getIntent();
-        String userId = myIntent.getStringExtra("userId");
-        String isManager= myIntent.getStringExtra("isManager");
-
+        Intent thisIntent= getIntent();
+        String userId = thisIntent.getStringExtra("userId");
+        String isManager= thisIntent.getStringExtra("isManager");
 
         applyKmBtn.setOnClickListener(view -> {
             String distance = distanceEditText.getText().toString();
@@ -73,7 +72,7 @@ public class Settings extends AppCompatActivity {
         turnOnAutoDetectLocationBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("auto_detect_location").setValue(1);
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(1);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -83,8 +82,8 @@ public class Settings extends AppCompatActivity {
 
         useSpecifiedLocationBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
-            String latitudeTxt= latitude_input.getText().toString();
-            String longitudeTxt= longitude_input.getText().toString();
+            String latitudeTxt= latitudeInput.getText().toString();
+            String longitudeTxt= longitudeInput.getText().toString();
             //check if they're valid numeric values
             boolean numeric = true;
             try {
@@ -105,8 +104,8 @@ public class Settings extends AppCompatActivity {
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("auto_detect_location").setValue(0);
-                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("specific_location").setValue(geoPoint);
+                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(0);
+                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("specificLocation").setValue(geoPoint);
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
@@ -128,7 +127,7 @@ public class Settings extends AppCompatActivity {
         turnOnNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(1);
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turnedOn").setValue(1);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -139,7 +138,7 @@ public class Settings extends AppCompatActivity {
         turnOffNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turned_on").setValue(0);
+                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turnedOn").setValue(0);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -168,8 +167,8 @@ public class Settings extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("auto_detect_location").setValue(0);
-                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("specific_location").setValue(geoPoint);
+                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(0);
+                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("specificLocation").setValue(geoPoint);
                                     }
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
