@@ -19,7 +19,7 @@
         android:layout_marginTop="40dp"
         android:paddingRight="10dp"
         android:layout_marginBottom="80dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:background="#8BC34A"
         />
 
@@ -87,22 +87,22 @@
         android:layout_marginBottom="80dp"
         android:textSize="20sp"
         android:textColor="@color/white"
-        android:background="#E91ED5"
+        android:background="#E91EC7"
         />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|top"
+        android:layout_gravity="left|top"
         android:text="Settings"
         android:padding="10dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="50dp"
         android:paddingLeft="10dp"
         android:layout_marginBottom="80dp"
         android:textSize="20sp"
         android:textColor="@color/white"
-        android:background="#2196F3"
+        android:background="#03A9F4"
         />
 
 </fragment>
