@@ -48,7 +48,7 @@
         android:padding="10dp"
         android:textSize="20sp"
         android:paddingLeft="10dp"
-        />
+    />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/manage_users_btn"

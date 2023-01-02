@@ -78,36 +78,38 @@ public class Register extends AppCompatActivity {
     }
 
     private void registerUser(String emailTxt, String passwordTxt, String phoneTxt, String fullNameTxt) {
-        auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
-            //add listener if failed or not and if yes then change.
-            //send verificationLink
+        if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
+            auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
+                //add listener if failed or not and if yes then change.
+                //send verificationLink
 
 
-            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
+                auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+                if (emailTxt.endsWith("@manager.com")) {
+                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
                 } else {
-                    Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
                 }
-            });
+                databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+                databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
+                databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
+                //TODO: add check of university email
+                Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
+                finish();
+            }).addOnFailureListener(e -> Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show());
 
+            //TODO: Add verify phone number
 
-
-            if (emailTxt.endsWith("@manager.com")) {
-                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
-            } else {
-                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
-            }
-            databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
-            databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
-            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
-            //TODO: add check of university email
-            Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
-            finish();
-        }).addOnFailureListener(e -> Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show());
-
-        //TODO: Add verify phone number
-
-
+        } else {
+            Toast.makeText(Register.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();
+        }
     }
 }
