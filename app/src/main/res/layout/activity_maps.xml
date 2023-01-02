@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right|bottom"
         android:text="Locate Me"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:background="#F44336"
         android:padding="10dp"
         android:textSize="20sp"
