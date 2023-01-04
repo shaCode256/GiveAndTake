@@ -72,17 +72,18 @@ public class NotificationService extends Service {
         userId = intent.getStringExtra("userId");
         isManager = intent.getStringExtra("isManager");
         lastTimeSeenMapStr = intent.getStringExtra("lastTimeSeenMapStr");
-        intent.putExtra("userId", userId);
-        intent.putExtra("isManager", isManager);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE);
+        Intent mapIntent= new Intent(this,  Map.class);
+        mapIntent.putExtra("userId", userId);
+        mapIntent.putExtra("isManager", isManager);
+        mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingMapIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_MUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
                 .setSmallIcon(R.drawable.star_icon)
                 .setContentTitle("Searching for Requests...!")
                 .setContentText("around you")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 // Set the intent that will fire when the user taps the notification
-                .setContentIntent(MapIntent)
+                .setContentIntent(pendingMapIntent)
                 .setAutoCancel(true);
         startForeground(1, builder.build());
         Timer myTimer = new Timer ();
