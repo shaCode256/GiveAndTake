@@ -3,6 +3,7 @@ package com.example.giveandtake;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,13 +87,23 @@ public class ViewRequest extends AppCompatActivity {
 
         userIdOfRequestEditTxt.setOnClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-            phoneIntent.setData(Uri.parse("tel:" + userId));
+            phoneIntent.setData(Uri.parse("tel:" + requestUserId));
             startActivity(phoneIntent);
+        });
+
+        userIdOfRequestEditTxt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
+                phoneIntent.setData(Uri.parse("tel:" + requestUserId));
+                startActivity(phoneIntent);
+                return false;
+            }
         });
 
         userIdOfRequestEditTxt.setOnLongClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-            phoneIntent.setData(Uri.parse("tel:" + userId));
+            phoneIntent.setData(Uri.parse("tel:" + requestUserId));
             startActivity(phoneIntent);
             return false;
         });
