@@ -51,7 +51,7 @@ public class VerifyEmail extends AppCompatActivity {
     }
 
     private void registerUser(String emailTxt, String passwordTxt) {
-        if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
+        if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
             auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
                 //add listener if failed or not and if yes then change.
                 //send verificationLink
