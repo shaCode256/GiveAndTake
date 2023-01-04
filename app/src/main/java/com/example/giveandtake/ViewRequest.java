@@ -83,20 +83,18 @@ public class ViewRequest extends AppCompatActivity {
         }
         }
 
-        contactDetailsEditTxt.setOnClickListener(v -> {
+        userIdOfRequestEditTxt.setOnClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
             phoneIntent.setData(Uri.parse("tel:" + contactDetails));
             startActivity(phoneIntent);
         });
 
-        contactDetailsEditTxt.setOnLongClickListener(v -> {
+        userIdOfRequestEditTxt.setOnLongClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
             phoneIntent.setData(Uri.parse("tel:" + contactDetails));
             startActivity(phoneIntent);
             return false;
         });
-
-
 
         btnBackToMap.setOnClickListener(v -> {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
