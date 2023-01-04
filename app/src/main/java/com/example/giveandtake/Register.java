@@ -26,21 +26,22 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         EditText fullName = findViewById(R.id.fullname);
         EditText email= findViewById(R.id.email);
-        EditText phone= findViewById(R.id.phone);
         EditText password= findViewById(R.id.password);
         EditText conPassword= findViewById(R.id.conPassword);
         Button registerBtn= findViewById(R.id.registerBtn);
         TextView loginNowBtn= findViewById(R.id.loginNow);
+        Intent thisIntent= getIntent();
+        String phoneTxt= thisIntent.getStringExtra("phoneTxt");
+
         auth= FirebaseAuth.getInstance();
 
         registerBtn.setOnClickListener(view -> {
             String fullNameTxt = fullName.getText().toString();
             String emailTxt = email.getText().toString();
-            String phoneTxt = phone.getText().toString();
             String passwordTxt = password.getText().toString();
             String conPasswordTxt = conPassword.getText().toString();
             //check if user fills all the fields before sending data to Firebase
-            if(fullNameTxt.isEmpty() || emailTxt.isEmpty() || phoneTxt.isEmpty()){
+            if(fullNameTxt.isEmpty() || emailTxt.isEmpty()){
                 Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
             }
             //check if passwords are matching with each other
@@ -48,22 +49,19 @@ public class Register extends AppCompatActivity {
             else if(!passwordTxt.equals(conPasswordTxt)){
                 Toast.makeText(Register.this, "Passwords are not matching", Toast.LENGTH_SHORT).show();
             }
-            else if(!phoneTxt.matches("[0-9]+")){
-                Toast.makeText(Register.this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
-            }
             else{
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //check if phone is not registered before
-                        if(snapshot.hasChild(phoneTxt)){
+                        if(snapshot.hasChild(phoneTxt) &&  snapshot.child(phoneTxt).child("isEmailVerified")!=null && snapshot.child(phoneTxt).child("isEmailVerified").getValue()!=null&& snapshot.child(phoneTxt).child("isEmailVerified").getValue().toString().equals("1")){
                             Toast.makeText(Register.this, "Phone is already registered", Toast.LENGTH_SHORT).show();
                         }
                         else{
                             registerUser(emailTxt, passwordTxt, phoneTxt, fullNameTxt);
                             //show a success message and then finish the activity
                         }
-                        }
+                    }
 
 
                     @Override
@@ -82,8 +80,6 @@ public class Register extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
                 //add listener if failed or not and if yes then change.
                 //send verificationLink
-
-
                 auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(Register.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
@@ -99,14 +95,14 @@ public class Register extends AppCompatActivity {
                     databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
                 }
                 databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+                databaseReference.child("users").child(phoneTxt).child("isEmailVerified").setValue("0");
                 databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
                 databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
                 //TODO: add check of university email
                 Toast.makeText(Register.this, "User is successfully registered", Toast.LENGTH_SHORT).show();
-                finish();
+                Intent loginIntent = new Intent(Register.this, Login.class);
+                startActivity(loginIntent);
             }).addOnFailureListener(e -> Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show());
-
-            //TODO: Add verify phone number
 
         } else {
             Toast.makeText(Register.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();

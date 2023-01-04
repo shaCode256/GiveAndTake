@@ -20,7 +20,7 @@
         android:textColor="#CC000000"
         android:fontFamily="sans-serif-condensed"
         android:textSize="60sp"
-        android:text="Join Us"
+        android:text="Join us"
         />
 
     <EditText
@@ -30,20 +30,6 @@
         android:inputType="text"
         android:id= "@+id/fullname"
         android:hint="Full Name"
-        android:maxLines="1"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="0dp"
-        />
-
-    <EditText
-        android:layout_marginTop="0dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:id= "@+id/phone"
-        android:hint="Mobile Number"
         android:maxLines="1"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"

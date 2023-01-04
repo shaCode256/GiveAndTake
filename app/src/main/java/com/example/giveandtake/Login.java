@@ -45,9 +45,9 @@ public class Login extends AppCompatActivity {
         if(phoneTxt.isEmpty() || passwordTxt.isEmpty()){
             Toast.makeText(Login.this, "Please enter mobile number and password ", Toast.LENGTH_SHORT).show();
         }
-        else if(!phoneTxt.matches(numericRegex)){
-            Toast.makeText(Login.this, "Please enter a valid numeric number ", Toast.LENGTH_SHORT).show();
-        }
+//        else if(!phoneTxt.matches(numericRegex)){
+//            Toast.makeText(Login.this, "Please enter a valid numeric number ", Toast.LENGTH_SHORT).show();
+//        }
         else{
             databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -82,7 +82,7 @@ public class Login extends AppCompatActivity {
 
     registerNowBtn.setOnClickListener(view -> {
         // open Register activity
-        startActivity(new Intent(Login.this, Register.class));
+        startActivity(new Intent(Login.this, VerifyPhone.class));
     });
 
 
@@ -92,6 +92,7 @@ public class Login extends AppCompatActivity {
         auth.signInWithEmailAndPassword(emailTxt , passwordTxt).addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 if (auth.getCurrentUser().isEmailVerified()) {
+                    databaseReference.child("users").child(phoneTxt).child("isEmailVerified").setValue("1");
                     Intent thisIntent = new Intent(Login.this, Map.class);
                     String isManager = snapshot.child(phoneTxt).child("isManager").getValue(String.class);
                     thisIntent.putExtra("userId", phoneTxt);
