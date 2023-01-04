@@ -86,13 +86,13 @@ public class ViewRequest extends AppCompatActivity {
 
         userIdOfRequestEditTxt.setOnClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-            phoneIntent.setData(Uri.parse("tel:" + contactDetails));
+            phoneIntent.setData(Uri.parse("tel:" + userId));
             startActivity(phoneIntent);
         });
 
         userIdOfRequestEditTxt.setOnLongClickListener(v -> {
             Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-            phoneIntent.setData(Uri.parse("tel:" + contactDetails));
+            phoneIntent.setData(Uri.parse("tel:" + userId));
             startActivity(phoneIntent);
             return false;
         });
