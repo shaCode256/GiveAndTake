@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".Register">
+    tools:context=".VerifyEmail">
 
     <ImageView
         android:layout_width="match_parent"
@@ -22,20 +22,16 @@
         android:textSize="60sp"
         android:text="Join us"
         />
-
-    <EditText
-        android:layout_marginTop="20dp"
+    <TextView
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
-        android:id= "@+id/fullname"
-        android:hint="Full Name"
-        android:maxLines="1"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="0dp"
-        />
+        android:fontFamily="sans-serif-condensed"
+        android:text="2 Way authentication: first university E-mail. Please enter your email and verify it. after, enter and verify your phone when you log in."
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+
 
     <EditText
         android:id="@+id/email"

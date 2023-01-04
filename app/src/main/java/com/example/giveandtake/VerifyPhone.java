@@ -1,6 +1,7 @@
 package com.example.giveandtake;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,13 +13,16 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import java.lang.annotation.Native;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhone extends AppCompatActivity {
@@ -27,11 +31,14 @@ public class VerifyPhone extends AppCompatActivity {
     FirebaseAuth mAuth;
     String verificationID;
     ProgressBar bar;
+    String fullNameTxt;
+    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_phone);
+        EditText fullName = findViewById(R.id.fullname);
         phone = findViewById(R.id.phone);
         otp = findViewById(R.id.otp);
         btngenOTP = findViewById(R.id.btngenerateOTP);
@@ -41,8 +48,9 @@ public class VerifyPhone extends AppCompatActivity {
         btngenOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TextUtils.isEmpty(phone.getText().toString())) {
-                    Toast.makeText(VerifyPhone.this, "Enter Valid Phone No.", Toast.LENGTH_SHORT).show();
+                fullNameTxt = fullName.getText().toString();
+                if (TextUtils.isEmpty(phone.getText().toString()) || fullNameTxt.isEmpty()) {
+                    Toast.makeText(VerifyPhone.this, "Enter Valid Phone No. and name", Toast.LENGTH_SHORT).show();
                 } else {
                     String number = phone.getText().toString();
                     bar.setVisibility(View.VISIBLE);
@@ -111,27 +119,52 @@ public class VerifyPhone extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(VerifyPhone.this, "Phone verify Successfull", Toast.LENGTH_SHORT).show();
-                            Intent registerIntent = new Intent(VerifyPhone.this, Register.class);
-                            registerIntent.putExtra("phoneTxt", phone.getText().toString());
-                            startActivity(registerIntent);
+                            Toast.makeText(VerifyPhone.this, "Phone verified Successfully", Toast.LENGTH_SHORT).show();
+                            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    //check if phone is not registered before
+                                    if(snapshot.hasChild(phone.getText().toString())){
+                                        Toast.makeText(VerifyPhone.this, "Phone is already registered", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Intent thisIntent= getIntent();
+                                        String emailTxt= thisIntent.getStringExtra("emailTxt");
+                                        registerUser(emailTxt, phone.getText().toString(), fullNameTxt);
+                                        //show a success message and then finish the activity
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                         }
                     }
                 });
     }
-}
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if(currentUser!=null)
-//        {
-//            Intent registerIntent = new Intent(VerifyPhone.this, Register.class);
-//            registerIntent.putExtra("phoneTxt", phone.getText().toString());
-//            startActivity(registerIntent);
-//            finish();
-//        }}}
+
+    private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
+        if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
+            if (emailTxt.endsWith("@manager.com")) {
+                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+            } else {
+                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+            }
+            databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
+            databaseReference.child("users").child(phoneTxt).child("isPhoneVerified").setValue("1");
+            databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
+            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
+            Toast.makeText(VerifyPhone.this, "User is successfully registered!", Toast.LENGTH_SHORT).show();
+            Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
+            startActivity(loginIntent);
+        } else {
+            Toast.makeText(VerifyPhone.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+}
 
 //Reference:
 // https://www.youtube.com/watch?v=BWseVs2MXaI
