@@ -47,7 +47,8 @@ public class ViewRequest extends AppCompatActivity {
         EditText userIdOfRequestEditTxt = findViewById(R.id.user_id_of_request);
         subjectEditTxt.setEnabled(false);
         bodyEditTxt.setEnabled(false);
-        userIdOfRequestEditTxt.setEnabled(false);
+        userIdOfRequestEditTxt.setEnabled(true);
+        contactDetailsEditTxt.setEnabled(false);
         longitudeInputEditTxt.setEnabled(false);
         latitudeInputEditTxt.setEnabled(false);
         creationTimeEditTxt.setEnabled(false);
