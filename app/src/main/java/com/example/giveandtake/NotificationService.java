@@ -85,6 +85,7 @@ public class NotificationService extends Service {
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingMapIntent)
                 .setAutoCancel(true);
+        //        startForeground(2, builder.build());
         startForeground(1, builder.build());
         Timer myTimer = new Timer ();
         TimerTask myTask = new TimerTask () {
@@ -132,8 +133,9 @@ public class NotificationService extends Service {
                     String autoDetectLocation = snapshot.child(userId).child("settings").child("notifications").child("autoDetectLocation").getValue().toString();
                     if (autoDetectLocation.equals("1") || snapshot.child(userId).child("settings").child("notifications").child("specificLocation").getValue() == null) {
                         if (
-                                ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
                         ) {
                             Toast.makeText(NotificationService.this, "please enable location permissions", Toast.LENGTH_SHORT).show();
                         } else {
@@ -153,7 +155,7 @@ public class NotificationService extends Service {
                                                 }
                                             }
                                         } else {
-                                            Toast.makeText(NotificationService.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(NotificationService.this, "Can't use your location. enable it in clicking on this app-> settings -> permissions -> location -> all the time", Toast.LENGTH_LONG).show();
                                          //TODO: fix logic
                                             // Get the location manager
                                             //showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);

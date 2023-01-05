@@ -131,7 +131,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             ) {
                 Toast.makeText(Map.this, "please enable permissions", Toast.LENGTH_SHORT).show();
                 ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION}, 90);
+                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 90);
             }
             else{
                 FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
