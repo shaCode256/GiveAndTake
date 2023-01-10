@@ -1,4 +1,4 @@
-package com.example.giveandtake;
+package com.example.giveandtake.Service;
 
 import static android.content.ContentValues.TAG;
 
@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.giveandtake.R;
+import com.example.giveandtake.View.Map;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;

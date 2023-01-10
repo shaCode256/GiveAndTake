@@ -1,4 +1,4 @@
-package com.example.giveandtake;
+package com.example.giveandtake.View;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.example.giveandtake.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

@@ -1,4 +1,4 @@
-package com.example.giveandtake;
+package com.example.giveandtake.View;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.giveandtake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;

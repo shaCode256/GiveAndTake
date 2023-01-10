@@ -1,4 +1,4 @@
-package com.example.giveandtake;
+package com.example.giveandtake.View;
 
 import static android.content.ContentValues.TAG;
 
@@ -23,6 +23,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.giveandtake.R;
+import com.example.giveandtake.Service.NotificationService;
+import com.example.giveandtake.Settings;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
