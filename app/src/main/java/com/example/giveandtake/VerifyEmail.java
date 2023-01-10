@@ -35,15 +35,11 @@ public class VerifyEmail extends AppCompatActivity {
             String emailTxt = email.getText().toString();
             String passwordTxt = password.getText().toString();
             String conPasswordTxt = conPassword.getText().toString();
-            //check if user fills all the fields before sending data to Firebase
-            //check if passwords are matching with each other
-            //if not matching, show a toast message
             if(!passwordTxt.equals(conPasswordTxt)){
                 Toast.makeText(VerifyEmail.this, "Passwords are not matching", Toast.LENGTH_SHORT).show();
             }
             else{
                 registerUser(emailTxt, passwordTxt);
-                //show a success message and then finish the activity
                 }
         });
 
@@ -53,8 +49,6 @@ public class VerifyEmail extends AppCompatActivity {
     private void registerUser(String emailTxt, String passwordTxt) {
         if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
             auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
-                //add listener if failed or not and if yes then change.
-                //send verificationLink
                 auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(VerifyEmail.this, "please check email for verification.", Toast.LENGTH_SHORT).show();

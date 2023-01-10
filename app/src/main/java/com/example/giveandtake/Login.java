@@ -55,20 +55,14 @@ public class Login extends AppCompatActivity {
                         auth.signInWithEmailAndPassword(phoneTxt , passwordTxt).addOnCompleteListener(task -> {
                             if (task.isSuccessful()){
                                 //if it's an email that is verified,
-                                // you can pick a phone number,
+                                // user can pick a phone number,
                                 //verify it and it will create a new user.
                                 if (auth.getCurrentUser().isEmailVerified()) {
-                                    //check if is phone verified (if is in db, it is)
-                                    if(snapshot.child(phoneTxt).hasChild("isPhoneVerified") && snapshot.child(phoneTxt).child("isPhoneVerified").getValue().toString().equals("1")) {
-                                        Toast.makeText(Login.this, "You already verified your phone, please log in with your phone, not e-mail", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
                                         Toast.makeText(Login.this, "Please verify your phone", Toast.LENGTH_SHORT).show();
                                         Intent verifyPhoneIntent = new Intent(Login.this, VerifyPhone.class);
                                         verifyPhoneIntent.putExtra("emailTxt", phoneTxt);
                                         startActivity(verifyPhoneIntent);
                                         finish();
-                                    }
                                 }
                                 else{
                                     Toast.makeText(Login.this, "Please click on the verification link sent to your email or click forgot password", Toast.LENGTH_SHORT).show();

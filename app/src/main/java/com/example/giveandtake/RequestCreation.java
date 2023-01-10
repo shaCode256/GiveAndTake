@@ -198,19 +198,10 @@ public class RequestCreation extends AppCompatActivity {
             if (grantResults.length > 0 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(RequestCreation.this, "permission is granted", Toast.LENGTH_SHORT).show();
-                // Permission is granted. Continue the action or workflow
-                // in your app.
             } else {
                 Toast.makeText(RequestCreation.this, "permission is NOT granted", Toast.LENGTH_SHORT).show();
-                // Explain to the user that the feature is unavailable because
-                // the feature requires a permission that the user has denied.
-                // At the same time, respect the user's decision. Don't link to
-                // system settings in an effort to convince the user to change
-                // their decision.
             }
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
     }
 
 
