@@ -9,7 +9,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.example.giveandtake.Model.Request;
+import com.example.giveandtake.Presenter.ClientPostRequest;
 import com.example.giveandtake.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +19,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Objects;
 
 public class Login extends AppCompatActivity {
@@ -35,6 +41,14 @@ public class Login extends AppCompatActivity {
         TextView registerNowBtn= findViewById(R.id.registerNowBtn);
         Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
         auth = FirebaseAuth.getInstance();
+        new Thread(() -> {
+            Request request= new Request();
+            request.setSubject("subjectTxt");
+            request.setBody("bodyTxt");
+            request.setContactDetails("contactDetailsTxt");
+            ClientPostRequest client= new ClientPostRequest(request);
+            client.post();
+        }).start();
         // reset password
         resetPasswordBtn.setOnClickListener(v -> startActivity(new Intent(Login.this, ResetPassword.class)));
 

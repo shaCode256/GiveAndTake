@@ -2,7 +2,9 @@ package com.example.giveandtake.Model;
 
 import com.google.firebase.firestore.GeoPoint;
 
-public class Request {
+import java.io.Serializable;
+
+public class Request implements Serializable {
 
     private String  contactDetails;
 

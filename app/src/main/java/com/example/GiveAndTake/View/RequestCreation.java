@@ -17,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+//import com.example.giveandtake.Model.Request;
+//import com.example.giveandtake.Model.Request;
+//import com.example.giveandtake.Presenter.ClientPostRequest;
 import com.example.giveandtake.Model.Request;
 import com.example.giveandtake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,6 +34,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,6 +141,10 @@ public class RequestCreation extends AppCompatActivity {
                                 request.setBody(bodyTxt);
                                 request.setContactDetails(contactDetailsTxt);
                                 request.setLocation(geoPointRequest);
+//                                new Thread(() -> {
+//                                    ClientPostRequest client= new ClientPostRequest(request);
+//                                    client.post();
+//                                }).start();
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
                             }
                             @Override
@@ -209,3 +222,4 @@ public class RequestCreation extends AppCompatActivity {
 
 
 //https://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null
+//https://www.codejava.net/java-se/networking/java-socket-server-examples-tcp-ip
