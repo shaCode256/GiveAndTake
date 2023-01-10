@@ -155,11 +155,7 @@ public class NotificationService extends Service {
                                                 }
                                             }
                                         } else {
-                                            Toast.makeText(NotificationService.this, "Can't use your location. enable it in clicking on this app-> settings -> permissions -> location -> all the time", Toast.LENGTH_LONG).show();
-                                         //TODO: fix logic
-                                            // Get the location manager
-                                            //showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
-                                        }
+                                            Toast.makeText(NotificationService.this, "Can't use your location. turn on location services or enable location tracking in clicking on this app-> settings -> permissions -> location -> all the time", Toast.LENGTH_LONG).show();                                        }
                                     });
                         }
                     }
