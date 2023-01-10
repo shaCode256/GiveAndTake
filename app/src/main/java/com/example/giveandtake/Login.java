@@ -33,7 +33,6 @@ public class Login extends AppCompatActivity {
         Button loginBtn= findViewById(R.id.loginBtn);
         TextView registerNowBtn= findViewById(R.id.registerNowBtn);
         Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
-        String numericRegex= "[0-9]+";
         auth = FirebaseAuth.getInstance();
         // reset password
         resetPasswordBtn.setOnClickListener(v -> startActivity(new Intent(Login.this, ResetPassword.class)));
@@ -45,9 +44,7 @@ public class Login extends AppCompatActivity {
         if(phoneTxt.isEmpty() || passwordTxt.isEmpty()){
             Toast.makeText(Login.this, "Please enter mobile number and password ", Toast.LENGTH_SHORT).show();
         }
-//        else if(!phoneTxt.matches(numericRegex)){
-//            Toast.makeText(Login.this, "Please enter a valid numeric number ", Toast.LENGTH_SHORT).show();
-//        }
+
         else{
             databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -62,11 +59,16 @@ public class Login extends AppCompatActivity {
                                 //verify it and it will create a new user.
                                 if (auth.getCurrentUser().isEmailVerified()) {
                                     //check if is phone verified (if is in db, it is)
-                                    Toast.makeText(Login.this, "Please verify your phone", Toast.LENGTH_SHORT).show();
-                                    Intent verifyPhoneIntent = new Intent(Login.this, VerifyPhone.class);
-                                    verifyPhoneIntent.putExtra("emailTxt", phoneTxt);
-                                    startActivity(verifyPhoneIntent);
-                                    finish();
+                                    if(snapshot.child(phoneTxt).hasChild("isPhoneVerified") && snapshot.child(phoneTxt).child("isPhoneVerified").getValue().toString().equals("1")) {
+                                        Toast.makeText(Login.this, "You already verified your phone, please log in with your phone, not e-mail", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        Toast.makeText(Login.this, "Please verify your phone", Toast.LENGTH_SHORT).show();
+                                        Intent verifyPhoneIntent = new Intent(Login.this, VerifyPhone.class);
+                                        verifyPhoneIntent.putExtra("emailTxt", phoneTxt);
+                                        startActivity(verifyPhoneIntent);
+                                        finish();
+                                    }
                                 }
                                 else{
                                     Toast.makeText(Login.this, "Please click on the verification link sent to your email or click forgot password", Toast.LENGTH_SHORT).show();
