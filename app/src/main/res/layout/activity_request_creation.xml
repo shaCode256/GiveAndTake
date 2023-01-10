@@ -8,8 +8,6 @@
     android:background="@drawable/background"
     android:gravity="center" >
 
-
-
     <TextView
         android:id="@+id/create_request_title"
         android:layout_width="match_parent"

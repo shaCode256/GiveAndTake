@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".Login">
+    tools:context="View.Login">
 
     <ImageView
         android:layout_width="500dp"
@@ -42,7 +42,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:hint="Mobile or E-mail for the first time"
+        android:hint="Mobile to log in | Email to verify phone"
         android:inputType="text"
         android:maxLines="1"
         android:minHeight="48dp"
@@ -97,6 +97,13 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -110,6 +117,8 @@
         android:layout_marginStart="5dp"
         android:text="@string/reset_password"
         android:textStyle="bold" />
+
+    </LinearLayout>
 
     <ImageView
         android:layout_width="100dp"
