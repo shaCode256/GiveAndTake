@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.giveandtake.Model.User;
 import com.example.giveandtake.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -148,16 +149,18 @@ public class VerifyPhone extends AppCompatActivity {
 
 
     private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
+        User user= new User();
+        user.setEmail(emailTxt);
+        user.setIsBlocked("0");
+        user.setName(fullNameTxt);
+        user.setIsPhoneVerified("1");
         if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
             if (emailTxt.endsWith("@manager.com")) {
-                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("1");
+                user.setIsManager("1");
             } else {
-                databaseReference.child("users").child(phoneTxt).child("isManager").setValue("0");
+                user.setIsManager("0");
             }
-            databaseReference.child("users").child(phoneTxt).child("fullName").setValue(fullNameTxt);
-            databaseReference.child("users").child(phoneTxt).child("isPhoneVerified").setValue("1");
-            databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
-            databaseReference.child("users").child(phoneTxt).child("isBlocked").setValue("0");
+            databaseReference.child("users").child(phoneTxt).setValue(user);
             Toast.makeText(VerifyPhone.this, "User is successfully registered!", Toast.LENGTH_SHORT).show();
             Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
             startActivity(loginIntent);

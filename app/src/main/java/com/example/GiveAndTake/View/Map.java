@@ -25,7 +25,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.giveandtake.R;
 import com.example.giveandtake.Service.NotificationService;
-import com.example.giveandtake.Settings;
+import com.example.giveandtake.View.Settings;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;

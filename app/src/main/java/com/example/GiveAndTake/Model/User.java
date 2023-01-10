@@ -1,18 +1,20 @@
-package com.example.GiveAndTake.Model;
+package com.example.giveandtake.Model;
+
+import android.widget.Toast;
+
+import com.example.giveandtake.View.VerifyPhone;
 
 public class User {
-
-    private int id;
 
     private String  Name;
 
     private String  email;
 
-    private String  mobile;
+    private String  isManager;
 
-    private String  password;
+    private String  isPhoneVerified;
 
-    private String  last_update;
+    private String  isBlocked;
 
     public String getName() {
         return Name;
@@ -30,42 +32,34 @@ public class User {
         this.email = email;
     }
 
-    public String getMobile() {
-        return mobile;
+    public String getIsManager() {
+        return isManager;
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
+    public void setIsManager(String isManager) {
+        this.isManager = isManager;
     }
 
-    public String getPassword() {
-        return password;
+    public String getIsBlocked() {
+        return isBlocked;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setIsBlocked(String isBlocked) {
+        this.isBlocked = isBlocked;
     }
 
-    public String getLast_update() {
-        return last_update;
+    public String getIsPhoneVerified() {
+        return isPhoneVerified;
     }
 
-    public void setLast_update(String last_update) {
-        this.last_update = last_update;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setIsPhoneVerified(String isPhoneVerified) {
+        this.isPhoneVerified= isPhoneVerified;
     }
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", Name=" + Name + ", email=" + email
-                + ", mobile=" + mobile + ", password=" + password + ", last_update=" + last_update
+        return "User [ Name=" + Name + ", email=" + email
+                + ", isPhoneVerified=" + isPhoneVerified+ ", isBlocked=" + isBlocked + ", isManager=" + isManager
                 + "]";
     }
 

@@ -176,7 +176,6 @@ public class ViewMyRequests extends ListActivity {
                         viewRequestIntent.putExtra("docId", docId);
                         viewRequestIntent.putExtra("requestId", requestId);
                         viewRequestIntent.putExtra("creationTime", creationTime);
-
                         startActivity(viewRequestIntent);
                     }
                     @Override

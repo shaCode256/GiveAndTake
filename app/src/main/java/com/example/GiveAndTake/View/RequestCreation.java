@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.giveandtake.Model.Request;
 import com.example.giveandtake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -82,10 +83,7 @@ public class RequestCreation extends AppCompatActivity {
             if (subjectTxt.isEmpty() || bodyTxt.isEmpty() | latitudeTxt.isEmpty() | longitudeTxt.isEmpty() | contactDetailsTxt.isEmpty()) {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
-                // Add a new marker with the request ID
-                //add to markersDb this location
-                // Add a new document with a generated ID
-                // Create a new user with a first, middle, and last name
+                // Add a new marker with the request ID to markersDB
                 HashMap<String, Object> user = new HashMap<>();
                 boolean numeric = true;
                 try {
@@ -126,16 +124,16 @@ public class RequestCreation extends AppCompatActivity {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 //add the request in the db
                                 //get currTime
+                                Request request= new Request();
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("creationTime").setValue(finalCreationTime);
+                                    request.setCreationTime(finalCreationTime);
                                 }
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("subject").setValue(subjectTxt);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("body").setValue(bodyTxt);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("contactDetails").setValue(contactDetailsTxt);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).child("location").setValue(geoPointRequest);
-                                //   }
+                                request.setSubject(subjectTxt);
+                                request.setBody(bodyTxt);
+                                request.setContactDetails(contactDetailsTxt);
+                                request.setLocation(geoPointRequest);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
 

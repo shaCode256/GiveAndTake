@@ -1,10 +1,8 @@
-package com.example.GiveAndTake.Model;
+package com.example.giveandtake.Model;
 
 import com.google.firebase.firestore.GeoPoint;
 
 public class Request {
-
-    private String  requestId;
 
     private String  contactDetails;
 
@@ -15,14 +13,6 @@ public class Request {
     private String  creationTime;
 
     private GeoPoint location;
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
 
     public String getContactDetails() {
         return contactDetails;
@@ -67,7 +57,7 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request [id=" + requestId + ", Subject=" + subject + ", body=" + body
+        return "Request [ Subject=" + subject + ", body=" + body
                 + ", contactDetails=" + contactDetails+ ", creationTime=" + creationTime
                 + "]";
     }
