@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.giveandtake.Model.User;
+import com.example.giveandtake.Presenter.RegisterUser;
 import com.example.giveandtake.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -48,31 +48,25 @@ public class VerifyPhone extends AppCompatActivity {
         btnverify = findViewById(R.id.btnverifyOTP);
         mAuth = FirebaseAuth.getInstance();
         bar = findViewById(R.id.bar);
-        btngenOTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fullNameTxt = fullName.getText().toString();
-                if (TextUtils.isEmpty(phone.getText().toString()) || fullNameTxt.isEmpty()) {
-                    Toast.makeText(VerifyPhone.this, "Enter Valid Phone No. and name", Toast.LENGTH_SHORT).show();
-                } else {
-                    String number = phone.getText().toString();
-                    bar.setVisibility(View.VISIBLE);
-                    sendverificationcode(number);
-                }
+        btngenOTP.setOnClickListener(v -> {
+            fullNameTxt = fullName.getText().toString();
+            if (TextUtils.isEmpty(phone.getText().toString()) || fullNameTxt.isEmpty()) {
+                Toast.makeText(VerifyPhone.this, "Enter Valid Phone No. and name", Toast.LENGTH_SHORT).show();
+            } else {
+                String number = phone.getText().toString();
+                bar.setVisibility(View.VISIBLE);
+                sendVerificationCode(number);
             }
         });
-        btnverify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (TextUtils.isEmpty(otp.getText().toString())) {
-                    Toast.makeText(VerifyPhone.this, "Wrong OTP Entered", Toast.LENGTH_SHORT).show();
-                } else
-                    verifycode(otp.getText().toString());
-            }
+        btnverify.setOnClickListener(v -> {
+            if (TextUtils.isEmpty(otp.getText().toString())) {
+                Toast.makeText(VerifyPhone.this, "Wrong OTP Entered", Toast.LENGTH_SHORT).show();
+            } else
+                verifyCode(otp.getText().toString());
         });
     }
 
-    private void sendverificationcode(String phoneNumber) {
+    private void sendVerificationCode(String phoneNumber) {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
                         .setPhoneNumber("+972 "+phoneNumber.substring(1))  // Phone number to verify. converts 0501234567 to +972 501234567
@@ -89,7 +83,7 @@ public class VerifyPhone extends AppCompatActivity {
         public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
             final String code = credential.getSmsCode();
             if (code != null) {
-                verifycode(code);
+                verifyCode(code);
             }
         }
 
@@ -110,12 +104,12 @@ public class VerifyPhone extends AppCompatActivity {
         }
     };
 
-    private void verifycode(String Code) {
+    private void verifyCode(String Code) {
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationID, Code);
-        signinbyCredentials(credential);
+        signInByCredentials(credential);
     }
 
-    private void signinbyCredentials(PhoneAuthCredential credential) {
+    private void signInByCredentials(PhoneAuthCredential credential) {
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener() {
@@ -134,7 +128,6 @@ public class VerifyPhone extends AppCompatActivity {
                                         Intent thisIntent= getIntent();
                                         String emailTxt= thisIntent.getStringExtra("emailTxt");
                                         registerUser(emailTxt, phone.getText().toString(), fullNameTxt);
-                                        //show a success message and then finish the activity
                                     }
                                 }
                                 @Override
@@ -147,20 +140,10 @@ public class VerifyPhone extends AppCompatActivity {
                 });
     }
 
-
     private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
-        User user= new User();
-        user.setEmail(emailTxt);
-        user.setIsBlocked("0");
-        user.setName(fullNameTxt);
-        user.setIsPhoneVerified("1");
         if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
-            if (emailTxt.endsWith("@manager.com")) {
-                user.setIsManager("1");
-            } else {
-                user.setIsManager("0");
-            }
-            databaseReference.child("users").child(phoneTxt).setValue(user);
+            RegisterUser registerUserPresenter= new RegisterUser();
+            registerUserPresenter.registerUser(emailTxt, phoneTxt, fullNameTxt, databaseReference);
             Toast.makeText(VerifyPhone.this, "User is successfully registered!", Toast.LENGTH_SHORT).show();
             Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
             startActivity(loginIntent);
