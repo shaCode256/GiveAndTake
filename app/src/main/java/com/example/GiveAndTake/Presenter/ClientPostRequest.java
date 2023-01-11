@@ -61,11 +61,11 @@ public class ClientPostRequest {
 
     public void post() {
 
-        String hostname = "10.102.1.168";
-        int port = 6868;
+        String hostname = "10.102.0.7";
+        int port = 8080;
+        System.out.println("come on");
 
         try (Socket socket = new Socket(hostname, port)) {
-
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 

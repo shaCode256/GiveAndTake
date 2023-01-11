@@ -3,18 +3,29 @@ package com.example.giveandtake.Presenter;
 import java.io.*;
 import java.net.*;
 import java.util.Date;
-//import com.example.giveandtake.Model.Request;
-//import com.google.firebase.database.DatabaseReference;
-//import com.google.firebase.database.FirebaseDatabase;
+import com.example.giveandtake.Model.Request;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ServerPostRequest implements Serializable {
 
     //ServerPostRequest.java 6868
 
-    public static void main(String[] args) {
-        if (args.length < 1) return;
+//    Request request;
+//    String requestUserId;
+//    String requestId;
 
-        int port = Integer.parseInt(args[0]);
+
+//    public ServerPostRequest(Request request, String requestUserId, String requestId){
+//        this.request= request;
+//        this.requestUserId= requestUserId;
+//        this.requestId= requestId;
+//    }
+
+    public ServerPostRequest(){
+    }
+    public static void main(String[] args){
+        int port = 8080;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Server is listening on port " + port);
