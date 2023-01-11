@@ -37,7 +37,7 @@ public class Request implements Serializable {
     }
 
     public void setSubject(String subjectTxt) {
-        this.subject = subject;
+        this.subject = subjectTxt;
     }
 
     public String getCreationTime() {

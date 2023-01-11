@@ -259,9 +259,17 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
                         String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
                         String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
-                        String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        String creationTime = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class));
+                        String requestLatitude;
+                        String requestLongitude;
+                        try {
+                            requestLatitude = snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(String.class);
+                            requestLongitude = snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(String.class);
+                        }
+                        catch(Exception e){
+                            requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
+                            requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        }
+                        String creationTime = snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class);
                         // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);

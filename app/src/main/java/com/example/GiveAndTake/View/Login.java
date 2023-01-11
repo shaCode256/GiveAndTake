@@ -2,7 +2,6 @@ package com.example.giveandtake.View;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -11,16 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 //import com.example.giveandtake.Model.Request;
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.example.giveandtake.Presenter.ClientPostRequest;
-import com.example.giveandtake.Presenter.ServerPostRequest;
 import com.example.giveandtake.R;
-import com.google.android.gms.common.util.IOUtils;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,30 +18,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class Login extends AppCompatActivity {
@@ -69,46 +35,6 @@ public class Login extends AppCompatActivity {
         TextView registerNowBtn= findViewById(R.id.registerNowBtn);
         Button resetPasswordBtn= findViewById(R.id.resetPasswordBtn);
         auth = FirebaseAuth.getInstance();
-
-        new Thread(() -> {
-    //    String urlString = "http://10.102.0.7:8000";
-        String urlString = "http://10.102.0.7:8000/";
-
-        URL url = null;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            System.out.println("error1");
-            e.printStackTrace();
-        }
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
-            String jsonInputString = "123";
-            try(OutputStream os = conn.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("error2");
-        }
-            try {
-            InputStream is = conn.getInputStream();
-            String result = CharStreams.toString(new InputStreamReader(
-                    is, Charsets.UTF_8));
-            System.out.println("yes:"+result);
-        } catch (IOException e) {
-            System.out.println("error3");
-            e.printStackTrace();
-        }
-        }).start();
-
 
         // reset password
         resetPasswordBtn.setOnClickListener(v -> startActivity(new Intent(Login.this, ResetPassword.class)));
@@ -179,7 +105,6 @@ public class Login extends AppCompatActivity {
         startActivity(new Intent(Login.this, VerifyEmail.class));
     });
 
-
     }
 
     private void loginUser(String emailTxt, String passwordTxt, String phoneTxt) {
@@ -214,4 +139,6 @@ public class Login extends AppCompatActivity {
             }
         }).addOnFailureListener(e -> Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+
 }

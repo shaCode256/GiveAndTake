@@ -26,6 +26,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,23 +36,31 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-import java.io.BufferedReader;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
+    static int successPost=0;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
+
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         //TODO: what happens when we create a request in the same place?
         Intent thisIntent = getIntent();
         FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
@@ -83,8 +93,8 @@ public class RequestCreation extends AppCompatActivity {
             int randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
             String setRequestId = String.valueOf(randomNum);
             //to avoid repeating the same requestId
-            HashSet<String> takenRequestsIds= (HashSet<String>)thisIntent.getExtras().getSerializable("takenRequestsIds");
-            while (takenRequestsIds.contains(setRequestId)){
+            HashSet<String> takenRequestsIds = (HashSet<String>) thisIntent.getExtras().getSerializable("takenRequestsIds");
+            while (takenRequestsIds.contains(setRequestId)) {
                 //change until it's a new request number
                 randomNum = ThreadLocalRandom.current().nextInt(0, 10000 + 1);
                 setRequestId = String.valueOf(randomNum);
@@ -93,7 +103,6 @@ public class RequestCreation extends AppCompatActivity {
                 Toast.makeText(RequestCreation.this, "Please fill in all the request details", Toast.LENGTH_SHORT).show();
             } else {
                 // Add a new marker with the request ID to markersDB
-                HashMap<String, Object> user = new HashMap<>();
                 boolean numeric = true;
                 try {
                     Double.parseDouble(longitudeTxt);
@@ -110,24 +119,26 @@ public class RequestCreation extends AppCompatActivity {
                     double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                     if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
                         //check valid latitude and longitude input
-                        String creationTime= "";
+                        String creationTime = "";
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                             creationTime = LocalDateTime.now().toString();
                         }
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
+                        HashMap<String, Object> user = new HashMap<>();
                         user.put("geoPoint", geoPointRequest);
                         user.put("requestId", setRequestId);
                         user.put("userId", requestUserId);
                         user.put("isManager", isManager);
                         user.put("creationTime", creationTime);
+                        String finalSetRequestId = setRequestId;
+                        String finalCreationTime = creationTime;
+                        //Add manually, not by server
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
                                 })
                                 .addOnFailureListener(e -> {
                                 });
-                        String finalSetRequestId = setRequestId;
-                        String finalCreationTime = creationTime;
                         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -141,11 +152,6 @@ public class RequestCreation extends AppCompatActivity {
                                 request.setBody(bodyTxt);
                                 request.setContactDetails(contactDetailsTxt);
                                 request.setLocation(geoPointRequest);
-//                                new Thread(() -> {
-//                                    ClientPostRequest client= new ClientPostRequest(request);
-//                                    client.post();
-//                                }).start();
-
                                 databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
                             }
                             @Override
@@ -153,44 +159,42 @@ public class RequestCreation extends AppCompatActivity {
 
                             }
                         });
+                        // //Add by server
+                       // postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
                         Intent myIntent = new Intent(RequestCreation.this, Map.class);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);
                         startActivity(myIntent);
-                    }
-                    else{
+                    } else {
                         Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                     }
-                }
-                else{
+                } else {
                     Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         addCurrLocation.setOnClickListener(v -> {
-                if (
-                        ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    Toast.makeText(RequestCreation.this, "please enable permissions", Toast.LENGTH_SHORT).show();
-                    ActivityCompat.requestPermissions(RequestCreation.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION}, 90);
-                }
-            else{
-                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-                    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
-                            .addOnSuccessListener(RequestCreation.this, location -> {
-                                // Got last known location. In some rare situations this can be null.
-                                if (location != null) {
-                                    longitudeInput.setText(String. valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
-                                    latitudeInput.setText(String. valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
-                                }
-                                else{
-                                    Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+            if (
+                    ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                            ContextCompat.checkSelfPermission(RequestCreation.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Toast.makeText(RequestCreation.this, "please enable permissions", Toast.LENGTH_SHORT).show();
+                ActivityCompat.requestPermissions(RequestCreation.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION}, 90);
+            } else {
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
+                        .addOnSuccessListener(RequestCreation.this, location -> {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                longitudeInput.setText(String.valueOf(location.getLongitude()), TextView.BufferType.EDITABLE);
+                                latitudeInput.setText(String.valueOf(location.getLatitude()), TextView.BufferType.EDITABLE);
+                            } else {
+                                Toast.makeText(RequestCreation.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
@@ -218,7 +222,101 @@ public class RequestCreation extends AppCompatActivity {
     }
 
 
+
+
+    public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
+        boolean flag = false;
+        new Thread(() -> {
+            String urlString = "http://10.102.0.7:8000/";
+
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                RequestCreation.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("body", body);
+                json.put("subject", subject);
+                json.put("contactDetails", contactDetails);
+                json.put("userId", userId);
+                json.put("creationTime", creationTime);
+                json.put("locationLat", locationLat);
+                json.put("locationLang", locationLang);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+                if (result.equals("\"success\"")) {
+                    //add marker
+                    GeoPoint geoPointRequest = new GeoPoint(Double.valueOf(locationLat), Double.valueOf(locationLang));
+                    HashMap<String, Object> user = new HashMap<>();
+                    user.put("geoPoint", geoPointRequest);
+                    user.put("requestId", requestId);
+                    user.put("userId", requestUserId);
+                    user.put("isManager", isManager);
+                    user.put("creationTime", creationTime);
+                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            //if this request was created successfully, add the marker
+                            markersDb.collection("MapsData")
+                                    .add(user)
+                                    .addOnSuccessListener(documentReference -> {
+                                    })
+                                    .addOnFailureListener(e -> {
+                                    });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                //         RequestCreation.this.runOnUiThread(new Runnable() {
+                  //  public void run() {
+                    //    Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    //}
+                //});
+            }
+        }).start();
+    }
+
 }
+
+
+
 
 
 
