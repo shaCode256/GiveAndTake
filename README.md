@@ -56,20 +56,19 @@ pip install foobar
 ```
 
 ## Usage
+Download the code from this repository.
 
-```python
-import foobar
+If you want to run the Uploading Requests Server:
+Open the main.py
+pip install all needed packages you see
+then run the code py main.py
+or click Play from IDE
 
-# returns 'words'
-foobar.pluralize('word')
+Then download the java code, 
+open in Android studio and run it there
+on emulator or on pyhsical device
 
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
-```
-
+APK version will be available soon to download directly Be'ezrat Hashem
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
