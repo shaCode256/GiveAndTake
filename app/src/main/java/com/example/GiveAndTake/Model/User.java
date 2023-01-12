@@ -6,7 +6,7 @@ import com.example.giveandtake.View.VerifyPhone;
 
 public class User {
 
-    private String  Name;
+    private String  fullName;
 
     private String  email;
 
