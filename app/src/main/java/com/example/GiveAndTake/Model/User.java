@@ -17,11 +17,11 @@ public class User {
     private String  isBlocked;
 
     public String getName() {
-        return Name;
+        return fullName;
     }
 
     public void setName(String name) {
-        Name = name;
+        fullName = name;
     }
 
     public String getEmail() {
