@@ -141,15 +141,11 @@ public class VerifyPhone extends AppCompatActivity {
     }
 
     private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
-        if (emailTxt.endsWith("@manager.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
             RegisterUser registerUserPresenter= new RegisterUser();
             registerUserPresenter.registerUser(emailTxt, phoneTxt, fullNameTxt, databaseReference);
             Toast.makeText(VerifyPhone.this, "User is successfully registered!", Toast.LENGTH_SHORT).show();
             Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
             startActivity(loginIntent);
-        } else {
-            Toast.makeText(VerifyPhone.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();
-        }
     }
 
 }
