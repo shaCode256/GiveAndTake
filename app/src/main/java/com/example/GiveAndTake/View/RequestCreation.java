@@ -54,7 +54,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
-    static int successPost=0;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     @SuppressLint("MissingPermission")
@@ -132,35 +131,35 @@ public class RequestCreation extends AppCompatActivity {
                         user.put("creationTime", creationTime);
                         String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
-                        //Add manually, not by server
-                        markersDb.collection("MapsData")
-                                .add(user)
-                                .addOnSuccessListener(documentReference -> {
-                                })
-                                .addOnFailureListener(e -> {
-                                });
-                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                //add the request in the db
-                                //get currTime
-                                Request request= new Request();
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    request.setCreationTime(finalCreationTime);
-                                }
-                                request.setSubject(subjectTxt);
-                                request.setBody(bodyTxt);
-                                request.setContactDetails(contactDetailsTxt);
-                                request.setLocation(geoPointRequest);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
-                            }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
+                        //Add manually, not by server: directly to Firebase
+//                        markersDb.collection("MapsData")
+//                                .add(user)
+//                                .addOnSuccessListener(documentReference -> {
+//                                })
+//                                .addOnFailureListener(e -> {
+//                                });
+//                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                //add the request in the db
+//                                //get currTime
+//                                Request request= new Request();
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                    request.setCreationTime(finalCreationTime);
+//                                }
+//                                request.setSubject(subjectTxt);
+//                                request.setBody(bodyTxt);
+//                                request.setContactDetails(contactDetailsTxt);
+//                                request.setLocation(geoPointRequest);
+//                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
+//                            }
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError error) {
+//
+//                            }
+//                        });
                         // //Add by server
-                       // postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
+                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
                         Intent myIntent = new Intent(RequestCreation.this, Map.class);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);
@@ -222,12 +221,12 @@ public class RequestCreation extends AppCompatActivity {
     }
 
 
-
-
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
         boolean flag = false;
         new Thread(() -> {
-            String urlString = "http://10.102.0.7:8000/";
+            String urlString = "http://10.0.0.2:8000/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
 
             URL url = null;
             try {
@@ -238,7 +237,6 @@ public class RequestCreation extends AppCompatActivity {
                 RequestCreation.this.runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show();
-
                     }
                 });
             }
@@ -286,7 +284,6 @@ public class RequestCreation extends AppCompatActivity {
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            //if this request was created successfully, add the marker
                             markersDb.collection("MapsData")
                                     .add(user)
                                     .addOnSuccessListener(documentReference -> {
@@ -304,15 +301,15 @@ public class RequestCreation extends AppCompatActivity {
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
-                //         RequestCreation.this.runOnUiThread(new Runnable() {
-                  //  public void run() {
-                    //    Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show();
-                    //}
-                //});
+                showServerDownToast();
             }
         }).start();
     }
 
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show());
+    }
 }
 
 
