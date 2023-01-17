@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:background="#009688"
             android:layout_marginTop="10dp"
-            android:text="Auto Use location when I open the app"
+            android:text="Auto Use location in background"
             android:textColor="@color/white"
             android:textSize="18sp" />
 

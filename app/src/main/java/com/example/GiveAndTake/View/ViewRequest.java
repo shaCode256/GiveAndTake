@@ -195,8 +195,22 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnReportRequest.setOnClickListener(v -> {
-          databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).setValue(userId);
-          databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //grab user's name
+                    // and enter it to reports data
+                    //also enter the request creator id
+                    String fullName= dataSnapshot.child("users").child(userId).child("fullName").getValue(String.class);
+                    databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).setValue(fullName);
+                    databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
+                }//onDataChange
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }//onCancelled
+            });
         });
 
         btnUnReportRequest.setOnClickListener(v -> {
