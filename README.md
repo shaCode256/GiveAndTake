@@ -47,15 +47,8 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 <img src="readme_pictures/login.jpeg" width="200" height="350">
 <img src="readme_pictures/watch_request.jpeg" width="200" height="350">
 
-## Installation (Readme in building proccess... ) 
+## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
-```bash
-pip install foobar
-```
-
-## Usage
 Download the code from this repository.
 
 If you want to run the Uploading Requests Server:
@@ -69,6 +62,13 @@ open in Android studio and run it there
 on emulator or on pyhsical device
 
 APK version will be available soon to download directly Be'ezrat Hashem
+
+## Usage
+
+Open the app, register, verify your email and phone number as insturcted,
+then login and let the magic begin.
+Have fun helping and being an active part of this community!
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

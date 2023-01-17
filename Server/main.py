@@ -41,11 +41,11 @@ async def submit(request: Request):
     })
     request_location_ref= request_ref.child('location')
     request_location_ref.update({
-        'latitude': locationLat,
-        'longitude': locationLang
+        'latitude': float(locationLat),
+        'longitude': float(locationLang)
     })
     return 'success'
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="10.102.0.7", port=8000)
+    uvicorn.run(app, host="10.0.0.2", port=8000)
 

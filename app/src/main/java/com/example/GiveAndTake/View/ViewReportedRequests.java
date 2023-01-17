@@ -90,6 +90,7 @@ public class ViewReportedRequests extends ListActivity {
                         String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
                         String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
                         String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
+                        String creationTime = snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class);
                         Intent viewRequestIntent = new Intent(ViewReportedRequests.this, ViewRequest.class);
                         viewRequestIntent.putExtra("requestSubject",requestSubject);
                         viewRequestIntent.putExtra("requestBody", requestBody);
@@ -101,6 +102,7 @@ public class ViewReportedRequests extends ListActivity {
                         viewRequestIntent.putExtra("isManager", isManager);
                         viewRequestIntent.putExtra("docId", docId);
                         viewRequestIntent.putExtra("requestId", requestId);
+                        viewRequestIntent.putExtra("creationTime", creationTime);
                         startActivity(viewRequestIntent);
                     }
                     @Override
