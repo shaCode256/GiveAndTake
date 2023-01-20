@@ -224,7 +224,7 @@ public class RequestCreation extends AppCompatActivity {
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
         boolean flag = false;
         new Thread(() -> {
-            String urlString = "http://10.0.0.2:8000/";
+            String urlString = "http://10.102.2.155:8000/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
 

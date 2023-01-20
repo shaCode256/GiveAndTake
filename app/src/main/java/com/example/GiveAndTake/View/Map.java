@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -72,13 +74,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        Button createRequestBtn= findViewById(R.id.btn_create_request_from_map);
-        Button btnLocateMe= findViewById(R.id.btn_locate_me);
-        Button btnMyRequests= findViewById(R.id.btn_my_requests);
-        Button btnRequestReports= findViewById(R.id.btn_watch_request_reports);
-        Button logOutBtn= findViewById(R.id.log_out_btn);
-        Button settingsBtn= findViewById(R.id.btn_settings);
-        Button manageUsersBtn= findViewById(R.id.manage_users_btn);
+        ImageView createRequestBtn= findViewById(R.id.btn_create_request_from_map);
+        ImageView btnLocateMe= findViewById(R.id.btn_locate_me);
+        ImageView btnMyRequests= findViewById(R.id.btn_my_requests);
+        ImageView btnRequestReports= findViewById(R.id.btn_watch_request_reports);
+        ImageView logOutBtn= findViewById(R.id.log_out_btn);
+        ImageView settingsBtn= findViewById(R.id.btn_settings);
+        ImageView manageUsersBtn= findViewById(R.id.manage_users_btn);
         db = FirebaseFirestore.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -200,7 +202,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                                     assert value != null;
                                     BitmapDescriptor handIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand", 85, 85));
                                     BitmapDescriptor starIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("star_icon", 85, 85));
-                            for (QueryDocumentSnapshot doc : value) {
+                                    for (QueryDocumentSnapshot doc : value) {
                                         if (doc.get("geoPoint") != null) {
                                             //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
                                             GeoPoint geoPoint= doc.getGeoPoint("geoPoint");

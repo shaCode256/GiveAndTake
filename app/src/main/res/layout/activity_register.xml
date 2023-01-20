@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".VerifyEmail">
+    tools:context=".View.VerifyEmail">
 
     <ImageView
         android:layout_width="match_parent"
@@ -22,6 +22,7 @@
         android:textSize="60sp"
         android:text="Join us"
         />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
@@ -106,5 +107,7 @@
             android:textStyle= "bold" />
 
     </LinearLayout>
+
+
 
 </LinearLayout>
