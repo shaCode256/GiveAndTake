@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,9 +77,9 @@ public class RequestCreation extends AppCompatActivity {
         EditText longitudeInput = findViewById(R.id.longitude_input);
         EditText latitudeInput = findViewById(R.id.latitude_input);
         EditText contactDetails = findViewById(R.id.create_request_input_contact_details);
-        Button btnAddRequest = findViewById(R.id.button_add_request);
-        Button btnBackToMap = findViewById(R.id.btn_back_to_map);
-        Button addCurrLocation = findViewById(R.id.button_add_location);
+        RelativeLayout btnAddRequest = findViewById(R.id.button_add_request);
+        ImageView btnBackToMap = findViewById(R.id.btn_back_to_map);
+        RelativeLayout addCurrLocation = findViewById(R.id.button_add_location);
         if (clickedLat != null && clickedLong != null) {
             longitudeInput.setText(clickedLong, TextView.BufferType.EDITABLE);
             latitudeInput.setText(clickedLat, TextView.BufferType.EDITABLE);
@@ -132,34 +134,34 @@ public class RequestCreation extends AppCompatActivity {
                         String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
                         //Add manually, not by server: directly to Firebase
-//                        markersDb.collection("MapsData")
-//                                .add(user)
-//                                .addOnSuccessListener(documentReference -> {
-//                                })
-//                                .addOnFailureListener(e -> {
-//                                });
-//                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                //add the request in the db
-//                                //get currTime
-//                                Request request= new Request();
-//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                                    request.setCreationTime(finalCreationTime);
-//                                }
-//                                request.setSubject(subjectTxt);
-//                                request.setBody(bodyTxt);
-//                                request.setContactDetails(contactDetailsTxt);
-//                                request.setLocation(geoPointRequest);
-//                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
-//                            }
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                            }
-//                        });
+                        markersDb.collection("MapsData")
+                                .add(user)
+                                .addOnSuccessListener(documentReference -> {
+                                })
+                                .addOnFailureListener(e -> {
+                                });
+                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                //add the request in the db
+                                //get currTime
+                                Request request= new Request();
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    request.setCreationTime(finalCreationTime);
+                                }
+                                request.setSubject(subjectTxt);
+                                request.setBody(bodyTxt);
+                                request.setContactDetails(contactDetailsTxt);
+                                request.setLocation(geoPointRequest);
+                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                         // //Add by server
-                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
+//                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
                         Intent myIntent = new Intent(RequestCreation.this, Map.class);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);

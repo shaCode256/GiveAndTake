@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,11 +41,11 @@ public class ViewRequest extends AppCompatActivity {
         String longitude= myIntent.getStringExtra("requestLongitude");
         String docId= myIntent.getStringExtra("docId");
         String creationTime= myIntent.getStringExtra("creationTime");
-        EditText subjectEditTxt = findViewById(R.id.create_request_input_subject);
-        EditText bodyEditTxt = findViewById(R.id.create_request_input_body);
+        EditText subjectEditTxt = findViewById(R.id.view_request_input_subject);
+        EditText bodyEditTxt = findViewById(R.id.view_request_input_body);
         EditText longitudeInputEditTxt = findViewById(R.id.longitude_input);
         EditText latitudeInputEditTxt = findViewById(R.id.latitude_input);
-        EditText contactDetailsEditTxt = findViewById(R.id.create_request_input_contact_details);
+        EditText contactDetailsEditTxt = findViewById(R.id.view_request_input_contact_details);
         EditText creationTimeEditTxt = findViewById(R.id.creation_time);
         EditText userIdOfRequestEditTxt = findViewById(R.id.user_id_of_request);
         subjectEditTxt.setEnabled(false);
@@ -54,7 +55,7 @@ public class ViewRequest extends AppCompatActivity {
         longitudeInputEditTxt.setEnabled(false);
         latitudeInputEditTxt.setEnabled(false);
         creationTimeEditTxt.setEnabled(false);
-        Button btnBackToMap = findViewById(R.id.btn_back_to_map);
+        ImageView btnBackToMap = findViewById(R.id.btn_back_to_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
         Button btnJoinRequest = findViewById(R.id.btn_join_request);

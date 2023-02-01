@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context="View.Settings">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="60sp"
+        android:text="Settings"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:text="Turn notifications on/off"
+        />
+
+
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_turn_on_notification"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="#8BC34A"
+            android:layout_marginTop="10dp"
+            android:text="turn on"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_turn_off_notification"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:text="turn off"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/white"
+            android:background="#FF5722"/>
+    </TableRow>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:text="Get notificated on requests on radius from current location when opening the app"
+        />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_turn_on_auto_detect_location"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="#009688"
+            android:layout_marginTop="10dp"
+            android:text="Auto Use location in background"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:text="Get notificated on requests on radius from a specified location"
+        />
+
+    <EditText
+        android:id="@+id/latitude_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint=" Insert Latitude"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:textAlignment="center"
+        android:minHeight="48dp"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:autofillHints="" />
+
+    <EditText
+        android:id="@+id/longitude_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint=" Insert Longitude"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:textAlignment="center"
+        android:minHeight="48dp"
+        android:padding="6dp"
+        android:textSize="20sp"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:autofillHints="" />
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_use_specified_location"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="#2196F3"
+            android:layout_marginTop="10dp"
+            android:text="Use specified location"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_use_curr_location"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:background="#3F51B5"
+        android:layout_marginTop="10dp"
+        android:text="Use current location"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:text="What's the distance of requests you want to get notified on? in Km"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:id= "@+id/closeRaidus"
+        android:hint="insert KM decimal number"
+        android:maxLines="1"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="0dp"
+        />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/applyKmBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text= "Apply KM changes"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:background="#00BCD4"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_marginStart="5dp"
+            android:id="@+id/backToMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text= "Back to map"
+            android:textSize="20sp"
+            android:textStyle= "bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FBFBFB"
-    android:layoutDirection="ltr"
-    >
+    android:background="#FBFBFB">
 
     <ImageView
         android:id="@+id/btn_back_to_map"
@@ -25,12 +17,69 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_24" />
 
+    <RelativeLayout
+        android:id="@+id/button_add_request"
+        android:layout_width="170dp"
+        android:layout_height="39dp"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/cornered_button"
+        android:backgroundTint="#D8DAE3"
+        app:layout_constraintEnd_toEndOf="@+id/bodyCardView"
+        app:layout_constraintHorizontal_bias="0.477"
+        app:layout_constraintStart_toStartOf="@+id/bodyCardView"
+        app:layout_constraintTop_toBottomOf="@+id/bodyCardView">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="CREATE"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/button_add_location"
+        android:layout_width="191dp"
+        android:layout_height="29dp"
+        android:background="@drawable/cornered_button"
+        android:backgroundTint="#D7D9E1"
+        app:layout_constraintEnd_toEndOf="@+id/locationCardView"
+        app:layout_constraintHorizontal_bias="0.629"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/locationCardView">
+
+        <ImageView
+            android:id="@+id/location_view_img"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="0dp"
+            app:srcCompat="@drawable/ic_baseline_location" />
+
+        <TextView
+            android:id="@+id/location_view_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@+id/location_view_img"
+            android:text="Use Current Location"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+
     <TextView
-        android:id="@+id/view_request_title"
+        android:id="@+id/create_request_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
-        android:text="View Request"
+        android:text="New Request"
         android:textColor="?attr/actionMenuTextColor"
         android:textSize="25sp"
         android:textStyle="bold"
@@ -42,23 +91,24 @@
         android:id="@+id/title_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
         android:text="Title"
+        android:layout_gravity = "start"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="118dp" />
+        app:layout_constraintTop_toBottomOf="@+id/create_request_title" />
 
     <TextView
         android:id="@+id/contact_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:text="Contact"
+        android:layout_gravity = "start"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -69,10 +119,10 @@
         android:id="@+id/subject_view"
         android:layout_width="89dp"
         android:layout_height="29dp"
-        android:layout_gravity="left"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:text="Location"
+        android:layout_gravity = "start"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -90,7 +140,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/locationCardView" />
+        app:layout_constraintTop_toBottomOf="@+id/button_add_location" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/contactCardView"
@@ -110,14 +160,15 @@
             android:scaleType="fitXY">
 
             <EditText
-                android:id="@+id/view_request_input_contact_details"
+                android:id="@+id/create_request_input_contact_details"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="5dp"
                 android:background="@null"
+                android:gravity="center_horizontal"
                 android:hint="Contact information..."
                 android:textAlignment="center"
                 android:textColor="@android:color/darker_gray" />
@@ -148,11 +199,12 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="38dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginStart="19dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="3dp"
                 android:background="@null"
                 android:hint="Latitude"
+                android:gravity="center_horizontal"
                 android:textAlignment="center"
                 android:textColor="@android:color/darker_gray" />
 
@@ -164,12 +216,13 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="9dp"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="23dp"
                 android:layout_marginBottom="2dp"
                 android:layout_toEndOf="@+id/latitude_input"
                 android:background="@null"
                 android:hint="Longitude"
+                android:gravity="center_horizontal"
                 android:textAlignment="center"
                 android:textColor="@android:color/darker_gray" />
 
@@ -217,7 +270,7 @@
                 android:scrollHorizontally="false">
 
                 <EditText
-                    android:id="@+id/view_request_input_body"
+                    android:id="@+id/create_request_input_body"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -239,7 +292,7 @@
         app:cardCornerRadius="30dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintStart_toEndOf="@+id/title_view"
-        app:layout_constraintTop_toBottomOf="@+id/view_request_title">
+        app:layout_constraintTop_toBottomOf="@+id/create_request_title">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -249,165 +302,21 @@
             android:scaleType="fitXY">
 
             <EditText
-                android:id="@+id/view_request_input_subject"
+                android:id="@+id/create_request_input_subject"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="5dp"
                 android:background="@null"
                 android:hint="Enter title..."
+                android:gravity="center_horizontal"
                 android:textAlignment="center"
                 android:textColor="@android:color/darker_gray" />
 
         </RelativeLayout>
-
     </androidx.cardview.widget.CardView>
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:id="@+id/user_id_of_request_title"
-        android:fontFamily="sans-serif-condensed"
-        android:gravity="left"
-        android:text="Phone number:"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/bodyCardView"
-        tools:layout_editor_absoluteX="35dp"/>
-
-    <EditText
-        android:id="@+id/user_id_of_request"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-        android:inputType="text"
-        android:padding="6dp"
-        android:textSize="20sp"
-        android:layout_marginStart="70dp"
-        android:layout_marginEnd="70dp"
-        android:autofillHints=""
-        app:layout_constraintTop_toBottomOf="@+id/user_id_of_request_title"
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:id="@+id/creation_time_of_request_title"
-        android:fontFamily="sans-serif-condensed"
-        android:gravity="left"
-        android:text="Creation Time:"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/user_id_of_request"
-        tools:layout_editor_absoluteX="35dp"/>
-
-    <EditText
-        android:id="@+id/creation_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-        android:inputType="text"
-        android:padding="6dp"
-        android:textSize="20sp"
-        android:layout_marginStart="70dp"
-        android:layout_marginEnd="70dp"
-        android:autofillHints=""
-        app:layout_constraintTop_toBottomOf="@+id/creation_time_of_request_title"
-        />
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_delete_request"
-        android:layout_marginStart="70dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginTop="10dp"
-        android:text="Delete request"
-        android:textColor="@color/black"
-        android:background="#F44336"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/creation_time"
-        />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_view_joiners"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="View joiners"
-        android:textSize="20sp"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/white"
-        android:background="#2196F3"
-        app:layout_constraintTop_toBottomOf="@+id/btn_delete_request"
-        />
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/btn_view_joiners"
-        android:id="@+id/btn_join_requests_table"
-        >
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_join_request"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:background="#9C27B0"
-            android:layout_marginTop="10dp"
-
-            android:text="Join request"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_unjoin_request"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:text="Unjoin request"
-            android:textSize="18sp"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/white"
-            android:background="#FF9800"/>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/btn_join_requests_table"
-        >
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_report_request"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:text="Report request"
-            android:textSize="18sp"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/white"
-            android:background="#870F35"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_unreport_request"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Unreport request"
-            android:textSize="18sp"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/white"
-            android:background="#B1949D"/>
-
-    </TableRow>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
