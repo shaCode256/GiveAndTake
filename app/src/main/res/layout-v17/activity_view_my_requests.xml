@@ -11,15 +11,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:layout_marginTop="30dp"
-        android:fontFamily="sans-serif-condensed"
         android:gravity="center"
+        android:padding="5dp"
         android:text="View Requests"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="40sp"
-        android:padding="5dp"
-        android:background="@color/black"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
+        android:textSize="25sp"
         android:textStyle="bold" />
 
     <TextView
@@ -27,7 +25,6 @@
         android:layout_height="wrap_content"
         android:text="Phone number:"
         android:gravity="center"
-        android:fontFamily="sans-serif-condensed"
         android:textSize="20sp"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
@@ -35,44 +32,47 @@
 
     <EditText
         android:id="@+id/user_id_of_request"
-        android:layout_width="887dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="26dp"
-        android:layout_marginEnd="70dp"
+        android:layout_marginLeft="136dp"
         android:autofillHints=""
+        android:gravity="center"
         android:inputType="text"
-        android:padding="6dp"
+        android:textAlignment="center"
         android:textSize="20sp" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:id="@+id/blockUser"
         android:text="Block user"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#FF5722"
+        android:backgroundTint="#F47C56"
         />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:id="@+id/unblockUser"
         android:text="Unblock user"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#8BC34A"
+        android:backgroundTint="#60B9C5"
         />
 
     <Button
         android:id="@+id/showMyOpenRequestsBtn"
-        android:text="Show user's open requests"
+        android:text="Show open requests"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/teal_200"
         />
 
     <Button
         android:id="@+id/showRequestsIJoinedBtn"
-        android:text="Show requests user joined"
+        android:text="Show joined requests"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:backgroundTint="#D2B8ED"
         />
 
     <ListView

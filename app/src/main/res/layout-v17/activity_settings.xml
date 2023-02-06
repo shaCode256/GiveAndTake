@@ -13,8 +13,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
-        android:textSize="60sp"
+        android:textSize="25sp"
         android:text="Settings"
         />
 
@@ -24,7 +23,6 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
         android:textSize="20sp"
         android:text="Turn notifications on/off"
         />
@@ -61,7 +59,6 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
         android:textSize="20sp"
         android:text="Get notificated on requests on radius from current location when opening the app"
         />
@@ -83,7 +80,6 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
         android:textSize="20sp"
         android:text="Get notificated on requests on radius from a specified location"
         />
@@ -149,7 +145,6 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
         android:textSize="20sp"
         android:text="What's the distance of requests you want to get notified on? in Km"
         />

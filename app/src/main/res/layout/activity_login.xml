@@ -8,11 +8,22 @@
     tools:context="View.Login">
 
     <ImageView
-        android:layout_width="500dp"
-        android:layout_gravity="top|center"
-        android:layout_height="222dp"
-        android:contentDescription="@string/login_pic"
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="221dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:scaleType="fitXY"
         android:src="@drawable/login_pic" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/give_and_take"
+        android:textColor="#CC000000"
+        android:textSize="45sp"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
@@ -20,18 +31,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
-        android:textSize="55sp"
-        android:text="@string/give_and_take"
-        />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="#CC000000"
-        android:fontFamily="sans-serif-condensed"
-        android:textSize="40sp"
+        android:textSize="35sp"
         android:text="Welcome"
         />
 
