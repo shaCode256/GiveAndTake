@@ -33,11 +33,9 @@
 
     <EditText
         android:id="@+id/request_id"
-        android:layout_width="887dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="26dp"
-        android:layout_marginEnd="70dp"
+        android:layout_marginStart="175dp"
         android:autofillHints=""
         android:inputType="text"
         android:padding="6dp"
