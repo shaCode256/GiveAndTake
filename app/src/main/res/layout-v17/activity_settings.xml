@@ -55,15 +55,17 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
+        android:layout_height="94dp"
+        android:layout_marginLeft="-20dp"
+        android:layout_marginRight="-20dp"
         android:gravity="center"
+        android:text="Get notificated on requests on radius \n from current location when opening \n the app"
+
         android:textColor="#CC000000"
         android:textSize="20sp"
-        android:text="Get notificated on requests on radius from current location when opening the app"
-        />
+        android:textStyle="bold" />
 
-        <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_turn_on_auto_detect_location"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
@@ -76,13 +78,14 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
+        android:layout_height="74dp"
+        android:layout_marginRight="-20dp"
+        android:layout_marginLeft="-20dp"
         android:gravity="center"
+        android:text="Get notificated on requests on radius \n from a specified location"
         android:textColor="#CC000000"
         android:textSize="20sp"
-        android:text="Get notificated on requests on radius from a specified location"
-        />
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/latitude_input"
@@ -146,7 +149,7 @@
         android:gravity="center"
         android:textColor="#CC000000"
         android:textSize="20sp"
-        android:text="What's the distance of requests you want to get notified on? in Km"
+        android:text="What's the distance of requests\n you want to get notified on? in Km"
         />
 
     <EditText

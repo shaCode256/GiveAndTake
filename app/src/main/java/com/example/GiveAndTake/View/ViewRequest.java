@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -168,6 +169,7 @@ public class ViewRequest extends AppCompatActivity {
                 //TODO: maybe add contact details
                 databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contactDetails").setValue(joinerContactDetails);
                 databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
+                Toast.makeText(ViewRequest.this, "Joined successfully", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -180,6 +182,7 @@ public class ViewRequest extends AppCompatActivity {
                 assert requestUserId != null;
                 databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
                 databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).getRef().removeValue();
+                Toast.makeText(ViewRequest.this, "Unjoined successfully", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -205,6 +208,7 @@ public class ViewRequest extends AppCompatActivity {
                     String fullName= dataSnapshot.child("users").child(userId).child("fullName").getValue(String.class);
                     databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).setValue(fullName);
                     databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
+                    Toast.makeText(ViewRequest.this, "Reported successfully", Toast.LENGTH_SHORT).show();
                 }//onDataChange
 
                 @Override
@@ -225,8 +229,8 @@ public class ViewRequest extends AppCompatActivity {
                             || isManager.equals("1"))) {
                         databaseReference.child("reportedRequests").child(requestId).removeValue();
                     }
+                    Toast.makeText(ViewRequest.this, "Removed report successfully", Toast.LENGTH_SHORT).show();
                 }//onDataChange
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
 

@@ -110,7 +110,7 @@ public class ViewMyRequests extends ListActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //check if phone is not registered before
                 if (snapshot.hasChild(requestUserId)) {
-                    Toast.makeText(ViewMyRequests.this, "Blocking is done", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewMyRequests.this, "Blocked successfully", Toast.LENGTH_SHORT).show();
                     databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("1");
                 }
             }
@@ -126,7 +126,7 @@ public class ViewMyRequests extends ListActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //check if phone is not registered before
                 if (snapshot.hasChild(requestUserId)) {
-                    Toast.makeText(ViewMyRequests.this, "Unblocking is done", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewMyRequests.this, "Unblocked successfully", Toast.LENGTH_SHORT).show();
                     databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("0");
                 }
             }

@@ -136,6 +136,9 @@ public class VerifyPhone extends AppCompatActivity {
                                 }
                             });
                         }
+                        else{
+                            Toast.makeText(VerifyPhone.this, "Wrong code", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
