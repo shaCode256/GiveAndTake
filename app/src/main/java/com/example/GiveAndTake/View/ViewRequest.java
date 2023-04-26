@@ -15,12 +15,27 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.giveandtake.R;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
 
 public class ViewRequest extends AppCompatActivity {
 
@@ -124,6 +139,7 @@ public class ViewRequest extends AppCompatActivity {
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //remove this request from all it's joiners list of joined requests
+//            deleteRequest(userId, requestId, docId);
             if(requestId!=null) {
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -166,7 +182,6 @@ public class ViewRequest extends AppCompatActivity {
                 assert requestUserId != null;
                // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
                 String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
-                //TODO: maybe add contact details
                 databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contactDetails").setValue(joinerContactDetails);
                 databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
                 Toast.makeText(ViewRequest.this, "Joined successfully", Toast.LENGTH_SHORT).show();
@@ -199,6 +214,8 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnReportRequest.setOnClickListener(v -> {
+
+           // reportRequest(requestId,userId, requestUserId);
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -219,6 +236,8 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnUnReportRequest.setOnClickListener(v -> {
+         //   unReportRequest(requestId,userId);
+
             databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).removeValue();
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -237,5 +256,281 @@ public class ViewRequest extends AppCompatActivity {
                 }//onCancelled
             });
         });
+    }
+
+    public void deleteRequest(String requestId, String userId, String docId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        new Thread(() -> {
+            String urlString = "http://10.102.2.155:8000/delete/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewRequest.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+                if (result.equals("\"success\"")) {
+                    //add marker
+                    HashMap<String, Object> user = new HashMap<>();
+                    user.put("requestId", requestId);
+                    db.collection("MapsData").document(docId).delete(); //deletes from markersDb
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+    public void reportRequest(String requestId, String userId, String requestUserId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        new Thread(() -> {
+            String urlString = "http://10.102.2.155:8000/report/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewRequest.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                json.put("requestUserId", requestUserId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+
+    public void unReportRequest(String requestId, String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        new Thread(() -> {
+            String urlString = "http://10.102.2.155:8000/unReport/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewRequest.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+
+    public void joinRequest(String requestId, String userId, String joinerContactDetails) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        new Thread(() -> {
+            String urlString = "http://10.102.2.155:8000/join/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewRequest.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                json.put("joinerContactDetails", joinerContactDetails);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+
+    public void unJoinRequest(String requestId, String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        new Thread(() -> {
+            String urlString = "http://10.102.2.155:8000/unJoin/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewRequest.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show());
     }
 }
