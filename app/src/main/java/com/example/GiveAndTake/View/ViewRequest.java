@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 public class ViewRequest extends AppCompatActivity {
+    String IPv4_Address= "10.0.0.3";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +177,11 @@ public class ViewRequest extends AppCompatActivity {
             startActivity(mapIntent);
         });
 
-        btnJoinRequest.setOnClickListener(v -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        btnJoinRequest.setOnClickListener(
+                v -> {
+                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+
+
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 assert requestUserId != null;
@@ -189,9 +194,15 @@ public class ViewRequest extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        }));
+        });
 
-        btnUnjoinRequest.setOnClickListener(v -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+// //Join by server
+      //             joinRequest(requestId, userId, requestUserId);
+                    ;});
+
+        btnUnjoinRequest.setOnClickListener(v ->
+                {
+                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 assert requestUserId != null;
@@ -202,7 +213,12 @@ public class ViewRequest extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        }));
+        });
+
+                // //UnJoin by server
+                    //unJoinRequest(requestId, userId, requestUserId);
+
+                ;});
 
         btnViewJoiners.setOnClickListener(v -> {
             Intent viewJoinersIntent = new Intent(ViewRequest.this, ViewJoiners.class);
@@ -215,7 +231,7 @@ public class ViewRequest extends AppCompatActivity {
 
         btnReportRequest.setOnClickListener(v -> {
 
-           // reportRequest(requestId,userId, requestUserId);
+          //  reportRequest(requestId,userId, requestUserId);
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -236,7 +252,7 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnUnReportRequest.setOnClickListener(v -> {
-         //   unReportRequest(requestId,userId);
+           // unReportRequest(requestId,userId);
 
             databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).removeValue();
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -258,10 +274,10 @@ public class ViewRequest extends AppCompatActivity {
         });
     }
 
-    public void deleteRequest(String requestId, String userId, String docId) {
+    public void deleteRequest(String userId, String requestId, String docId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/delete/";
+            String urlString = "http://"+IPv4_Address+":8000/delete/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -319,7 +335,7 @@ public class ViewRequest extends AppCompatActivity {
     public void reportRequest(String requestId, String userId, String requestUserId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/report/";
+            String urlString = "http://"+IPv4_Address+":8000/report/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -373,7 +389,7 @@ public class ViewRequest extends AppCompatActivity {
     public void unReportRequest(String requestId, String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/unReport/";
+            String urlString = "http://"+IPv4_Address+":8000/unReport/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -423,10 +439,10 @@ public class ViewRequest extends AppCompatActivity {
     }
 
 
-    public void joinRequest(String requestId, String userId, String joinerContactDetails) {
+    public void joinRequest(String requestId, String userId, String requestUserId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/join/";
+            String urlString = "http://"+IPv4_Address+":8000/join/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -451,7 +467,7 @@ public class ViewRequest extends AppCompatActivity {
                 JSONObject json = new JSONObject();
                 json.put("requestId", requestId);
                 json.put("userId", userId);
-                json.put("joinerContactDetails", joinerContactDetails);
+                json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
@@ -477,10 +493,10 @@ public class ViewRequest extends AppCompatActivity {
     }
 
 
-    public void unJoinRequest(String requestId, String userId) {
+    public void unJoinRequest(String requestId, String userId, String requestUserId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/unJoin/";
+            String urlString = "http://"+IPv4_Address+":8000/unJoin/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -505,6 +521,7 @@ public class ViewRequest extends AppCompatActivity {
                 JSONObject json = new JSONObject();
                 json.put("requestId", requestId);
                 json.put("userId", userId);
+                json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");

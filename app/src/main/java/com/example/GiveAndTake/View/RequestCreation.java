@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -19,9 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-//import com.example.giveandtake.Model.Request;
-//import com.example.giveandtake.Model.Request;
-//import com.example.giveandtake.Presenter.ClientPostRequest;
 import com.example.giveandtake.Model.Request;
 import com.example.giveandtake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -52,7 +48,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class RequestCreation extends AppCompatActivity {
     protected Context context;
@@ -133,7 +128,7 @@ public class RequestCreation extends AppCompatActivity {
                         user.put("creationTime", creationTime);
                         String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
-                        //Add manually, not by server: directly to Firebase
+     //                   Add manually, not by server: directly to Firebase
                         markersDb.collection("MapsData")
                                 .add(user)
                                 .addOnSuccessListener(documentReference -> {
@@ -160,7 +155,7 @@ public class RequestCreation extends AppCompatActivity {
 
                             }
                         });
-                        // //Add by server
+                         //Add by server
 //                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
                         Intent myIntent = new Intent(RequestCreation.this, Map.class);
                         myIntent.putExtra("userId", userId);
@@ -226,7 +221,7 @@ public class RequestCreation extends AppCompatActivity {
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
         boolean flag = false;
         new Thread(() -> {
-            String urlString = "http://10.102.2.155:8000/";
+            String urlString = "http://10.0.0.3:8000/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
 
