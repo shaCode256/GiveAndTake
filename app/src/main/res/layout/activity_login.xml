@@ -10,10 +10,10 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="221dp"
+        android:layout_height="200dp"
         android:adjustViewBounds="true"
-        android:cropToPadding="false"
         android:scaleType="fitXY"
+        android:layout_marginTop="-80dp"
         android:src="@drawable/login_pic" />
 
     <TextView
@@ -23,17 +23,17 @@
         android:text="@string/give_and_take"
         android:textColor="#CC000000"
         android:textSize="45sp"
+        android:layout_marginTop="40dp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:gravity="center"
+        android:text="Welcome"
         android:textColor="#CC000000"
         android:textSize="35sp"
-        android:text="Welcome"
-        />
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/phone"
@@ -123,9 +123,9 @@
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/ariel"
-        android:contentDescription="@string/ariel_university_logo" />
+        android:layout_marginBottom="-40dp"
+        android:contentDescription="@string/ariel_university_logo"
+        android:src="@drawable/ariel" />
 
 </LinearLayout>
 

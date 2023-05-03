@@ -10,6 +10,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:layout_marginTop="-150dp"
         android:src="@drawable/register_pic" />
 
     <TextView
@@ -25,11 +26,11 @@
 
     <TextView
         android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="375dp"
+        android:layout_height="114dp"
         android:fontFamily="sans-serif-condensed"
-        android:text="2 Way authentication: first university E-mail. Please enter your email and verify it. after, enter and verify your phone when you log in."
-        android:textSize="20dp"
+        android:text="2 Way authentication: first university E-mail. Please enter your email and verify it. after, click log in with email, enter and verify your phone."
+        android:textSize="23dp"
         android:textStyle="bold" />
 
 
