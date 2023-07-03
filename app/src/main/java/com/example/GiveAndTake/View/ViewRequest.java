@@ -197,7 +197,7 @@ public class ViewRequest extends AppCompatActivity {
         });
 
 // //Join by server
-      //             joinRequest(requestId, userId, requestUserId);
+                   //joinRequest(requestId, userId, requestUserId);//
                     ;});
 
         btnUnjoinRequest.setOnClickListener(v ->
@@ -288,7 +288,7 @@ public class ViewRequest extends AppCompatActivity {
                 e.printStackTrace();
                 ViewRequest.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. Please contact admin", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -330,6 +330,7 @@ public class ViewRequest extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
+        Toast.makeText(ViewRequest.this, "Deleted successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void reportRequest(String requestId, String userId, String requestUserId) {
@@ -346,7 +347,7 @@ public class ViewRequest extends AppCompatActivity {
                 e.printStackTrace();
                 ViewRequest.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewRequest.this, "Server is down, can't report the request. Please contact admin", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -383,6 +384,7 @@ public class ViewRequest extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
+        Toast.makeText(ViewRequest.this, "Reported successfully", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -400,7 +402,7 @@ public class ViewRequest extends AppCompatActivity {
                 e.printStackTrace();
                 ViewRequest.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewRequest.this, "Server is down, can't unreport the request. Please contact admin", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -436,6 +438,7 @@ public class ViewRequest extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
+        Toast.makeText(ViewRequest.this, "Unreported successfully", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -453,7 +456,7 @@ public class ViewRequest extends AppCompatActivity {
                 e.printStackTrace();
                 ViewRequest.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewRequest.this, "Server is down, can't join the request. Please contact admin", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -490,6 +493,7 @@ public class ViewRequest extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
+        Toast.makeText(ViewRequest.this, "Joined successfully", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -507,7 +511,7 @@ public class ViewRequest extends AppCompatActivity {
                 e.printStackTrace();
                 ViewRequest.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewRequest.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -544,10 +548,11 @@ public class ViewRequest extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
+        Toast.makeText(ViewRequest.this, "Unjoined successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void showServerDownToast()
     {
-        runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. please contact Shavit", Toast.LENGTH_SHORT).show());
+        runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
     }
 }
