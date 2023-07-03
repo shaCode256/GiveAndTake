@@ -48,7 +48,10 @@ public class VerifyEmail extends AppCompatActivity {
     }
 
     private void registerUser(String emailTxt, String passwordTxt) {
-        if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
+        if(passwordTxt ==null || (passwordTxt != null && passwordTxt.trim().isEmpty())){
+            Toast.makeText(VerifyEmail.this, "please enter password.", Toast.LENGTH_SHORT).show();
+        }
+        else if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
             auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
                 auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
