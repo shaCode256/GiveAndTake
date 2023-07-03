@@ -30,8 +30,8 @@
         android:layout_marginTop="330dp"
         android:layout_marginBottom="20dp"
         android:fontFamily="sans-serif-condensed"
-        android:text="2 Way authentication: first university E-mail. DONE. now, enter your name and phone below.
-if you already have an account, verifying the phone below will create a new user."
+        android:text="2 Way authentication: E-mail: DONE. Enter your name and phone.
+When another phone number is registered, verifying creates a new user. Contact us for issues."
         android:textSize="20dp"
         android:textStyle="bold" />
 
