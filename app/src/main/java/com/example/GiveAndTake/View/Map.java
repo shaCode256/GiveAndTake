@@ -284,48 +284,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             String docId = markersRequestToDocId.get(requestId);
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
                             JSONObject jsonRequestDetails = new JSONObject();
-//                            String requestSubject = "";
-//                            String requestBody = "";
-//                            String contactDetails = "";
-//                            String requestLatitude= "";
-//                            String requestLongitude= "";
-//                            String creationTime = "";
-//                            String stringRequestDetails= getRequestDetails(requestId, userId, requestUserId);
-//                            try {
-//                                jsonRequestDetails = new JSONObject(stringRequestDetails);
-//                            }catch (JSONException err){
-//                                Log.d("Error", err.toString());
-//                            }
-//                            try {
-//                                requestSubject = jsonRequestDetails.getString("requestSubject");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                            try {
-//                                requestBody = jsonRequestDetails.getString("requestBody");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                            try {
-//                                contactDetails = jsonRequestDetails.getString("contactDetails");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                            try {
-//                                requestLatitude= jsonRequestDetails.getString("requestLatitude");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                            try {
-//                                requestLongitude= jsonRequestDetails.getString("requestLongitude");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                            try {
-//                                creationTime = jsonRequestDetails.getString("creationTime");
-//                            } catch (JSONException e) {
-//                                throw new RuntimeException(e);
-//                            }
+                            //String stringRequestDetails= getRequestDetails(requestId, userId, requestUserId);
                             viewRequestIntent.putExtra("requestSubject", requestSubject);
                             viewRequestIntent.putExtra("requestBody", requestBody);
                             viewRequestIntent.putExtra("contactDetails", contactDetails);
