@@ -15,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,7 +25,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.giveandtake.R;
 import com.example.giveandtake.Service.NotificationService;
-import com.example.giveandtake.View.Settings;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -41,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,13 +49,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     protected Context context;
+
+    String IPv4_Address= "10.0.0.3";
     private GoogleMap mMap;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
@@ -180,6 +192,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -270,6 +283,49 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
+                            JSONObject jsonRequestDetails = new JSONObject();
+//                            String requestSubject = "";
+//                            String requestBody = "";
+//                            String contactDetails = "";
+//                            String requestLatitude= "";
+//                            String requestLongitude= "";
+//                            String creationTime = "";
+//                            String stringRequestDetails= getRequestDetails(requestId, userId, requestUserId);
+//                            try {
+//                                jsonRequestDetails = new JSONObject(stringRequestDetails);
+//                            }catch (JSONException err){
+//                                Log.d("Error", err.toString());
+//                            }
+//                            try {
+//                                requestSubject = jsonRequestDetails.getString("requestSubject");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                requestBody = jsonRequestDetails.getString("requestBody");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                contactDetails = jsonRequestDetails.getString("contactDetails");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                requestLatitude= jsonRequestDetails.getString("requestLatitude");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                requestLongitude= jsonRequestDetails.getString("requestLongitude");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                creationTime = jsonRequestDetails.getString("creationTime");
+//                            } catch (JSONException e) {
+//                                throw new RuntimeException(e);
+//                            }
                             viewRequestIntent.putExtra("requestSubject", requestSubject);
                             viewRequestIntent.putExtra("requestBody", requestBody);
                             viewRequestIntent.putExtra("contactDetails", contactDetails);
@@ -347,6 +403,66 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         stopService(serviceIntent);
     }
 
+    public String getRequestDetails(String requestId, String userId, String requestUserId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        AtomicReference<String> result= new AtomicReference<>("");
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Map.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                json.put("requestUserId", requestUserId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+               result.set(CharStreams.toString(new InputStreamReader(
+                       is, Charsets.UTF_8)));
+                System.out.println("Request Details: " + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
+        return result.get();
+    }
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
+    }
 }
 
 
