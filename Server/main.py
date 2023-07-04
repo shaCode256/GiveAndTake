@@ -1,3 +1,5 @@
+import json
+
 import uvicorn
 from fastapi import FastAPI, Request
 import orjson
@@ -129,8 +131,30 @@ async def join(request: Request):
         userId).child("contactDetails").set(joinerContactDetails)
     users_ref.child(userId).child("requestsUserJoined").child(requestId).child(
         "requestUserId").set(requestUserId)
-
     return 'success'
+
+@app.post('/getRequestDetails/')
+async def getRequestDetails(request: Request):
+    print("enter getRequestDetails")
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestUserId = data['requestUserId']
+    requestId = data['requestId']
+    users_ref = db.reference('users/')
+    requestSubject = users_ref.child(requestUserId).child("requestId").child(requestId).child("subject").get()
+    requestBody = users_ref.child(requestUserId).child("requestId").child(requestId).child("body").get()
+    contactDetails = users_ref.child(requestUserId).child("requestId").child(requestId).child("contactDetails").get()
+    requestLatitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").get())
+    requestLongitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").get())
+    creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
+
+    result= (json.dumps({requestBody: requestBody, requestSubject: requestSubject, contactDetails: contactDetails,
+            requestLongitude: requestLongitude, requestLatitude: requestLatitude, creationTime: creationTime
+                       }))
+    print(result)
+    return result
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
