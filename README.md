@@ -1,5 +1,5 @@
 # Give And Take: Android Application
-
+## Shared map-based, users events storage and management
 For Ariel university students | staff that are smartphone users, who want to ask for help or give help to their peers: 
 
 the Give and Take Android application is a sharing social application
