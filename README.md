@@ -1,4 +1,4 @@
-# Give And Take: Android app
+# Give And Take: Android Application
 
 For Ariel university students | staff that are smartphone users, who want to ask for help or give help to their peers: 
 
