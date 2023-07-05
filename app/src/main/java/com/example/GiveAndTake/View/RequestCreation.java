@@ -2,7 +2,6 @@ package com.example.giveandtake.View;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -50,7 +49,6 @@ import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
-    protected Context context;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     @SuppressLint("MissingPermission")
@@ -219,7 +217,6 @@ public class RequestCreation extends AppCompatActivity {
 
 
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
-        boolean flag = false;
         new Thread(() -> {
             String urlString = "http://10.0.0.3:8000/";
             //Wireless LAN adapter Wi-Fi:

@@ -23,7 +23,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -198,7 +197,7 @@ public class ViewRequest extends AppCompatActivity {
 
 // //Join by server
                    //joinRequest(requestId, userId, requestUserId);//
-                    ;});
+                });
 
         btnUnjoinRequest.setOnClickListener(v ->
                 {
@@ -218,7 +217,7 @@ public class ViewRequest extends AppCompatActivity {
                 // //UnJoin by server
                     //unJoinRequest(requestId, userId, requestUserId);
 
-                ;});
+                });
 
         btnViewJoiners.setOnClickListener(v -> {
             Intent viewJoinersIntent = new Intent(ViewRequest.this, ViewJoiners.class);
@@ -334,7 +333,6 @@ public class ViewRequest extends AppCompatActivity {
     }
 
     public void reportRequest(String requestId, String userId, String requestUserId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/report/";
             //Wireless LAN adapter Wi-Fi:
@@ -389,7 +387,6 @@ public class ViewRequest extends AppCompatActivity {
 
 
     public void unReportRequest(String requestId, String userId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/unReport/";
             //Wireless LAN adapter Wi-Fi:
@@ -443,7 +440,6 @@ public class ViewRequest extends AppCompatActivity {
 
 
     public void joinRequest(String requestId, String userId, String requestUserId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/join/";
             //Wireless LAN adapter Wi-Fi:
@@ -498,7 +494,6 @@ public class ViewRequest extends AppCompatActivity {
 
 
     public void unJoinRequest(String requestId, String userId, String requestUserId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/unJoin/";
             //Wireless LAN adapter Wi-Fi:

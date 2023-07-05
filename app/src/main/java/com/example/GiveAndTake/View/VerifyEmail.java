@@ -7,19 +7,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.giveandtake.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class VerifyEmail extends AppCompatActivity {
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     private FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +41,7 @@ public class VerifyEmail extends AppCompatActivity {
     }
 
     private void registerUser(String emailTxt, String passwordTxt) {
-        if(passwordTxt ==null || (passwordTxt != null && passwordTxt.trim().isEmpty())){
+        if(passwordTxt ==null || passwordTxt.trim().isEmpty()){
             Toast.makeText(VerifyEmail.this, "please enter password.", Toast.LENGTH_SHORT).show();
         }
         else if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {

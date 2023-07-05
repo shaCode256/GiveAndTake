@@ -6,7 +6,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -63,10 +62,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
-    protected Context context;
     String stringRequestDetails="";
     String IPv4_Address= "10.0.0.3";
     private GoogleMap mMap;
@@ -370,8 +367,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public void getRequestDetails(String requestId, String userId, String requestUserId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        AtomicReference<String> result= new AtomicReference<>("");
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
