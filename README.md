@@ -26,7 +26,7 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 
 6) The administrator is given the option to add an event with a special icon
 
-7) The application displays a notification on the phone about a new request or event (according to the user's preferences).
+7) The application offers a notification service for a new request/event, according to the user's preferences.
 
 8) The app enables users to report other users
 
