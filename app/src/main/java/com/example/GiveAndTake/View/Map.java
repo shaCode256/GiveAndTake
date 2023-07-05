@@ -67,7 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     protected Context context;
-
+    String stringRequestDetails="";
     String IPv4_Address= "10.0.0.3";
     private GoogleMap mMap;
     FirebaseFirestore db;
@@ -284,7 +284,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                             String docId = markersRequestToDocId.get(requestId);
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
                             JSONObject jsonRequestDetails = new JSONObject();
-                            //String stringRequestDetails= getRequestDetails(requestId, userId, requestUserId);
+                           // getRequestDetails(requestId, userId, requestUserId);
+                            try {
+                                jsonRequestDetails = new JSONObject(stringRequestDetails);
+//                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
+//                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
+                            }catch (JSONException err){
+                                Log.d("Error", err.toString());
+                            }
                             viewRequestIntent.putExtra("requestSubject", requestSubject);
                             viewRequestIntent.putExtra("requestBody", requestBody);
                             viewRequestIntent.putExtra("contactDetails", contactDetails);
@@ -362,7 +369,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         stopService(serviceIntent);
     }
 
-    public String getRequestDetails(String requestId, String userId, String requestUserId) {
+    public void getRequestDetails(String requestId, String userId, String requestUserId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         AtomicReference<String> result= new AtomicReference<>("");
         new Thread(() -> {
@@ -405,9 +412,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
             try {
                 InputStream is = conn.getInputStream();
-               result.set(CharStreams.toString(new InputStreamReader(
-                       is, Charsets.UTF_8)));
-                System.out.println("Request Details: " + result);
+                stringRequestDetails= CharStreams.toString(new InputStreamReader(
+                       is, Charsets.UTF_8));
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
@@ -415,7 +421,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         }).start();
         Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
-        return result.get();
     }
 
     public void showServerDownToast()

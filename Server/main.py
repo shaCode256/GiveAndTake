@@ -149,9 +149,10 @@ async def getRequestDetails(request: Request):
     requestLongitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").get())
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
 
-    result= (json.dumps({requestBody: requestBody, requestSubject: requestSubject, contactDetails: contactDetails,
-            requestLongitude: requestLongitude, requestLatitude: requestLatitude, creationTime: creationTime
-                       }))
+    result= json.dumps({"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails,
+            "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime
+                        })
+   # result= result[1:-1]
     print(result)
     return result
 
