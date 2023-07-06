@@ -1,5 +1,5 @@
-# Give And Take: Android app
-
+# Give And Take: Android Application
+## Shared map-based, users events storage and management
 For Ariel university students | staff that are smartphone users, who want to ask for help or give help to their peers: 
 
 the Give and Take Android application is a sharing social application
@@ -7,8 +7,10 @@ that allows users to open and maintain requests, watch open requests of others, 
 
 Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our product allows users to manage the requests on a targeted system to Ariel students only, enabling wide distribution and location filtering by combining requests management and a map.
 
+<img src="Give And Take-poster.png" width="1000" height="350">
 <img src="readme_pictures/maps_for_admin.jpg" width="200" height="350">
 <img src="readme_pictures/maps_for_reg.jpeg" width="200" height="350">
+
 
 ## Features:
 
@@ -24,7 +26,7 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
 
 6) The administrator is given the option to add an event with a special icon
 
-7) The application displays a notification on the phone about a new request or event (according to the user's preferences).
+7) The application offers a notification service for a new request/event, according to the user's preferences.
 
 8) The app enables users to report other users
 
