@@ -156,8 +156,8 @@ async def getRequestDetails(request: Request):
     print(result)
     return result
 
-@app.post('/setNotificationSettingsKm/')
-async def setNotificationSettingsKm(request: Request):
+@app.post('/setKmDistanceNotifications/')
+async def setKmDistanceNotifications(request: Request):
     print("enter getRequestDetails")
     body = await request.body()
     body.decode("utf-8")
@@ -168,50 +168,43 @@ async def setNotificationSettingsKm(request: Request):
     users_ref.child("users").child(userId).child("settings").child("notifications").child("distance").set(distance);
     return 'success'
 
-@app.post('/turnOnAutoDetectLocation/')
+@app.post('/turnOnOffAutoDetectLocationNotifications/')
 async def turnOnAutoDetectLocationBtn(request: Request):
     print("enter getRequestDetails")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
+    onOff = int( data['onOff'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(1);
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(onOff);
     return 'success'
 
-@app.post('/useSpecifiedLocationBtn/')
+@app.post('/useSpecificLocationNotifications/')
 async def useSpecifiedLocation(request: Request):
     print("enter getRequestDetails")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
-    geoPoint = data['geoPoint']
+    latitude = float(data['latitude'])
+    longitude = float(data['longitude'])
     users_ref = db.reference('users/')
     users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0);
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").set(geoPoint)
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
     return 'success'
 
-@app.post('/turnOnNotifications/')
+@app.post('/turnOnOffNotifications/')
 async def turnOnNotifications(request: Request):
     print("enter getRequestDetails")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
+    onOff = int (data['onOff'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("turnedOn").set(1);
-    return 'success'
-
-@app.post('/turnOffNotifications/')
-async def turnOffNotifications(request: Request):
-    print("enter getRequestDetails")
-    body = await request.body()
-    body.decode("utf-8")
-    data = orjson.loads(body)
-    userId = data['userId']
-    users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("turnedOn").set(0);
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("turnedOn").set(onOff);
     return 'success'
 
 @app.post('/useCurrLocationNotifications/')
@@ -221,10 +214,12 @@ async def useCurrLocationNotifications(request: Request):
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
-    geoPoint = data['geoPoint']
+    latitude = float(data['latitude'])
+    longitude = float(data['longitude'])
     users_ref = db.reference('users/')
     users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0)
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").set(geoPoint)
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
+    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
     return 'success'
 
 if __name__ == "__main__":

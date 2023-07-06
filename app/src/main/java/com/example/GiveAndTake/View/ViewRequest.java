@@ -42,7 +42,6 @@ import java.util.HashMap;
 
 public class ViewRequest extends AppCompatActivity {
     String IPv4_Address= "10.0.0.3";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");

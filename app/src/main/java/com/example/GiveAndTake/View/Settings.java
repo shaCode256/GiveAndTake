@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,9 +30,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.GeoPoint;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class Settings extends AppCompatActivity {
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     private FirebaseAuth auth;
+    String IPv4_Address= "10.0.0.3";
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +71,8 @@ public class Settings extends AppCompatActivity {
                 Toast.makeText(Settings.this, "Please fill in valid distance in km", Toast.LENGTH_SHORT).show();
             }
             else{
+
+              //  sendKmDistance(userId, distance);
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -69,7 +86,7 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-
+        //turnOnOffAutoDetectLocation(userId, "1");
         turnOnAutoDetectLocationBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -102,6 +119,7 @@ public class Settings extends AppCompatActivity {
                 double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                 if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
                     GeoPoint geoPoint = new GeoPoint(doubleLatitude, doubleLongitude);
+                    // sendUseSpecificLocation(userId, geoPoint);
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -125,6 +143,7 @@ public class Settings extends AppCompatActivity {
             startActivity(newIntent);
         });
 
+        //turnOnOffAutoDetectLocation(userId, "1");
         turnOnNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -136,6 +155,7 @@ public class Settings extends AppCompatActivity {
             }
         }));
 
+        //turnOnOffAutoDetectLocation(userId, "0");
         turnOffNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -145,7 +165,8 @@ public class Settings extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }));
+        }
+        ));
 
         useCurrLocationBtn.setOnClickListener(view -> {
             // get curr location
@@ -164,6 +185,7 @@ public class Settings extends AppCompatActivity {
                         .addOnSuccessListener(Settings.this, location -> {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
+                               // sendUseCurrLocation(userId, location);
                                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -185,6 +207,274 @@ public class Settings extends AppCompatActivity {
         });
 
 
+    }
+
+    public void sendUseCurrLocation(String userId, Location location) {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/useCurrLocationNotifications/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Settings.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("locationLat", location.getLatitude());
+                json.put("locationLong", location.getLongitude());
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Settings.this, "Set use curr location successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void sendTurnOnOffNotifications(String userId, String onOff) {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/turnOnOffNotifications/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Settings.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("onOff", onOff);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Settings.this, "Set On/Off notifications successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void sendUseSpecificLocation(String userId, GeoPoint location) {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/useSpecificLocationNotifications/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Settings.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("locationLat", location.getLatitude());
+                json.put("locationLong", location.getLongitude());
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Settings.this, "Set use curr location successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void turnOnOffAutoDetectLocation(String userId, String onOff) {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/turnOnOffAutoDetectLocationNotifications/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Settings.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("onOff", onOff);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Settings.this, "Set use curr location successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void sendKmDistance(String userId, String distance) {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/setKmDistanceNotifications/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Settings.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("distance", distance);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("yes:" + result);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Settings.this, "Set use curr location successfully", Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
     }
 
 }
