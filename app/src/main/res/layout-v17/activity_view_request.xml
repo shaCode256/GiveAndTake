@@ -25,6 +25,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close_24" />
 
+        <ImageView
+            android:id="@+id/btn_show_on_map"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="350dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/background_add_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/map" />
+
         <TextView
             android:id="@+id/view_request_title"
             android:layout_width="wrap_content"
@@ -96,7 +107,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/contactCardView"
             android:layout_width="293dp"
-            android:layout_height="65dp"
+            android:layout_height="80dp"
             app:cardCornerRadius="30dp"
             app:cardUseCompatPadding="true"
             app:layout_constraintStart_toStartOf="@+id/titleCardView"
@@ -197,7 +208,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/bodyCardView"
             android:layout_width="377dp"
-            android:layout_height="189dp"
+            android:layout_height="200dp"
             android:layout_marginStart="16dp"
             app:cardCornerRadius="30dp"
             app:cardUseCompatPadding="true"

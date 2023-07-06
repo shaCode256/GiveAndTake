@@ -73,7 +73,6 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-
     <TextView
         android:id="@+id/create_request_title"
         android:layout_width="wrap_content"
@@ -145,7 +144,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/contactCardView"
         android:layout_width="293dp"
-        android:layout_height="65dp"
+        android:layout_height="80dp"
         app:cardCornerRadius="30dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintStart_toStartOf="@+id/titleCardView"
@@ -168,9 +167,9 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
                 android:background="@null"
-                android:maxLength="17"
+                android:maxLength="30"
                 android:gravity="center_horizontal"
-                android:hint="Contact information..."
+                android:hint="Enter contact information... \nup to 30 characters"
                 android:textAlignment="center"
                 android:textColor="@android:color/darker_gray" />
 
@@ -249,7 +248,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/bodyCardView"
         android:layout_width="377dp"
-        android:layout_height="189dp"
+        android:layout_height="200dp"
         android:layout_marginStart="16dp"
         app:cardCornerRadius="30dp"
         app:cardUseCompatPadding="true"
@@ -277,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:hint="Enter your request..."
+                    android:hint="Enter your request... \nUp to 180 characters"
                     android:importantForAutofill="no"
                     android:maxLength="180"
                     android:inputType="text|textNoSuggestions|textMultiLine"
@@ -314,7 +313,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
                 android:background="@null"
-                android:hint="Enter title..."
+                android:hint="Enter title... \n up to 70 characters"
                 android:maxLength="70"
                 android:gravity="center_horizontal"
                 android:textAlignment="center"

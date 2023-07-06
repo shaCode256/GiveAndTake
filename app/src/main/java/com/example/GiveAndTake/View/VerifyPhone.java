@@ -146,7 +146,7 @@ public class VerifyPhone extends AppCompatActivity {
     private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
             RegisterUser registerUserPresenter= new RegisterUser();
             registerUserPresenter.registerUser(emailTxt, phoneTxt, fullNameTxt, databaseReference);
-            Toast.makeText(VerifyPhone.this, "User is successfully registered!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(VerifyPhone.this, "User is successfully registered, \nnow log in with your phone!", Toast.LENGTH_SHORT).show();
             Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
             startActivity(loginIntent);
     }

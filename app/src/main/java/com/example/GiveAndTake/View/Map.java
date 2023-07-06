@@ -197,8 +197,16 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         double lang= 35.20542059093714;
         LatLng defaultLocation = new LatLng(lat, lang);
         float DEFAULT_ZOOM= 15;
-        mMap.moveCamera(CameraUpdateFactory
-                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+        Intent thisIntent = getIntent();
+        double goToLongLocation= thisIntent.getDoubleExtra("goToLongLocation", -999);
+        double goToLatLocation= thisIntent.getDoubleExtra("goToLatLocation", -999);
+        if(goToLongLocation != -999 && goToLatLocation != -999 ){
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(goToLatLocation, goToLongLocation), 17.0f));
+        }
+        else {
+            mMap.moveCamera(CameraUpdateFactory
+                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+        }
         new Thread(){
             @Override
             public void run(){
@@ -245,7 +253,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         // adding on click listener to marker of google maps.
         mMap.setOnMapLongClickListener(latLng -> {
             //passing userId to request
-            Intent thisIntent = getIntent();
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");
             Intent createRequestIntent = new Intent(Map.this, RequestCreation.class);
@@ -260,7 +267,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
         mMap.setOnMarkerClickListener(marker -> {
             String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
-            Intent thisIntent = getIntent();
             String requestId= marker.getTitle();
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");

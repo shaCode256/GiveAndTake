@@ -1,5 +1,7 @@
 package com.example.giveandtake.View;
 
+import static java.lang.Double.parseDouble;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.giveandtake.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
@@ -72,6 +76,7 @@ public class ViewRequest extends AppCompatActivity {
         latitudeInputEditTxt.setEnabled(false);
         creationTimeEditTxt.setEnabled(false);
         ImageView btnBackToMap = findViewById(R.id.btn_back_to_map);
+        ImageView btnShowOnMap = findViewById(R.id.btn_show_on_map);
         Button btnDeleteRequest = findViewById(R.id.btn_delete_request);
         Button btnViewJoiners = findViewById(R.id.btn_view_joiners);
         Button btnJoinRequest = findViewById(R.id.btn_join_request);
@@ -130,6 +135,15 @@ public class ViewRequest extends AppCompatActivity {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
                 mapIntent.putExtra("userId", userId);
                 mapIntent.putExtra("isManager", isManager);
+            startActivity(mapIntent);
+        });
+
+        btnShowOnMap.setOnClickListener(v -> {
+            Intent mapIntent = new Intent(ViewRequest.this, Map.class);
+            mapIntent.putExtra("userId", userId);
+            mapIntent.putExtra("isManager", isManager);
+            mapIntent.putExtra("goToLatLocation", (parseDouble(latitude)));
+            mapIntent.putExtra("goToLongLocation", (parseDouble(longitude)));
             startActivity(mapIntent);
         });
 

@@ -168,14 +168,13 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/applyKmBtn"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text= "Apply KM changes"
+        android:text= "Apply KM change"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:background="#00BCD4"
+        android:textSize="18sp"
         />
 
     <LinearLayout
@@ -188,9 +187,10 @@
         <androidx.appcompat.widget.AppCompatButton
             android:layout_marginStart="5dp"
             android:id="@+id/backToMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text= "Back to map"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:background="#00BCD4"
+            android:text= "Apply On/Off &amp; Back to map"
             android:textSize="20sp"
             android:textStyle= "bold" />
 
