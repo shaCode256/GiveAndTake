@@ -220,7 +220,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             public boolean onQueryTextSubmit(String query) {
                 // on below line we are getting the
                 // location name from search view.
-                String location = searchView.getQuery().toString();
+
+                String location= "";
+                location = searchView.getQuery().toString();
 
                 // below line is to create a list of address
                 // where we will store the list of all address.
