@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +50,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import androidx.appcompat.widget.SearchView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,6 +65,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
@@ -71,6 +76,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> takenRequestsIds = new HashSet<>();
+
+    SearchView searchView;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @SuppressLint("MissingPermission")
     @Override
@@ -200,6 +207,59 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent thisIntent = getIntent();
         double goToLongLocation= thisIntent.getDoubleExtra("goToLongLocation", -999);
         double goToLatLocation= thisIntent.getDoubleExtra("goToLatLocation", -999);
+        // initializing our search view.
+        searchView = findViewById(R.id.idSearchView);
+
+        // Obtain the SupportMapFragment and get notified
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        // adding on query listener for our search view.
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // on below line we are getting the
+                // location name from search view.
+                String location = searchView.getQuery().toString();
+
+                // below line is to create a list of address
+                // where we will store the list of all address.
+                List<Address> addressList = null;
+
+                // checking if the entered location is null or not.
+                if (location != null || location.equals("")) {
+                    // on below line we are creating and initializing a geo coder.
+                    Geocoder geocoder = new Geocoder(Map.this);
+                    try {
+                        // on below line we are getting location from the
+                        // location name and adding that location to address list.
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(addressList!= null && addressList.size()!=0) {
+                        // on below line we are getting the location
+                        // from our list a first position.
+                        Address address = addressList.get(0);
+
+                        // on below line we are creating a variable for our location
+                        // where we will add our locations latitude and longitude.
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                        // below line is to animate camera to that position.
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         if(goToLongLocation != -999 && goToLatLocation != -999 ){
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(goToLatLocation, goToLongLocation), 17.0f));
         }
@@ -430,7 +490,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 }
 
-
+//https://www.geeksforgeeks.org/how-to-add-searchview-in-google-maps-in-android/
 //https://firebase.google.com/docs/firestore/query-data/listen
 //https://stackoverflow.com/questions/52389072/google-maps-custom-marker-too-large
 //https://www.youtube.com/watch?v=4BuRMScaaI4 //How to create Notification in Android tutorial

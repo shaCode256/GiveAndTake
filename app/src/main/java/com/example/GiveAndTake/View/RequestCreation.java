@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -22,6 +25,7 @@ import com.example.giveandtake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -46,6 +50,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
@@ -73,10 +78,58 @@ public class RequestCreation extends AppCompatActivity {
         RelativeLayout btnAddRequest = findViewById(R.id.button_add_request);
         ImageView btnBackToMap = findViewById(R.id.btn_back_to_map);
         RelativeLayout addCurrLocation = findViewById(R.id.button_add_location);
+        SearchView searchView;
         if (clickedLat != null && clickedLong != null) {
             longitudeInput.setText(clickedLong, TextView.BufferType.EDITABLE);
             latitudeInput.setText(clickedLat, TextView.BufferType.EDITABLE);
         }
+        // initializing our search view.
+        searchView = findViewById(R.id.idSearchView);
+
+        // adding on query listener for our search view.
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // on below line we are getting the
+                // location name from search view.
+                String location = searchView.getQuery().toString();
+
+                // below line is to create a list of address
+                // where we will store the list of all address.
+                List<Address> addressList = null;
+
+                // checking if the entered location is null or not.
+                if (location != null || location.equals("")) {
+                    // on below line we are creating and initializing a geo coder.
+                    Geocoder geocoder = new Geocoder(RequestCreation.this);
+                    try {
+                        // on below line we are getting location from the
+                        // location name and adding that location to address list.
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if(addressList!= null && addressList.size()!=0) {
+
+                        // on below line we are getting the location
+                        // from our list a first position.
+                        Address address = addressList.get(0);
+
+                        // on below line we are creating a variable for our location
+                        // where we will add our locations latitude and longitude.
+                        longitudeInput.setText(String.valueOf(address.getLongitude()));
+                        latitudeInput.setText(String.valueOf(address.getLatitude()));
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         btnAddRequest.setOnClickListener(v -> {
             String subjectTxt = subject.getText().toString();
             String bodyTxt = body.getText().toString();

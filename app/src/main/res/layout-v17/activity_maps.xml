@@ -29,6 +29,19 @@
             app:tint="@color/teal_200"
             />
 
+        <!--search view to search location-->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/idSearchView"
+            android:layout_width="270dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="63dp"
+            android:background="#BFBFBF"
+            android:elevation="5dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search Here"
+            tools:layout_editor_absoluteX="78dp"
+            tools:layout_editor_absoluteY="5dp" />
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_my_requests"
             android:layout_width="42dp"

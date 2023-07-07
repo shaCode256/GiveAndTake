@@ -21,7 +21,7 @@
         android:id="@+id/button_add_request"
         android:layout_width="170dp"
         android:layout_height="39dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="35dp"
         android:background="@drawable/cornered_button"
         android:backgroundTint="#D8DAE3"
         app:layout_constraintEnd_toEndOf="@+id/bodyCardView"
@@ -176,10 +176,11 @@
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
+
     <androidx.cardview.widget.CardView
         android:id="@+id/locationCardView"
         android:layout_width="286dp"
-        android:layout_height="68dp"
+        android:layout_height="100dp"
         app:cardCornerRadius="30dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintStart_toStartOf="@+id/contactCardView"
@@ -187,10 +188,24 @@
 
         <RelativeLayout
             android:layout_width="304dp"
-            android:layout_height="41dp"
+            android:layout_height="130dp"
             android:layout_gravity="center"
             android:background="@drawable/background_add_btn"
             android:scaleType="fitXY">
+
+            <!--search view to search location-->
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/idSearchView"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="#BFBFBF"
+                android:elevation="5dp"
+                app:iconifiedByDefault="false"
+                app:queryHint="Search Here" />
 
             <EditText
                 android:id="@+id/latitude_input"
@@ -200,7 +215,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="19dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginBottom="3dp"
                 android:background="@null"
                 android:hint="Latitude"
@@ -217,7 +232,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="9dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginEnd="23dp"
                 android:layout_marginBottom="2dp"
                 android:layout_toEndOf="@+id/latitude_input"
