@@ -63,6 +63,17 @@ async def delete(request: Request):
     print("requestId:"+requestId)
     request_to_delete_ref= users_ref.child(userId).child("requestId").child(requestId)
     request_to_delete_ref.delete()
+
+    #remove from all joiners list
+    joiners_list= users_ref.child(userId).child("requestId").child(requestId).child(
+            "joiners")
+    if joiners_list != None and joiners_list.get() != None:
+        joiners_list= joiners_list.get().val().keys()
+        for joinerId in joiners_list:
+            print(joinerId)
+            # delete requestId from joiner's list
+            db.reference("reportedRequests").child(requestId).delete()
+            users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
     return 'success'
 
 @app.post('/report/')
@@ -149,40 +160,40 @@ async def getRequestDetails(request: Request):
     requestLongitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").get())
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
 
-    result= json.dumps({"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails,
+    result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails,
             "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime
-                        })
+    }
    # result= result[1:-1]
     print(result)
     return result
 
 @app.post('/setKmDistanceNotifications/')
 async def setKmDistanceNotifications(request: Request):
-    print("enter getRequestDetails")
+    print("enter setKmDistanceNotifications")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
     distance= data['distance']
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("distance").set(distance);
+    users_ref.child(userId).child("settings").child("notifications").child("distance").set(distance);
     return 'success'
 
 @app.post('/turnOnOffAutoDetectLocationNotifications/')
 async def turnOnAutoDetectLocationBtn(request: Request):
-    print("enter getRequestDetails")
+    print("enter turnOnOffAutoDetectLocationNotifications")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
     onOff = int( data['onOff'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(onOff);
+    users_ref.child(userId).child("settings").child("notifications").child("autoDetectLocation").set(onOff);
     return 'success'
 
 @app.post('/useSpecificLocationNotifications/')
 async def useSpecifiedLocation(request: Request):
-    print("enter getRequestDetails")
+    print("enter useSpecifiedLocation")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
@@ -190,26 +201,26 @@ async def useSpecifiedLocation(request: Request):
     latitude = float(data['latitude'])
     longitude = float(data['longitude'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0);
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
+    users_ref.child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0);
+    users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
+    users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
     return 'success'
 
 @app.post('/turnOnOffNotifications/')
 async def turnOnNotifications(request: Request):
-    print("enter getRequestDetails")
+    print("enter turnOnOffNotifications")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
     userId = data['userId']
     onOff = int (data['onOff'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("turnedOn").set(onOff);
+    users_ref.child(userId).child("settings").child("notifications").child("turnedOn").set(onOff);
     return 'success'
 
 @app.post('/useCurrLocationNotifications/')
 async def useCurrLocationNotifications(request: Request):
-    print("enter getRequestDetails")
+    print("enter turnOnOffNotifications")
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
@@ -217,9 +228,9 @@ async def useCurrLocationNotifications(request: Request):
     latitude = float(data['latitude'])
     longitude = float(data['longitude'])
     users_ref = db.reference('users/')
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0)
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
-    users_ref.child("users").child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
+    users_ref.child(userId).child("settings").child("notifications").child("autoDetectLocation").set(0)
+    users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').set(latitude)
+    users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').set(longitude)
     return 'success'
 
 if __name__ == "__main__":

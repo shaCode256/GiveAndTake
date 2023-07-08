@@ -151,84 +151,23 @@ public class ViewRequest extends AppCompatActivity {
             mapIntent.putExtra("userId", userId);
             mapIntent.putExtra("isManager", isManager);
             db.collection("MapsData").document(docId).delete(); //deletes from markersDb
-            //remove this request from all it's joiners list of joined requests
-//            deleteRequest(userId, requestId, docId);
+            //delete request by server
             if(requestId!=null) {
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            //go through all joiners of this request
-                            for(DataSnapshot d : dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").getChildren()) {
-                                String joinerId= (d.getKey());
-                                //delete requestId from joiner's list
-                                databaseReference.child("reportedRequests").child(requestId).removeValue();
-                                databaseReference.child("users").child(joinerId).child("requestsUserJoined").child(requestId).getRef().removeValue();
-                            }
-                        }
-                    }//onDataChange
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }//onCancelled
-                });
-                //remove requestId from usersDb
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        assert requestUserId != null;
-                        snapshot.child(requestUserId).child("requestId").child(requestId).getRef().removeValue();
-
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+                deleteRequest(userId, requestId, docId);
             }
             startActivity(mapIntent);
         });
 
         btnJoinRequest.setOnClickListener(
                 v -> {
-                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                assert requestUserId != null;
-               // String joinerContactDetails=  snapshot.child("users").child(userId).child("email").getValue(String.class);
-                String joinerContactDetails=  databaseReference.child("users").child(userId).child("email").toString();
-                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).child("contactDetails").setValue(joinerContactDetails);
-                databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").setValue(requestUserId);
-                Toast.makeText(ViewRequest.this, "Joined successfully", Toast.LENGTH_SHORT).show();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
 // //Join by server
-                   //joinRequest(requestId, userId, requestUserId);//
+                   joinRequest(requestId, userId, requestUserId);
                 });
 
         btnUnjoinRequest.setOnClickListener(v ->
                 {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                assert requestUserId != null;
-                databaseReference.child("users").child(requestUserId).child("requestId").child(requestId).child("joiners").child(userId).getRef().removeValue();
-                databaseReference.child("users").child(userId).child("requestsUserJoined").child(requestId).getRef().removeValue();
-                Toast.makeText(ViewRequest.this, "Unjoined successfully", Toast.LENGTH_SHORT).show();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
-                // //UnJoin by server
-                    //unJoinRequest(requestId, userId, requestUserId);
+                 //UnJoin by server
+                    unJoinRequest(requestId, userId, requestUserId);
 
                 });
 
@@ -242,47 +181,12 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnReportRequest.setOnClickListener(v -> {
-
-          //  reportRequest(requestId,userId, requestUserId);
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //grab user's name
-                    // and enter it to reports data
-                    //also enter the request creator id
-                    String fullName= dataSnapshot.child("users").child(userId).child("fullName").getValue(String.class);
-                    databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).setValue(fullName);
-                    databaseReference.child("reportedRequests").child(requestId).child("requestUserId").setValue(requestUserId);
-                    Toast.makeText(ViewRequest.this, "Reported successfully", Toast.LENGTH_SHORT).show();
-                }//onDataChange
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }//onCancelled
-            });
+            reportRequest(requestId,userId, requestUserId);
         });
 
         btnUnReportRequest.setOnClickListener(v -> {
-           // unReportRequest(requestId,userId);
-
-            databaseReference.child("reportedRequests").child(requestId).child("reporters").child(userId).removeValue();
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    //if after deleting this report, there are no more reporting: remove this request from reported requests
-                    //or if the unreporter is a manager (meaning the manager checked and approved the request)
-                    if (dataSnapshot.exists() && ( !dataSnapshot.child("reportedRequests").child(requestId).child("reporters").hasChildren()
-                            || isManager.equals("1"))) {
-                        databaseReference.child("reportedRequests").child(requestId).removeValue();
-                    }
-                    Toast.makeText(ViewRequest.this, "Removed report successfully", Toast.LENGTH_SHORT).show();
-                }//onDataChange
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }//onCancelled
-            });
+            //unreport request by server
+           unReportRequest(requestId,userId);
         });
     }
 
@@ -331,7 +235,7 @@ public class ViewRequest extends AppCompatActivity {
                         is, Charsets.UTF_8));
                 System.out.println("yes:" + result);
                 if (result.equals("\"success\"")) {
-                    //add marker
+                    //removes marker from map
                     HashMap<String, Object> user = new HashMap<>();
                     user.put("requestId", requestId);
                     db.collection("MapsData").document(docId).delete(); //deletes from markersDb

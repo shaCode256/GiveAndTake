@@ -348,15 +348,24 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
-                            JSONObject jsonRequestDetails = new JSONObject();
+//                            JSONObject jsonRequestDetails = new JSONObject();
                            // getRequestDetails(requestId, userId, requestUserId);
-                            try {
-                                jsonRequestDetails = new JSONObject(stringRequestDetails);
-//                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
-//                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
-                            }catch (JSONException err){
-                                Log.d("Error", err.toString());
-                            }
+                           // //retreive from server
+//                            String requestSubject;
+//                            String requestBody;
+//                            String contactDetails;
+//                            String requestLatitude;
+//                            String requestLongitude;
+//                            requestLatitude;
+//                            requestLongitude;
+//                            String creationTime;
+//                            try {
+//                                jsonRequestDetails = new JSONObject(stringRequestDetails);
+////                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
+////                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
+//                            }catch (JSONException err){
+//                                Log.d("Error", err.toString());
+//                            }
                             viewRequestIntent.putExtra("requestSubject", requestSubject);
                             viewRequestIntent.putExtra("requestBody", requestBody);
                             viewRequestIntent.putExtra("contactDetails", contactDetails);
@@ -477,6 +486,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                        is, Charsets.UTF_8));
+                System.out.println("details received: "+stringRequestDetails);
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();

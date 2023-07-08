@@ -179,35 +179,8 @@ public class RequestCreation extends AppCompatActivity {
                         user.put("creationTime", creationTime);
                         String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
-     //                   Add manually, not by server: directly to Firebase
-                        markersDb.collection("MapsData")
-                                .add(user)
-                                .addOnSuccessListener(documentReference -> {
-                                })
-                                .addOnFailureListener(e -> {
-                                });
-                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                //add the request in the db
-                                //get currTime
-                                Request request= new Request();
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    request.setCreationTime(finalCreationTime);
-                                }
-                                request.setSubject(subjectTxt);
-                                request.setBody(bodyTxt);
-                                request.setContactDetails(contactDetailsTxt);
-                                request.setLocation(geoPointRequest);
-                                databaseReference.child("users").child(requestUserId).child("requestId").child(finalSetRequestId).setValue(request);
-                            }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                         //Add by server
-//                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
+                       //  //Add by server
+                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
                         Intent myIntent = new Intent(RequestCreation.this, Map.class);
                         myIntent.putExtra("userId", userId);
                         myIntent.putExtra("isManager", isManager);
@@ -358,8 +331,6 @@ public class RequestCreation extends AppCompatActivity {
         runOnUiThread(() -> Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show());
     }
 }
-
-
 
 
 

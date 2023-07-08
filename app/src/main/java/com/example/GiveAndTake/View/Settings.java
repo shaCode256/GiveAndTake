@@ -71,32 +71,13 @@ public class Settings extends AppCompatActivity {
                 Toast.makeText(Settings.this, "Please fill in valid distance in km", Toast.LENGTH_SHORT).show();
             }
             else{
-
-              //  sendKmDistance(userId, distance);
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("distance").setValue(distance);
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+              sendKmDistance(userId, distance);
             }
         });
 
-        //turnOnOffAutoDetectLocation(userId, "1");
-        turnOnAutoDetectLocationBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(1);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        }));
+        turnOnAutoDetectLocationBtn.setOnClickListener(view -> {
+            turnOnOffAutoDetectLocation(userId, "1");
+        });
 
         useSpecifiedLocationBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
@@ -119,22 +100,10 @@ public class Settings extends AppCompatActivity {
                 double doubleLatitude = Double.parseDouble(latitudeTxt); // returns double primitive
                 if (doubleLatitude >= -90 && doubleLatitude <= 90 && doubleLongitude >= -180 && doubleLongitude <= 180) {
                     GeoPoint geoPoint = new GeoPoint(doubleLatitude, doubleLongitude);
-                    // sendUseSpecificLocation(userId, geoPoint);
-                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(0);
-                            databaseReference.child("users").child(userId).child("settings").child("notifications").child("specificLocation").setValue(geoPoint);
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
+                    sendUseSpecificLocation(userId, geoPoint);
                 }
             }
-
-                });
+        });
 
         backToMapBtn.setOnClickListener(view -> {
             Intent newIntent = new Intent(Settings.this, Map.class);
@@ -143,30 +112,14 @@ public class Settings extends AppCompatActivity {
             startActivity(newIntent);
         });
 
-        //turnOnOffAutoDetectLocation(userId, "1");
-        turnOnNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turnedOn").setValue(1);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        turnOnNotificationsBtn.setOnClickListener(view -> {
+                    sendTurnOnOffNotifications(userId, "1");
+                }
+        );
 
-            }
-        }));
-
-        //turnOnOffAutoDetectLocation(userId, "0");
-        turnOffNotificationsBtn.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child("users").child(userId).child("settings").child("notifications").child("turnedOn").setValue(0);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        }
-        ));
+        turnOffNotificationsBtn.setOnClickListener(view -> {
+            sendTurnOnOffNotifications(userId, "0");
+        });
 
         useCurrLocationBtn.setOnClickListener(view -> {
             // get curr location
@@ -185,19 +138,7 @@ public class Settings extends AppCompatActivity {
                         .addOnSuccessListener(Settings.this, location -> {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                               // sendUseCurrLocation(userId, location);
-                                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("autoDetectLocation").setValue(0);
-                                        databaseReference.child("users").child(userId).child("settings").child("notifications").child("specificLocation").setValue(geoPoint);
-                                    }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
+                               sendUseCurrLocation(userId, location);
                             }
                             else{
                                 Toast.makeText(Settings.this, "Can't use your location.", Toast.LENGTH_SHORT).show();
@@ -235,8 +176,8 @@ public class Settings extends AppCompatActivity {
                 conn.setDoOutput(true);
                 JSONObject json = new JSONObject();
                 json.put("userId", userId);
-                json.put("locationLat", location.getLatitude());
-                json.put("locationLong", location.getLongitude());
+                json.put("latitude", location.getLatitude());
+                json.put("longitude", location.getLongitude());
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
@@ -340,8 +281,8 @@ public class Settings extends AppCompatActivity {
                 conn.setDoOutput(true);
                 JSONObject json = new JSONObject();
                 json.put("userId", userId);
-                json.put("locationLat", location.getLatitude());
-                json.put("locationLong", location.getLongitude());
+                json.put("latitude", location.getLatitude());
+                json.put("longitude", location.getLongitude());
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
