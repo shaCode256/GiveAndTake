@@ -72,6 +72,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
     String IPv4_Address= "10.0.0.3";
     private GoogleMap mMap;
+
+    boolean isRunning= true;
     FirebaseFirestore db;
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
@@ -348,9 +350,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
                             Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
-//                            JSONObject jsonRequestDetails = new JSONObject();
-                           // getRequestDetails(requestId, userId, requestUserId);
-                           // //retreive from server
+                           JSONObject jsonRequestDetails = new JSONObject();
+//                            try {
+//                                getRequestDetails(requestId, userId, requestUserId);
+//                            } catch (InterruptedException e) {
+//                                throw new RuntimeException(e);
+//                            }
+                            // //retrieve from server
 //                            String requestSubject;
 //                            String requestBody;
 //                            String contactDetails;
@@ -361,8 +367,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 //                            String creationTime;
 //                            try {
 //                                jsonRequestDetails = new JSONObject(stringRequestDetails);
-////                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
-////                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
+//                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
+//                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
 //                            }catch (JSONException err){
 //                                Log.d("Error", err.toString());
 //                            }
@@ -443,7 +449,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         stopService(serviceIntent);
     }
 
-    public void getRequestDetails(String requestId, String userId, String requestUserId) {
+    public void getRequestDetails(String requestId, String userId, String requestUserId) throws InterruptedException {
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
@@ -487,6 +493,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                        is, Charsets.UTF_8));
                 System.out.println("details received: "+stringRequestDetails);
+                isRunning=false;
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();

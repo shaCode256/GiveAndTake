@@ -59,19 +59,15 @@ async def delete(request: Request):
     userId= data['userId']
     requestId = data['requestId']
     users_ref = db.reference('users/')
-    print("userId:"+userId)
-    print("requestId:"+requestId)
-    request_to_delete_ref= users_ref.child(userId).child("requestId").child(requestId)
-    request_to_delete_ref.delete()
-
-    #remove from all joiners list
     joiners_list= users_ref.child(userId).child("requestId").child(requestId).child(
             "joiners")
-    if joiners_list != None and joiners_list.get() != None:
-        joiners_list= joiners_list.get().val().keys()
+    joiners_list = joiners_list.get(False, True)  # as a dict
+    request_to_delete_ref= users_ref.child(userId).child("requestId").child(requestId)
+    request_to_delete_ref.delete()
+    #remove from all joiners list
+    if joiners_list != None:
         for joinerId in joiners_list:
             print(joinerId)
-            # delete requestId from joiner's list
             db.reference("reportedRequests").child(requestId).delete()
             users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
     return 'success'
@@ -159,11 +155,8 @@ async def getRequestDetails(request: Request):
     requestLatitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").get())
     requestLongitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").get())
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
-
-    result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails,
-            "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime
-    }
-   # result= result[1:-1]
+    # jsonString example: "{\"email\": \"example@com\", \"name\": \"John\"}";
+    result= "{\"requestBody\": \"requestBody\", \"requestSubject\": \"requestSubject\", \"contactDetails\": \"contactDetails\", \"requestLongitude\": \"requestLongitude\", \"requestLatitude\": \"requestLatitude\", \"creationTime\": \"creationTime\"}"
     print(result)
     return result
 
