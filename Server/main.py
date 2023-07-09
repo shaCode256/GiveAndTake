@@ -159,8 +159,10 @@ async def getRequestDetails(request: Request):
     requestLongitude = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").get())
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
     # jsonString example: "{\"email\": \"example@com\", \"name\": \"John\"}";
-    result= "{\"requestBody\": \"requestBody\", \"requestSubject\": \"requestSubject\", \"contactDetails\": \"contactDetails\", \"requestLongitude\": \"requestLongitude\", \"requestLatitude\": \"requestLatitude\", \"creationTime\": \"creationTime\"}"
+    result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails, "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime}
+    result= json.dumps(result, ensure_ascii=False).encode('utf8')
     print(result)
+    print(result.decode())
     return result
 
 @app.post('/setKmDistanceNotifications/')
