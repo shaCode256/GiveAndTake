@@ -108,7 +108,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         String isManager= thisIntent.getStringExtra("isManager");
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             String lastTimeSeenMap= LocalDateTime.now().toString();
-            databaseReference.child("users").child(userId).child("lastTimeSeenMap").setValue(lastTimeSeenMap);
+            try {
+                setLastTimeSeenMap(userId, lastTimeSeenMap);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         // if the user is not a manager
         if (isManager!=null &&isManager.equals("0")){
@@ -492,6 +496,59 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                        is, Charsets.UTF_8));
+                System.out.println("details received: "+stringRequestDetails);
+                isRunning=false;
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+        Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setLastTimeSeenMap(String userId, String time) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/setLastTimeSeenMap/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Map.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("time", time);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                stringRequestDetails= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
                 System.out.println("details received: "+stringRequestDetails);
                 isRunning=false;
             } catch (IOException e) {
