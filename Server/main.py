@@ -58,6 +58,7 @@ async def delete(request: Request):
     data = orjson.loads(body)
     userId= data['userId']
     requestId = data['requestId']
+    docId= data['docId']
     users_ref = db.reference('users/')
     joiners_list= users_ref.child(userId).child("requestId").child(requestId).child(
             "joiners")
@@ -70,6 +71,8 @@ async def delete(request: Request):
             print(joinerId)
             db.reference("reportedRequests").child(requestId).delete()
             users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
+  #  db.reference("MapsData").document(docId).delete(); # deletes marker from markersDb
+
     return 'success'
 
 @app.post('/report/')

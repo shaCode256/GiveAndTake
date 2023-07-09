@@ -13,19 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.giveandtake.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
@@ -38,14 +30,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
 public class ViewRequest extends AppCompatActivity {
     String IPv4_Address= "10.0.0.3";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_request);
         Intent myIntent = getIntent();
@@ -150,7 +139,6 @@ public class ViewRequest extends AppCompatActivity {
             Intent mapIntent = new Intent(ViewRequest.this, Map.class);
             mapIntent.putExtra("userId", userId);
             mapIntent.putExtra("isManager", isManager);
-            db.collection("MapsData").document(docId).delete(); //deletes from markersDb
             //delete request by server
             if(requestId!=null) {
                 deleteRequest(userId, requestId, docId);
@@ -218,6 +206,7 @@ public class ViewRequest extends AppCompatActivity {
                 JSONObject json = new JSONObject();
                 json.put("requestId", requestId);
                 json.put("userId", userId);
+                json.put("docId", docId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
@@ -236,8 +225,6 @@ public class ViewRequest extends AppCompatActivity {
                 System.out.println("yes:" + result);
                 if (result.equals("\"success\"")) {
                     //removes marker from map
-                    HashMap<String, Object> user = new HashMap<>();
-                    user.put("requestId", requestId);
                     db.collection("MapsData").document(docId).delete(); //deletes from markersDb
                 }
             } catch (IOException e) {
