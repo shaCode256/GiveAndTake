@@ -23,11 +23,6 @@ import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.json.JSONException;
@@ -42,7 +37,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Settings extends AppCompatActivity {
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     private FirebaseAuth auth;
     String IPv4_Address= "10.0.0.3";
     @SuppressLint("MissingPermission")

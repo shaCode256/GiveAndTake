@@ -248,6 +248,18 @@ async def getIsNotificationsTurnedOn(request: Request):
     notificationsTurnedOn = str(users_ref.child(userId).child("settings").child("notifications").child("turnedOn").get())
     return notificationsTurnedOn
 
+@app.post('/blockUnblockUser/')
+async def blockUnblockUser(request: Request):
+    print('enter getIsNotificationsTurnedOn')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    blockUnblock= data['blockUnblock']
+    users_ref = db.reference('users/')
+    users_ref.child(userId).child("isBlocked").set(blockUnblock);
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
 

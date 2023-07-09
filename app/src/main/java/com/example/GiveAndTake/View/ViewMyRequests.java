@@ -20,10 +20,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ViewMyRequests extends ListActivity {
+    String IPv4_Address= "10.0.0.3";
+
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
@@ -105,37 +116,21 @@ public class ViewMyRequests extends ListActivity {
             btnShowRequestsIJoined.setVisibility(View.GONE);
         });
 
-        btnBlockUser.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //check if phone is not registered before
-                if (snapshot.hasChild(requestUserId)) {
-                    Toast.makeText(ViewMyRequests.this, "Blocked successfully", Toast.LENGTH_SHORT).show();
-                    databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("1");
-                }
+        btnBlockUser.setOnClickListener(view -> {
+            try {
+                blockUnblockUser(requestUserId, "1");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
+        });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+        btnUnblockUser.setOnClickListener(view -> {
+            try {
+                blockUnblockUser(requestUserId, "0");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        }));
-
-        btnUnblockUser.setOnClickListener(view -> databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //check if phone is not registered before
-                if (snapshot.hasChild(requestUserId)) {
-                    Toast.makeText(ViewMyRequests.this, "Unblocked successfully", Toast.LENGTH_SHORT).show();
-                    databaseReference.child("users").child(requestUserId).child("isBlocked").setValue("0");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        }));
+        });
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestInfo= (String) parent.getAdapter().getItem(position);
             String requestId= requestsInfoToId.get(requestInfo);
@@ -205,6 +200,57 @@ public class ViewMyRequests extends ListActivity {
         listItems.addAll(requestsUserJoinedInfo);
         adapter.notifyDataSetChanged();
     }
+
+    public void blockUnblockUser(String userId, String blockUnblock) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/blockUnblockUser/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewMyRequests.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                json.put("blockUnblock", blockUnblock);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                //  latch.countDown();
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                //showServerDownToast();
+            }
+        }).start();
+        // Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
+    }
+
 }
 
 
