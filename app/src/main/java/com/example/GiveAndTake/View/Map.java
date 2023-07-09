@@ -529,7 +529,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 showServerDownToast();
             }
         }).start();
-        Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void setLastTimeSeenMap(String userId, String time) throws InterruptedException {
@@ -582,7 +581,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 showServerDownToast();
             }
         }).start();
-        Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void getIsNotificationsTurnOn(String userId) throws InterruptedException {
@@ -633,7 +631,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 //showServerDownToast();
             }
         }).start();
-       // Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void showServerDownToast()
