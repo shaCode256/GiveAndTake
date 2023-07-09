@@ -237,6 +237,16 @@ async def setLastTimeSeenMap(request: Request):
     users_ref = db.reference('users/')
     users_ref.child(userId).child("lastTimeSeenMap").set(time);
 
+@app.post('/getIsNotificationsTurnedOn/')
+async def getIsNotificationsTurnedOn(request: Request):
+    print('enter getIsNotificationsTurnedOn')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    notificationsTurnedOn = str(users_ref.child(userId).child("settings").child("notifications").child("turnedOn").get())
+    return notificationsTurnedOn
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)

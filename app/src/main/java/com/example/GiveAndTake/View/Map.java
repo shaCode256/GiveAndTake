@@ -67,6 +67,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
@@ -75,6 +76,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     boolean isRunning= true;
     FirebaseFirestore db;
+
+  //  CountDownLatch latch = new CountDownLatch(1);
+
+    String isNotificationsTurnedOn= "1";
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> takenRequestsIds = new HashSet<>();
@@ -425,28 +430,48 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
         //check if notifications are turned on in this user's settings
+        //CountDownLatch latch = new CountDownLatch(1);
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue()!=null) {
+                if (snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue() != null) {
                     String notificationsTurnedOn = snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue().toString();
                     if (notificationsTurnedOn.equals("1")) {
                         String isManager = thisIntent.getStringExtra("isManager");
                         serviceIntent.putExtra("userId", userId);
                         serviceIntent.putExtra("isManager", isManager);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            serviceIntent.putExtra("lastTimeSeenMapStr",  LocalDateTime.now().toString());
+                            serviceIntent.putExtra("lastTimeSeenMapStr", LocalDateTime.now().toString());
                         }
                         ContextCompat.startForegroundService(Map.this, serviceIntent);
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
+//                    try {
+//             //           latch.await();
+//                        getIsNotificationsTurnOn(userId);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    if (isNotificationsTurnedOn.equals("1")) {
+//                        String isManager = thisIntent.getStringExtra("isManager");
+//                        serviceIntent.putExtra("userId", userId);
+//                        serviceIntent.putExtra("isManager", isManager);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                            serviceIntent.putExtra("lastTimeSeenMapStr",  LocalDateTime.now().toString());
+//                        }
+//                        ContextCompat.startForegroundService(Map.this, serviceIntent);
+//                    }
+//                }
+
+
 
     public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, NotificationService.class);
@@ -558,6 +583,57 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         }).start();
         Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void getIsNotificationsTurnOn(String userId) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getIsNotificationsTurnedOn/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Map.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                isNotificationsTurnedOn= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+              //  latch.countDown();
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                //showServerDownToast();
+            }
+        }).start();
+       // Toast.makeText(Map.this, "Got request details successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void showServerDownToast()
