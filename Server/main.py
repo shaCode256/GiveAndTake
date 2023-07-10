@@ -153,6 +153,11 @@ async def getRequestDetails(request: Request):
     data = orjson.loads(body)
     requestUserId = data['requestUserId']
     requestId = data['requestId']
+    if "\"" in requestUserId:
+        requestUserId= requestUserId[1:]
+        requestUserId= requestUserId[:-1]
+    print('requestId: '+requestId)
+    print('requestUserId: ',requestUserId)
     users_ref = db.reference('users/')
     requestSubject = users_ref.child(requestUserId).child("requestId").child(requestId).child("subject").get()
     requestBody = users_ref.child(requestUserId).child("requestId").child(requestId).child("body").get()
@@ -162,6 +167,7 @@ async def getRequestDetails(request: Request):
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
     # jsonString example: "{\"email\": \"example@com\", \"name\": \"John\"}";
     result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails, "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime}
+    print(result)
     result= requestBody+"||##"+ requestSubject+"||##"+ contactDetails+"||##"+ requestLongitude+"||##"+ requestLatitude+"||##"+creationTime
     # Serializing json
     print(result)
@@ -277,6 +283,7 @@ async def getFinal1(request: Request):
     requestUserId = data['requestUserId']
     users_ref = db.reference('users/')
     finalRequestUserId= users_ref.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").get()
+    print("final: "+finalRequestUserId)
     return finalRequestUserId
 
 @app.post('/getFinal2/')

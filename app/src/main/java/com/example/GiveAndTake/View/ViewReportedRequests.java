@@ -7,22 +7,39 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.giveandtake.R;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class ViewReportedRequests extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
+
+    String IPv4_Address= "10.0.0.3";
+
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
@@ -82,36 +99,11 @@ public class ViewReportedRequests extends ListActivity {
             String requestUserId=  reportedRequestsInfoToId.get(requestInfo)[1];
             String docId= markersRequestToDocId.get(requestId);
             if(requestId!=null) {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        //else, it's open requests of a user, that the user opened, and it's requestUserId
-                        //TODO: fix this messy implementation
-                        assert requestUserId != null;
-                        String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                        String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
-                        String requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        String requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        String creationTime = snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class);
-                        Intent viewRequestIntent = new Intent(ViewReportedRequests.this, ViewRequest.class);
-                        viewRequestIntent.putExtra("requestSubject",requestSubject);
-                        viewRequestIntent.putExtra("requestBody", requestBody);
-                        viewRequestIntent.putExtra("contactDetails", contactDetails);
-                        viewRequestIntent.putExtra("requestLatitude", requestLatitude);
-                        viewRequestIntent.putExtra("requestLongitude", requestLongitude);
-                        viewRequestIntent.putExtra("userId", userId);
-                        viewRequestIntent.putExtra("requestUserId", requestUserId);
-                        viewRequestIntent.putExtra("isManager", isManager);
-                        viewRequestIntent.putExtra("docId", docId);
-                        viewRequestIntent.putExtra("requestId", requestId);
-                        viewRequestIntent.putExtra("creationTime", creationTime);
-                        startActivity(viewRequestIntent);
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+                try {
+                    getRequestDetails(requestId, userId, requestUserId, isManager, docId);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -124,6 +116,87 @@ public class ViewReportedRequests extends ListActivity {
         listItems.clear();
         listItems.addAll(reportedRequestsInfo);
         adapter.notifyDataSetChanged();
+    }
+
+    public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
+            //Wireless LAN adapter Wi-Fi:
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewReportedRequests.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestId", requestId);
+                json.put("userId", userId);
+                json.put("requestUserId", requestUserId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String stringRequestDetails= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("details received: "+stringRequestDetails);
+                // Removing first and last character
+                // of a string using substring() method
+                String [] details = stringRequestDetails.split("\\|\\|##");
+                System.out.println("string array: ");
+                System.out.println(Arrays.toString(details));
+                String requestSubject= details[1];
+                String requestBody= details[0];
+                String contactDetails= details[2];
+                String requestLatitude= details[4];
+                String requestLongitude= details[3];
+                String creationTime= details[5];
+                Intent viewRequestIntent = new Intent(ViewReportedRequests.this, ViewRequest.class);
+                viewRequestIntent.putExtra("requestSubject", requestSubject);
+                viewRequestIntent.putExtra("requestBody", requestBody);
+                viewRequestIntent.putExtra("contactDetails", contactDetails);
+                viewRequestIntent.putExtra("requestLatitude", requestLatitude);
+                viewRequestIntent.putExtra("requestLongitude", requestLongitude);
+                viewRequestIntent.putExtra("requestUserId", requestUserId);
+                viewRequestIntent.putExtra("userId", userId);
+                viewRequestIntent.putExtra("isManager", isManager);
+                viewRequestIntent.putExtra("docId", docId);
+                viewRequestIntent.putExtra("requestId", requestId);
+                viewRequestIntent.putExtra("creationTime", creationTime);
+                startActivity(viewRequestIntent);
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(ViewReportedRequests.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
     }
 
 }
