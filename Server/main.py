@@ -298,6 +298,30 @@ async def getFinal2(request: Request):
     finalRequestUserId= users_ref.child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").get()
     return finalRequestUserId
 
+@app.post('/getJoiners/')
+async def getJoiners(request: Request):
+    print('enter getJoiners')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestId= data['requestId']
+    requestUserId= data['requestUserId']
+    users_ref = db.reference('users/')
+    joiners_list= users_ref.child(requestUserId).child("requestId").child(requestId).child("joiners")
+    joiners_list = joiners_list.get(False, True)  # as a dict
+    #remove from all joiners list
+    joinersInfo = []
+    if joiners_list != None:
+        for joinerId in joiners_list:
+            print(joinerId)
+            db.reference("reportedRequests").child(requestId).delete()
+            users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
+            joinersInfo.append("Name: "+str(users_ref.child(joinerId).child("fullName").get())+" | Phone number: "+str(joinerId));
+    if not joinersInfo:
+        joinersInfo= "There are no joiners yet, please come back later!"
+    print(type(joinersInfo))
+    return joinersInfo
+
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
 

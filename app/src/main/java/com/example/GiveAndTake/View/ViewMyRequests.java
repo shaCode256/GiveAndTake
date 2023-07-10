@@ -140,7 +140,6 @@ public class ViewMyRequests extends ListActivity {
             String requestId = requestsInfoToId.get(requestInfo);
             String docId = markersRequestToDocId.get(requestId);
             if (requestId != null) {
-                String finalRequestUserId = requestUserId;
                 String managerWatching = thisIntent.getStringExtra("managerWatching");
                 if (managerWatching != null && managerWatching.equals("1") && openOrJoinedFlag == 1) {
                     //it's a manager watching another user's joined requests
