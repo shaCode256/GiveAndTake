@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:layout="@layout/activity_maps"
         tools:context="View.Map">
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_create_request_from_map"
@@ -52,7 +51,7 @@
             android:background="@drawable/background_add_btn"
             android:layout_marginBottom="10dp"
             app:srcCompat="@drawable/ic_list_24"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             app:tint="#BD9409" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -67,7 +66,7 @@
             app:srcCompat="@drawable/ic_my_location_24"
             app:tint="#FD3E3E"
             android:padding="3dp"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -80,7 +79,7 @@
             android:background="@drawable/background_add_btn"
             app:srcCompat="@drawable/ic_supervised_user_circle_24"
             app:tint="#303F9F"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -95,7 +94,7 @@
             app:layout_constraintVertical_bias="0.697"
             app:srcCompat="@drawable/ic_baseline_logout_24"
             app:tint="#82B1FF"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -110,7 +109,7 @@
             android:background="@drawable/background_add_btn"
             app:srcCompat="@drawable/ic_report_24"
             app:tint="#512DA8"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -124,7 +123,7 @@
             android:background="@drawable/background_add_btn"
             app:srcCompat="@drawable/ic_edit_notifications_24"
             app:tint="#FF9800"
-           android:backgroundTint="#F4ECEC"
+            android:backgroundTint="#F4ECEC"
             />
     </fragment>
 
