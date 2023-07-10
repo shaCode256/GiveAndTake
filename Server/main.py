@@ -65,6 +65,8 @@ async def delete(request: Request):
     joiners_list = joiners_list.get(False, True)  # as a dict
     request_to_delete_ref= users_ref.child(userId).child("requestId").child(requestId)
     request_to_delete_ref.delete()
+
+    db.reference('reportedRequests').child(requestId).delete()
     #remove from all joiners list
     if joiners_list != None:
         for joinerId in joiners_list:
@@ -160,10 +162,12 @@ async def getRequestDetails(request: Request):
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
     # jsonString example: "{\"email\": \"example@com\", \"name\": \"John\"}";
     result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails, "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime}
-    result= json.dumps(result, ensure_ascii=False).encode('utf8')
+    
+    # Serializing json
+    result = json.dumps(result, indent=0,  ensure_ascii=False)
     print(result)
-    print(result.decode())
     return result
+
 
 @app.post('/setKmDistanceNotifications/')
 async def setKmDistanceNotifications(request: Request):
