@@ -314,8 +314,6 @@ async def getJoiners(request: Request):
     if joiners_list != None:
         for joinerId in joiners_list:
             print(joinerId)
-            db.reference("reportedRequests").child(requestId).delete()
-            users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
             joinersInfo.append("Name: "+str(users_ref.child(joinerId).child("fullName").get())+" | Phone number: "+str(joinerId));
     if not joinersInfo:
         joinersInfo= "There are no joiners yet, please come back later!"
