@@ -267,6 +267,29 @@ async def blockUnblockUser(request: Request):
     users_ref = db.reference('users/')
     users_ref.child(userId).child("isBlocked").set(blockUnblock);
 
+@app.post('/getFinal1/')
+async def getFinal1(request: Request):
+    print('enter getFinal1')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestId= data['requestId']
+    requestUserId = data['requestUserId']
+    users_ref = db.reference('users/')
+    finalRequestUserId= users_ref.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").get()
+    return finalRequestUserId
+
+@app.post('/getFinal2/')
+async def getFinal2(request: Request):
+    print('enter getFinal2')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestId= data['requestId']
+    userId= data['userId']
+    users_ref = db.reference('users/')
+    finalRequestUserId= users_ref.child(userId).child("requestsUserJoined").child(requestId).child("requestUserId").get()
+    return finalRequestUserId
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
