@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -41,16 +42,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import androidx.appcompat.widget.SearchView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,8 +62,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
@@ -80,7 +72,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     boolean isRunning= true;
     FirebaseFirestore db;
 
-  //  CountDownLatch latch = new CountDownLatch(1);
+    //  CountDownLatch latch = new CountDownLatch(1);
 
     String isNotificationsTurnedOn= "1";
     HashMap<String, Marker> markersHashmap = new HashMap<>();
@@ -88,7 +80,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     public static HashSet<String> takenRequestsIds = new HashSet<>();
 
     SearchView searchView;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -324,7 +315,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         }.run();
 
-        startNotificationService();
+        try {
+            checkIfToStartNotificationService(thisIntent.getStringExtra("userId"));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         // adding on click listener to marker of google maps.
         mMap.setOnMapLongClickListener(latLng -> {
@@ -347,18 +342,18 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");
             if(requestId!=null) {
-                        if(markersHashmap.get(requestId)!=null) {
-                            String docId = markersRequestToDocId.get(requestId);
-                                try {
-                                    getRequestDetails(requestId, userId, requestUserId, isManager, docId);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
+                if(markersHashmap.get(requestId)!=null) {
+                    String docId = markersRequestToDocId.get(requestId);
+                    try {
+                        getRequestDetails(requestId, userId, requestUserId, isManager, docId);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                        }
-                        else{
-                            Toast.makeText(Map.this, "Oops! This request isn't available", Toast.LENGTH_SHORT).show();
-                        }
+                }
+                else{
+                    Toast.makeText(Map.this, "Oops! This request isn't available", Toast.LENGTH_SHORT).show();
+                }
             }
             return true;
         });
@@ -381,35 +376,26 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public void startNotificationService() {
+        System.out.println("yayyy");
         stopNotificationService();
         Intent serviceIntent = new Intent(this, NotificationService.class);
         Intent thisIntent = getIntent();
         String userId = thisIntent.getStringExtra("userId");
-        //check if notifications are turned on in this user's settings
-        //CountDownLatch latch = new CountDownLatch(1);
-        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue() != null) {
-                    String notificationsTurnedOn = snapshot.child(userId).child("settings").child("notifications").child("turnedOn").getValue().toString();
-                    if (notificationsTurnedOn.equals("1")) {
-                        String isManager = thisIntent.getStringExtra("isManager");
-                        serviceIntent.putExtra("userId", userId);
-                        serviceIntent.putExtra("isManager", isManager);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            serviceIntent.putExtra("lastTimeSeenMapStr", LocalDateTime.now().toString());
-                        }
-                        ContextCompat.startForegroundService(Map.this, serviceIntent);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        String isManager = thisIntent.getStringExtra("isManager");
+        serviceIntent.putExtra("userId", userId);
+        serviceIntent.putExtra("isManager", isManager);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            serviceIntent.putExtra("lastTimeSeenMapStr", LocalDateTime.now().toString());
+        }
+        ContextCompat.startForegroundService(Map.this, serviceIntent);
     }
+
+
+
+
+
+
+
     public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         stopService(serviceIntent);
@@ -457,7 +443,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             try {
                 InputStream is = conn.getInputStream();
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
-                       is, Charsets.UTF_8));
+                        is, Charsets.UTF_8));
                 System.out.println("details received: "+stringRequestDetails);
                 // Removing first and last character
                 // of a string using substring() method
@@ -544,7 +530,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }).start();
     }
 
-    public void getIsNotificationsTurnOn(String userId) throws InterruptedException {
+    public void checkIfToStartNotificationService(String userId) throws InterruptedException {
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/getIsNotificationsTurnedOn/";
             //Wireless LAN adapter Wi-Fi:
@@ -585,12 +571,23 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 isNotificationsTurnedOn= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-              //  latch.countDown();
+                System.out.println("isNotificationTurnedOn? "+isNotificationsTurnedOn);
+                if(isNotificationsTurnedOn.equals("\"1\"")){
+                    new Thread(() -> {
+                        startNotificationService();
+                    }).start();
+                }
+                else{
+                    new Thread(() -> {
+                        stopNotificationService();
+                    }).start();
+                }
+                //  latch.countDown();
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
             }
-        }).join();
+        }).start();
     }
 
     public void showServerDownToast()
