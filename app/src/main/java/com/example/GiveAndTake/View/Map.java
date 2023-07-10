@@ -63,17 +63,20 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
     String IPv4_Address= "10.0.0.3";
     private GoogleMap mMap;
 
+    static String [] details;
     boolean isRunning= true;
     FirebaseFirestore db;
 
@@ -344,65 +347,18 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             String userId = thisIntent.getStringExtra("userId");
             String isManager= thisIntent.getStringExtra("isManager");
             if(requestId!=null) {
-                databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String requestSubject = snapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue(String.class);
-                        String requestBody = snapshot.child(requestUserId).child("requestId").child(requestId).child("body").getValue(String.class);
-                        String contactDetails = snapshot.child(requestUserId).child("requestId").child(requestId).child("contactDetails").getValue(String.class);
-                        String requestLatitude;
-                        String requestLongitude;
-                        requestLatitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("latitude").getValue(Double.class));
-                        requestLongitude = String.valueOf(snapshot.child(requestUserId).child("requestId").child(requestId).child("location").child("longitude").getValue(Double.class));
-                        String creationTime = snapshot.child(requestUserId).child("requestId").child(requestId).child("creationTime").getValue(String.class);
-                        // open view request activity
                         if(markersHashmap.get(requestId)!=null) {
                             String docId = markersRequestToDocId.get(requestId);
-                            Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
-                           JSONObject jsonRequestDetails = new JSONObject();
-//                            try {
-//                                getRequestDetails(requestId, userId, requestUserId);
-//                            } catch (InterruptedException e) {
-//                                throw new RuntimeException(e);
-//                            }
-                            // //retrieve from server
-//                            String requestSubject;
-//                            String requestBody;
-//                            String contactDetails;
-//                            String requestLatitude;
-//                            String requestLongitude;
-//                            requestLatitude;
-//                            requestLongitude;
-//                            String creationTime;
-//                            try {
-//                                jsonRequestDetails = new JSONObject(stringRequestDetails);
-//                                System.out.println("jsonRequestDetails is: "+jsonRequestDetails);
-//                                System.out.println( "jsonRequestDetails.requestBody is: "+ jsonRequestDetails.get("requestBody"));
-//                            }catch (JSONException err){
-//                                Log.d("Error", err.toString());
-//                            }
-                            viewRequestIntent.putExtra("requestSubject", requestSubject);
-                            viewRequestIntent.putExtra("requestBody", requestBody);
-                            viewRequestIntent.putExtra("contactDetails", contactDetails);
-                            viewRequestIntent.putExtra("requestLatitude", requestLatitude);
-                            viewRequestIntent.putExtra("requestLongitude", requestLongitude);
-                            viewRequestIntent.putExtra("requestUserId", requestUserId);
-                            viewRequestIntent.putExtra("userId", userId);
-                            viewRequestIntent.putExtra("isManager", isManager);
-                            viewRequestIntent.putExtra("docId", docId);
-                            viewRequestIntent.putExtra("requestId", requestId);
-                            viewRequestIntent.putExtra("creationTime", creationTime);
-                            startActivity(viewRequestIntent);
+                                try {
+                                    getRequestDetails(requestId, userId, requestUserId, isManager, docId);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+
                         }
                         else{
                             Toast.makeText(Map.this, "Oops! This request isn't available", Toast.LENGTH_SHORT).show();
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
             }
             return true;
         });
@@ -454,31 +410,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         });
     }
-//                    try {
-//             //           latch.await();
-//                        getIsNotificationsTurnOn(userId);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                    if (isNotificationsTurnedOn.equals("1")) {
-//                        String isManager = thisIntent.getStringExtra("isManager");
-//                        serviceIntent.putExtra("userId", userId);
-//                        serviceIntent.putExtra("isManager", isManager);
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                            serviceIntent.putExtra("lastTimeSeenMapStr",  LocalDateTime.now().toString());
-//                        }
-//                        ContextCompat.startForegroundService(Map.this, serviceIntent);
-//                    }
-//                }
-
-
-
     public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         stopService(serviceIntent);
     }
 
-    public void getRequestDetails(String requestId, String userId, String requestUserId) throws InterruptedException {
+    public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
@@ -522,7 +459,31 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                        is, Charsets.UTF_8));
                 System.out.println("details received: "+stringRequestDetails);
+                // Removing first and last character
+                // of a string using substring() method
+                details = stringRequestDetails.split("\\|\\|##");
+                System.out.println("string array: ");
+                System.out.println(Arrays.toString(details));
                 isRunning=false;
+                String requestSubject= details[1];
+                String requestBody= details[0];
+                String contactDetails= details[2];
+                String requestLatitude= details[4];
+                String requestLongitude= details[3];
+                String creationTime= details[5];
+                Intent viewRequestIntent = new Intent(Map.this, ViewRequest.class);
+                viewRequestIntent.putExtra("requestSubject", requestSubject);
+                viewRequestIntent.putExtra("requestBody", requestBody);
+                viewRequestIntent.putExtra("contactDetails", contactDetails);
+                viewRequestIntent.putExtra("requestLatitude", requestLatitude);
+                viewRequestIntent.putExtra("requestLongitude", requestLongitude);
+                viewRequestIntent.putExtra("requestUserId", requestUserId);
+                viewRequestIntent.putExtra("userId", userId);
+                viewRequestIntent.putExtra("isManager", isManager);
+                viewRequestIntent.putExtra("docId", docId);
+                viewRequestIntent.putExtra("requestId", requestId);
+                viewRequestIntent.putExtra("creationTime", creationTime);
+                startActivity(viewRequestIntent);
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
@@ -628,9 +589,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
-                //showServerDownToast();
             }
-        }).start();
+        }).join();
     }
 
     public void showServerDownToast()

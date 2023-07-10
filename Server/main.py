@@ -162,9 +162,8 @@ async def getRequestDetails(request: Request):
     creationTime = users_ref.child(requestUserId).child("requestId").child(requestId).child("creationTime").get()
     # jsonString example: "{\"email\": \"example@com\", \"name\": \"John\"}";
     result= {"requestBody": requestBody, "requestSubject": requestSubject, "contactDetails": contactDetails, "requestLongitude": requestLongitude, "requestLatitude": requestLatitude, "creationTime": creationTime}
-    
+    result= requestBody+"||##"+ requestSubject+"||##"+ contactDetails+"||##"+ requestLongitude+"||##"+ requestLatitude+"||##"+creationTime
     # Serializing json
-    result = json.dumps(result, indent=0,  ensure_ascii=False)
     print(result)
     return result
 
