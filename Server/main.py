@@ -320,6 +320,27 @@ async def getJoiners(request: Request):
     print(type(joinersInfo))
     return joinersInfo
 
+@app.post('/getUsers/')
+async def getUsers(request: Request):
+    print('enter getUsers')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    users_ref = db.reference('users/')
+    users_list= users_ref.get(False, True)  # as a dict
+    #remove from all users list
+    usersInfo = []
+    if users_list != None:
+        for userId in users_list:
+            print(userId)
+            usersInfo.append("Name: "+str(users_ref.child(userId).child("fullName").get())+" | Phone number: "+str(userId)+"||##");
+
+    if not usersInfo:
+        usersInfo= "TThere are no users yet.."
+    print(type(usersInfo))
+    return usersInfo
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
 

@@ -7,21 +7,35 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.giveandtake.R;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ManageUsers extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
+    String IPv4_Address= "10.0.0.3";
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -43,22 +57,12 @@ public class ManageUsers extends ListActivity {
         String userId = thisIntent.getStringExtra("userId");
         String isManager = thisIntent.getStringExtra("isManager");
         HashMap<String, String> markersRequestToDocId= (HashMap<String, String>)thisIntent.getExtras().getSerializable("markersRequestToDocId");
-        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for(DataSnapshot d : dataSnapshot.getChildren()) {
-                        usersInfo.add("Name: "+dataSnapshot.child(d.getKey()).child("fullName").getValue().toString()+" | Phone number: "+d.getKey());
-                        usersInfoToId.put("Name: "+dataSnapshot.child(d.getKey()).child("fullName").getValue().toString()+" | Phone number: "+d.getKey(), d.getKey());
-                    }
-                }
-            }//onDataChange
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }//onCancelled
-        });
+        try {
+            addToUsersInfo();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         btnShowUsers.setOnClickListener(view -> {
             addItems(view);
@@ -67,7 +71,8 @@ public class ManageUsers extends ListActivity {
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {
             String requestUserInfo= (String) parent.getAdapter().getItem(position);
-            String requestUserId= usersInfoToId.get(requestUserInfo);
+            String requestUserId= requestUserInfo.substring(requestUserInfo.lastIndexOf(":")+2);
+            System.out.println("best:"+requestUserId+":");
             Intent viewRequestsIntent = new Intent(ManageUsers.this, ViewMyRequests.class);
             viewRequestsIntent.putExtra("userId", userId);
             viewRequestsIntent.putExtra("isManager", isManager);
@@ -85,6 +90,69 @@ public class ManageUsers extends ListActivity {
         // is fixed by putting addEventListener on create function
         listItems.addAll(usersInfo);
         adapter.notifyDataSetChanged();
+    }
+
+    public void addToUsersInfo() throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getUsers/";
+            //Wireless LAN adapter Wi-Fi:
+            System.out.println("inAddToJoiners");
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ManageUsers.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ManageUsers.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("request", "request");
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String info= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                //add this to the array
+                info= info.substring(2,info.length()-2);
+                for (String user:
+                        info.split(("\\|\\|##"))) {
+                    if (user.startsWith("\",\"")){
+                        user= user.substring(3);
+                    }
+                    usersInfo.add(user);
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(ManageUsers.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
     }
 }
 
