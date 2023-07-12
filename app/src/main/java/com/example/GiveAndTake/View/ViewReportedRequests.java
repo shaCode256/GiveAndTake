@@ -68,7 +68,7 @@ public class ViewReportedRequests extends ListActivity {
                         String requestId= d.getKey();
                         String requestUserId= d.child("requestUserId").getValue().toString();
                         String reporters=  d.child("reporters").getValue().toString();
-                        reporters= "{ Phone Number: "+reporters.substring(1);
+                        reporters= "{Phone Number: "+reporters.substring(1);
                         reporters= reporters.replace("=", " | Name: ");
                         reporters= reporters.replace(",", ", Phone Number: ");
                         assert requestId != null;
