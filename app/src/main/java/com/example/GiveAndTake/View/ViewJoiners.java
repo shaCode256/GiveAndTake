@@ -13,8 +13,6 @@ import android.widget.Toast;
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +32,6 @@ public class ViewJoiners extends ListActivity {
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     ArrayList<String> joinersInfo= new ArrayList<>();
     @Override
     public void onCreate(Bundle icicle) {

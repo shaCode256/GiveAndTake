@@ -14,11 +14,6 @@ import androidx.annotation.NonNull;
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
