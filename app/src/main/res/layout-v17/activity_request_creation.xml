@@ -21,11 +21,11 @@
         android:id="@+id/button_add_request"
         android:layout_width="170dp"
         android:layout_height="39dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="23dp"
         android:background="@drawable/cornered_button"
         android:backgroundTint="#D8DAE3"
         app:layout_constraintEnd_toEndOf="@+id/bodyCardView"
-        app:layout_constraintHorizontal_bias="0.477"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/bodyCardView"
         app:layout_constraintTop_toBottomOf="@+id/bodyCardView">
 
@@ -188,7 +188,7 @@
 
         <RelativeLayout
             android:layout_width="304dp"
-            android:layout_height="130dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
             android:background="@drawable/background_add_btn"
             android:scaleType="fitXY">
@@ -198,8 +198,8 @@
                 android:id="@+id/idSearchView"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:background="#BFBFBF"
@@ -246,7 +246,7 @@
             <TextView
                 android:id="@+id/imageView"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="75dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="138dp"

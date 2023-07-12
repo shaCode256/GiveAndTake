@@ -294,11 +294,11 @@ public class ViewMyRequests extends ListActivity {
                 System.out.println("string array: ");
                 System.out.println(Arrays.toString(details));
                 String requestSubject= details[1];
-                String requestBody= details[0];
+                String requestBody= details[0].substring(1);
                 String contactDetails= details[2];
                 String requestLatitude= details[4];
                 String requestLongitude= details[3];
-                String creationTime= details[5];
+                String creationTime= details[5].substring(1,details[5].length()-1);
                 Intent viewRequestIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
                 viewRequestIntent.putExtra("requestSubject", requestSubject);
                 viewRequestIntent.putExtra("requestBody", requestBody);

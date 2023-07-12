@@ -117,7 +117,14 @@ public class ViewJoiners extends ListActivity {
                 String info= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
                 //add this to the array
-                joinersInfo.add(info);
+                info= info.substring(2,info.length()-2);
+                for (String joiner:
+                     info.split(("\\|\\|##"))) {
+                    if (joiner.startsWith("\",\"")){
+                        joiner= joiner.substring(3);
+                    }
+                    joinersInfo.add(joiner);
+                }
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
