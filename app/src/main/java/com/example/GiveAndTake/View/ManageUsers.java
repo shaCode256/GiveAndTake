@@ -39,7 +39,6 @@ public class ManageUsers extends ListActivity {
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     ArrayList<String> usersInfo= new ArrayList<>();
     HashMap<String, String> usersInfoToId= new HashMap<>();
 
@@ -72,7 +71,6 @@ public class ManageUsers extends ListActivity {
         usersList.setOnItemClickListener((parent, view, position, id) -> {
             String requestUserInfo= (String) parent.getAdapter().getItem(position);
             String requestUserId= requestUserInfo.substring(requestUserInfo.lastIndexOf(":")+2);
-            System.out.println("best:"+requestUserId+":");
             Intent viewRequestsIntent = new Intent(ManageUsers.this, ViewMyRequests.class);
             viewRequestsIntent.putExtra("userId", userId);
             viewRequestsIntent.putExtra("isManager", isManager);
@@ -96,7 +94,6 @@ public class ManageUsers extends ListActivity {
         new Thread(() -> {
             String urlString = "http://"+IPv4_Address+":8000/getUsers/";
             //Wireless LAN adapter Wi-Fi:
-            System.out.println("inAddToJoiners");
             // IPv4 Address
             URL url = null;
             try {
