@@ -44,7 +44,7 @@ public class ViewRequest extends AppCompatActivity {
         String subject= myIntent.getStringExtra("requestSubject");
         String body= myIntent.getStringExtra("requestBody");
         String requestUserId= myIntent.getStringExtra("requestUserId");
-        String contactDetails= myIntent.getStringExtra("contactDetails");
+        String contactDetails= myIntent.getStringExtra("contactDetails").replaceAll("\"", "");
         String latitude= myIntent.getStringExtra("requestLatitude");
         String longitude= myIntent.getStringExtra("requestLongitude");
         String docId= myIntent.getStringExtra("docId");

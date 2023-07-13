@@ -11,16 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,11 +36,8 @@ public class ViewMyRequests extends ListActivity {
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     ArrayList<String> myOpenRequestsInfo = new ArrayList<>();
     ArrayList<String> requestsUserJoinedInfo = new ArrayList<>();
-    HashMap<String, String> requestsInfoToId = new HashMap<>();
-
     int openOrJoinedFlag=0;
 
     @Override
@@ -75,36 +65,18 @@ public class ViewMyRequests extends ListActivity {
         EditText userIdOfRequestEditTxt = findViewById(R.id.user_id_of_request);
         userIdOfRequestEditTxt.setText(requestUserId, TextView.BufferType.EDITABLE);
         userIdOfRequestEditTxt.setEnabled(false);
-        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot d : dataSnapshot.child(requestUserId).child("requestId").getChildren()) {
-                        String requestId = d.getKey();
-                        assert requestId != null;
-                        if (dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue() != null) {
-                            String requestSubject = dataSnapshot.child(requestUserId).child("requestId").child(requestId).child("subject").getValue().toString();
-                            myOpenRequestsInfo.add("Subject: " + requestSubject + " | Request Id: " + requestId);
-                            requestsInfoToId.put("Subject: " + requestSubject + " | Request Id: " + requestId, requestId);
-                        }
-                    }
-                    for (DataSnapshot d : dataSnapshot.child(requestUserId).child("requestsUserJoined").getChildren()) {
-                        String requestId = d.getKey();
-                        if (dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue() != null) {
-                            String creatorOfRequestUserJoined = dataSnapshot.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").getValue().toString();
-                            String requestSubject = dataSnapshot.child(creatorOfRequestUserJoined).child("requestId").child(requestId).child("subject").getValue().toString();
-                            requestsUserJoinedInfo.add("Subject: " + requestSubject + " | Request Id: " + requestId);
-                            requestsInfoToId.put("Subject: " + requestSubject + " | Request Id: " + requestId, requestId);
-                        }
-                    }
-                }
-            }//onDataChange
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        try {
+            addToMyOpenRequestsInfo(requestUserId);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
-            }//onCancelled
-        });
+        try {
+            addToRequestsUserJoined(requestUserId);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         btnShowMyOpenRequests.setOnClickListener(view -> {
             addMyOpenRequests(view);
@@ -135,9 +107,11 @@ public class ViewMyRequests extends ListActivity {
                 throw new RuntimeException(e);
             }
         });
+
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestInfo = (String) parent.getAdapter().getItem(position);
-            String requestId = requestsInfoToId.get(requestInfo);
+            String [] details= requestInfo.split("\\|");
+            String requestId= details[1].replaceAll("\\D", "");
             String docId = markersRequestToDocId.get(requestId);
             if (requestId != null) {
                 String managerWatching = thisIntent.getStringExtra("managerWatching");
@@ -192,6 +166,123 @@ public class ViewMyRequests extends ListActivity {
         listItems.clear();
         listItems.addAll(requestsUserJoinedInfo);
         adapter.notifyDataSetChanged();
+    }
+
+
+
+
+    public void addToMyOpenRequestsInfo(String requestUserId) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getOpenRequests/";
+            //Wireless LAN adapter Wi-Fi:
+            System.out.println("inAddToOpenRequests");
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewMyRequests.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestUserId", requestUserId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String info= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                //add this to the array
+                info= info.substring(2,info.length()-2);
+                for (String requestDetails:
+                        info.split(("\\|\\|##"))) {
+                    if (requestDetails.startsWith("\",\"")){
+                        requestDetails= requestDetails.substring(3);
+                    }
+                    myOpenRequestsInfo.add(requestDetails);
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+    public void addToRequestsUserJoined(String requestUserId) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getJoinedRequests/";
+            //Wireless LAN adapter Wi-Fi:
+            System.out.println("inAddToRequestsUserJoined");
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewMyRequests.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("requestUserId", requestUserId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String info= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                //add this to the array
+                info= info.substring(2,info.length()-2);
+                for (String requestDetails:
+                        info.split(("\\|\\|##"))) {
+                    if (requestDetails.startsWith("\",\"")){
+                        requestDetails= requestDetails.substring(3);
+                    }
+                    requestsUserJoinedInfo.add(requestDetails);
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
     }
 
     public void blockUnblockUser(String userId, String blockUnblock) throws InterruptedException {
@@ -292,6 +383,8 @@ public class ViewMyRequests extends ListActivity {
                 // of a string using substring() method
                 String [] details = stringRequestDetails.split("\\|\\|##");
                 System.out.println("string array: ");
+                requestUserId.replaceAll("\"", "");
+                userId.replaceAll("\"", "");
                 System.out.println(Arrays.toString(details));
                 String requestSubject= details[1];
                 String requestBody= details[0].substring(1);
@@ -299,10 +392,11 @@ public class ViewMyRequests extends ListActivity {
                 String requestLatitude= details[4];
                 String requestLongitude= details[3];
                 String creationTime= details[5].substring(1,details[5].length()-1);
+                contactDetails.replaceAll("\"", "");
                 Intent viewRequestIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
                 viewRequestIntent.putExtra("requestSubject", requestSubject);
                 viewRequestIntent.putExtra("requestBody", requestBody);
-                viewRequestIntent.putExtra("contactDetails", contactDetails);
+                viewRequestIntent.putExtra("contactDetails", contactDetails.replaceAll("\"", ""));
                 viewRequestIntent.putExtra("requestLatitude", requestLatitude);
                 viewRequestIntent.putExtra("requestLongitude", requestLongitude);
                 viewRequestIntent.putExtra("requestUserId", requestUserId);
@@ -408,8 +502,8 @@ public class ViewMyRequests extends ListActivity {
                 conn.setDoOutput(true);
                 JSONObject json = new JSONObject();
                 json.put("requestId", requestId);
-                json.put("userId", userId);
-                json.put("requestUserId", requestUserId);
+                json.put("userId", userId.replaceAll("\"", ""));
+                json.put("requestUserId", requestUserId.replaceAll("\"", ""));
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
@@ -425,6 +519,7 @@ public class ViewMyRequests extends ListActivity {
                 InputStream is = conn.getInputStream();
                 String finalRequestUserId= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
+                finalRequestUserId=finalRequestUserId.replaceAll("\"", "");
                 System.out.println("details final request is: "+finalRequestUserId);
                 try {
                     getRequestDetails(requestId, userId, finalRequestUserId, isManager, docId);

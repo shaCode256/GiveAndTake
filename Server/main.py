@@ -306,6 +306,8 @@ async def getJoiners(request: Request):
     data = orjson.loads(body)
     requestId= data['requestId']
     requestUserId= data['requestUserId']
+    print("requestUserId: "+requestUserId)
+    print("userId: "+requestId)
     users_ref = db.reference('users/')
     joiners_list= users_ref.child(requestUserId).child("requestId").child(requestId).child("joiners")
     joiners_list = joiners_list.get(False, True)  # as a dict
@@ -342,7 +344,7 @@ async def getUsers(request: Request):
 
 @app.post('/getReportedRequests/')
 async def getReportedRequests(request: Request):
-    print('enter getJoiners')
+    print('enter getReportesRequests')
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
@@ -369,6 +371,47 @@ async def getReportedRequests(request: Request):
     print(reportsInfo)
     return reportsInfo
 
+@app.post('/getOpenRequests/')
+async def getOpenRequests(request: Request):
+    print('enter getOpenRequests')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestUserId= data['requestUserId']
+    users_ref = db.reference('users/')
+    requests_list = users_ref.child(requestUserId).child("requestId").get()# as a dict
+    #remove from all joiners list
+    requestsInfo = []
+    if requests_list != None:
+        for requestId in requests_list:
+            requestSubject = users_ref.child(requestUserId).child("requestId").child(requestId).child("subject").get()
+            requestsInfo.append("Subject: " + requestSubject + " | Request Id: " + requestId+"||##");
+    if not requestsInfo:
+        requestsInfo= "TThere are no requests.."
+    print(type(requestsInfo))
+    print(requestsInfo)
+    return requestsInfo
+
+@app.post('/getJoinedRequests/')
+async def getJoinedRequests(request: Request):
+    print('enter getOpenRequests')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    requestUserId= data['requestUserId']
+    users_ref = db.reference('users/')
+    requests_list = users_ref.child(requestUserId).child("requestsUserJoined").get()  # as a dict
+    requestsInfo = []
+    if requests_list != None:
+        for requestId in requests_list:
+            creatorOfRequestUserJoined = users_ref.child(requestUserId).child("requestsUserJoined").child(requestId).child("requestUserId").get()
+            requestSubject = users_ref.child(creatorOfRequestUserJoined).child("requestId").child(requestId).child("subject").get()
+            requestsInfo.append("Subject: " + requestSubject + " | Request Id: " + requestId+"||##");
+    if not requestsInfo:
+        requestsInfo= "TThere are no requests.."
+    print(type(requestsInfo))
+    print(requestsInfo)
+    return requestsInfo
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
