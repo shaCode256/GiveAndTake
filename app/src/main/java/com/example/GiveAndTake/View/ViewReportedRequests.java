@@ -9,16 +9,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,10 +35,7 @@ public class ViewReportedRequests extends ListActivity {
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     ArrayList<String> reportedRequestsInfo = new ArrayList<>();
-    HashMap<String, String[]> reportedRequestsInfoToId = new HashMap<>();
-
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -60,32 +50,12 @@ public class ViewReportedRequests extends ListActivity {
         HashMap<String, String> markersRequestToDocId= (HashMap<String, String>)thisIntent.getExtras().getSerializable("markersRequestToDocId");
         String userId = thisIntent.getStringExtra("userId");
         String isManager = thisIntent.getStringExtra("isManager");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for(DataSnapshot d : dataSnapshot.child("reportedRequests").getChildren()) {
-                        String requestId= d.getKey();
-                        String requestUserId= d.child("requestUserId").getValue().toString();
-                        String reporters=  d.child("reporters").getValue().toString();
-                        reporters= "{Phone Number: "+reporters.substring(1);
-                        reporters= reporters.replace("=", " | Name: ");
-                        reporters= reporters.replace(",", ", Phone Number: ");
-                        assert requestId != null;
-                        if( dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("subject").getValue()!=null) {
-                            String requestSubject = dataSnapshot.child("users").child(requestUserId).child("requestId").child(requestId).child("subject").getValue().toString();
-                            reportedRequestsInfo.add("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters);
-                            reportedRequestsInfoToId.put("Subject: " + requestSubject + " | Request Id: " + requestId+ " | reporters: "+reporters, new String[] {requestId, requestUserId});
-                        }
-                    }
-                }
-            }//onDataChange
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }//onCancelled
-        });
+        try {
+            addToReportsInfo();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         btnShowReportedRequests.setOnClickListener(view -> {
             addReportedRequests(view);
@@ -95,16 +65,15 @@ public class ViewReportedRequests extends ListActivity {
 
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
             String requestInfo= (String) parent.getAdapter().getItem(position);
-            String requestId= reportedRequestsInfoToId.get(requestInfo)[0];
-            String requestUserId=  reportedRequestsInfoToId.get(requestInfo)[1];
+            String [] details= requestInfo.split("\\|");
+            String requestId= details[1].replaceAll("\\D", "");
+            String requestUserId= details[2].replaceAll("\\D", "");
             String docId= markersRequestToDocId.get(requestId);
-            if(requestId!=null) {
                 try {
                     getRequestDetails(requestId, userId, requestUserId, isManager, docId);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-            }
         });
     }
 
@@ -194,6 +163,61 @@ public class ViewReportedRequests extends ListActivity {
         }).start();
     }
 
+    public void addToReportsInfo() throws InterruptedException {
+        new Thread(() -> {
+            String urlString = "http://"+IPv4_Address+":8000/getReportedRequests/";
+            //Wireless LAN adapter Wi-Fi:
+            System.out.println("inAddToJoiners");
+            // IPv4 Address
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                ViewReportedRequests.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String info= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                //add this to the array
+                info= info.substring(2,info.length()-2);
+                for (String report:
+                        info.split(("\\|\\|##"))) {
+                    if (report.startsWith("\",\"")){
+                        report= report.substring(3);
+                    }
+                    reportedRequestsInfo.add(report);
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
     public void showServerDownToast()
     {
         runOnUiThread(() -> Toast.makeText(ViewReportedRequests.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());

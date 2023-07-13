@@ -340,6 +340,35 @@ async def getUsers(request: Request):
     print(type(usersInfo))
     return usersInfo
 
+@app.post('/getReportedRequests/')
+async def getReportedRequests(request: Request):
+    print('enter getJoiners')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    users_ref = db.reference('users/')
+    reports_ref = db.reference('reportedRequests/')
+    reports_list = reports_ref.get(False, False)  # as a dict
+    #remove from all joiners list
+    reportsInfo = []
+    if reports_list != None:
+        for requestId in reports_list:
+            requestUserId= reports_ref.child(requestId).child("requestUserId").get()
+            reporters= str(reports_ref.child(requestId).child("reporters").get())
+            reporters= "{Phone Number: "+reporters[1:]
+            reporters= reporters.replace("=", " | Name: ")
+            reporters= reporters.replace(",", ", Phone Number: ")
+            print("requestUserId: "+requestUserId)
+            print("requestId: "+requestId)
+            requestSubject = str(users_ref.child(requestUserId).child("requestId").child(requestId).child("subject").get())
+            reportsInfo.append("Subject: " + requestSubject + " | Request Id: " + requestId+" | RequestUserId: " + requestUserId+ " | reporters: "+reporters+"||##")
+
+    if not reportsInfo:
+        reportsInfo= "TThere are no reports.."
+    print(type(reportsInfo))
+    print(reportsInfo)
+    return reportsInfo
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
