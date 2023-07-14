@@ -53,6 +53,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RequestCreation extends AppCompatActivity {
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
+    String IPv4_Address= "http://10.0.0.3:8000/";
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,10 +179,6 @@ public class RequestCreation extends AppCompatActivity {
                         String finalCreationTime = creationTime;
                        //  //Add by server
                         postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
-                        Intent myIntent = new Intent(RequestCreation.this, Map.class);
-                        myIntent.putExtra("userId", userId);
-                        myIntent.putExtra("isManager", isManager);
-                        startActivity(myIntent);
                     } else {
                         Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                     }
@@ -241,7 +238,7 @@ public class RequestCreation extends AppCompatActivity {
 
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
         new Thread(() -> {
-            String urlString = "http://10.0.0.3:8000/";
+            String urlString = IPv4_Address;
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
 
@@ -314,6 +311,10 @@ public class RequestCreation extends AppCompatActivity {
 
                         }
                     });
+                    Intent myIntent = new Intent(RequestCreation.this, Map.class);
+                    myIntent.putExtra("userId", userId);
+                    myIntent.putExtra("isManager", isManager);
+                    startActivity(myIntent);
                 }
             } catch (IOException e) {
                 System.out.println("error3");

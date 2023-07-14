@@ -7,9 +7,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
@@ -30,7 +29,7 @@ import java.util.HashMap;
 
 public class ManageUsers extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -41,6 +40,8 @@ public class ManageUsers extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_manage_users);
+        RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
+        loadingPanel.setVisibility(View.GONE);
         Button btnShowUsers= findViewById(R.id.showBtn);
         ListView usersList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
@@ -87,7 +88,7 @@ public class ManageUsers extends ListActivity {
 
     public void addToUsersInfo() throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getUsers/";
+            String urlString = IPv4_Address+"getUsers/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;

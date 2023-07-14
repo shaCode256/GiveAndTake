@@ -38,7 +38,7 @@ import java.net.URL;
 
 public class Settings extends AppCompatActivity {
     private FirebaseAuth auth;
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +146,7 @@ public class Settings extends AppCompatActivity {
 
     public void sendUseCurrLocation(String userId, Location location) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/useCurrLocationNotifications/";
+            String urlString = IPv4_Address+"useCurrLocationNotifications/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -199,7 +199,7 @@ public class Settings extends AppCompatActivity {
 
     public void sendTurnOnOffNotifications(String userId, String onOff) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/turnOnOffNotifications/";
+            String urlString = IPv4_Address+"turnOnOffNotifications/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -251,7 +251,7 @@ public class Settings extends AppCompatActivity {
 
     public void sendUseSpecificLocation(String userId, GeoPoint location) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/useSpecificLocationNotifications/";
+            String urlString = IPv4_Address+"useSpecificLocationNotifications/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -304,7 +304,7 @@ public class Settings extends AppCompatActivity {
 
     public void turnOnOffAutoDetectLocation(String userId, String onOff) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/turnOnOffAutoDetectLocationNotifications/";
+            String urlString = IPv4_Address+"turnOnOffAutoDetectLocationNotifications/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -356,7 +356,7 @@ public class Settings extends AppCompatActivity {
 
     public void sendKmDistance(String userId, String distance) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/setKmDistanceNotifications/";
+            String urlString = IPv4_Address+"setKmDistanceNotifications/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 
 public class ViewJoiners extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -37,6 +38,14 @@ public class ViewJoiners extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_joiners);
+        RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
+        loadingPanel.setVisibility(View.VISIBLE);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                loadingPanel.setVisibility(View.GONE);
+//            }
+//        },1000*5);
         Button btnShowJoiners = findViewById(R.id.showBtn);
         adapter= new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
@@ -72,7 +81,7 @@ public class ViewJoiners extends ListActivity {
 
     public void addToJoinersInfo(String requestId, String requestUserId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getJoiners/";
+            String urlString = IPv4_Address+"getJoiners/";
             //Wireless LAN adapter Wi-Fi:
             System.out.println("inAddToJoiners");
             // IPv4 Address

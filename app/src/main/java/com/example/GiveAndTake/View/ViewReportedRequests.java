@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.giveandtake.R;
@@ -31,7 +32,7 @@ public class ViewReportedRequests extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
 
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -40,6 +41,8 @@ public class ViewReportedRequests extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_reported_requests);
+        RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
+        loadingPanel.setVisibility(View.GONE);
         Button btnShowReportedRequests= findViewById(R.id.showReportedRequestsBtn);
         ListView requestsList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
@@ -89,7 +92,7 @@ public class ViewReportedRequests extends ListActivity {
 
     public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
+            String urlString = IPv4_Address+"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -165,7 +168,7 @@ public class ViewReportedRequests extends ListActivity {
 
     public void addToReportsInfo() throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getReportedRequests/";
+            String urlString = IPv4_Address+"getReportedRequests/";
             //Wireless LAN adapter Wi-Fi:
             System.out.println("inAddToJoiners");
             // IPv4 Address

@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ViewRequest extends AppCompatActivity {
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,19 +136,15 @@ public class ViewRequest extends AppCompatActivity {
         });
 
         btnDeleteRequest.setOnClickListener(v -> {
-            Intent mapIntent = new Intent(ViewRequest.this, Map.class);
-            mapIntent.putExtra("userId", userId);
-            mapIntent.putExtra("isManager", isManager);
             //delete request by server
             if(requestId!=null) {
-                deleteRequest(userId, requestId, docId);
+                deleteRequest(userId, requestId, docId, isManager);
             }
-            startActivity(mapIntent);
         });
 
         btnJoinRequest.setOnClickListener(
                 v -> {
-// //Join by server
+                    // Join by server
                    joinRequest(requestId, userId, requestUserId);
                 });
 
@@ -178,12 +174,10 @@ public class ViewRequest extends AppCompatActivity {
         });
     }
 
-    public void deleteRequest(String userId, String requestId, String docId) {
+    public void deleteRequest(String userId, String requestId, String docId, String isManager) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/delete/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"delete/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -226,6 +220,10 @@ public class ViewRequest extends AppCompatActivity {
                 if (result.equals("\"success\"")) {
                     //removes marker from map
                     db.collection("MapsData").document(docId).delete(); //deletes from markersDb
+                    Intent mapIntent = new Intent(ViewRequest.this, Map.class);
+                    mapIntent.putExtra("userId", userId);
+                    mapIntent.putExtra("isManager", isManager);
+                    startActivity(mapIntent);
                 }
             } catch (IOException e) {
                 System.out.println("error3");
@@ -238,9 +236,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void reportRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/report/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"report/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -292,9 +288,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void unReportRequest(String requestId, String userId) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/unReport/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"unReport/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -345,9 +339,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void joinRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/join/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"join/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -399,9 +391,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void unJoinRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/unJoin/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"unJoin/";
             URL url = null;
             try {
                 url = new URL(urlString);

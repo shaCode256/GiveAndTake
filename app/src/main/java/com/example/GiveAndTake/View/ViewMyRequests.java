@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class ViewMyRequests extends ListActivity {
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
@@ -44,6 +45,8 @@ public class ViewMyRequests extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_my_requests);
+        RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
+        loadingPanel.setVisibility(View.GONE);
         Button btnShowMyOpenRequests = findViewById(R.id.showMyOpenRequestsBtn);
         Button btnShowRequestsIJoined = findViewById(R.id.showRequestsIJoinedBtn);
         Button btnBlockUser = findViewById(R.id.blockUser);
@@ -173,8 +176,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void addToMyOpenRequestsInfo(String requestUserId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getOpenRequests/";
-            //Wireless LAN adapter Wi-Fi:
+            String urlString = IPv4_Address+"getOpenRequests/";
             System.out.println("inAddToOpenRequests");
             // IPv4 Address
             URL url = null;
@@ -230,7 +232,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void addToRequestsUserJoined(String requestUserId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getJoinedRequests/";
+            String urlString = IPv4_Address+"getJoinedRequests/";
             //Wireless LAN adapter Wi-Fi:
             System.out.println("inAddToRequestsUserJoined");
             // IPv4 Address
@@ -287,7 +289,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void blockUnblockUser(String userId, String blockUnblock) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/blockUnblockUser/";
+            String urlString = IPv4_Address+"blockUnblockUser/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -337,7 +339,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
+            String urlString = IPv4_Address+"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -416,10 +418,8 @@ public class ViewMyRequests extends ListActivity {
 
     public void getFinal1(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getFinal1/";
+            String urlString = IPv4_Address+"getFinal1/";
             System.out.println("inget1");
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -477,8 +477,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void getFinal2(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getFinal2/";
-            //Wireless LAN adapter Wi-Fi:
+            String urlString = IPv4_Address+"getFinal2/";
             System.out.println("inget2");
             // IPv4 Address
             URL url = null;

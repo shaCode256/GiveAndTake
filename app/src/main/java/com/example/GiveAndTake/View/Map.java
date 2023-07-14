@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -65,9 +66,8 @@ import java.util.Objects;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
-    String IPv4_Address= "10.0.0.3";
+    String IPv4_Address= "http://10.0.0.3:8000/";
     private GoogleMap mMap;
-
     static String [] details;
     boolean isRunning= true;
     FirebaseFirestore db;
@@ -78,6 +78,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     HashMap<String, Marker> markersHashmap = new HashMap<>();
     HashMap<String, String> markersRequestToDocId = new HashMap<>();
     public static HashSet<String> takenRequestsIds = new HashSet<>();
+
 
     SearchView searchView;
     @SuppressLint("MissingPermission")
@@ -91,6 +92,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
+        loadingPanel.setVisibility(View.GONE);
         ImageView createRequestBtn= findViewById(R.id.btn_create_request_from_map);
         ImageView btnLocateMe= findViewById(R.id.btn_locate_me);
         ImageView btnMyRequests= findViewById(R.id.btn_my_requests);
@@ -337,6 +340,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
 
         mMap.setOnMarkerClickListener(marker -> {
+            RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
             String requestUserId = Objects.requireNonNull(marker.getTag()).toString();
             String requestId= marker.getTitle();
             String userId = thisIntent.getStringExtra("userId");
@@ -345,11 +349,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 if(markersHashmap.get(requestId)!=null) {
                     String docId = markersRequestToDocId.get(requestId);
                     try {
-                        getRequestDetails(requestId, userId, requestUserId, isManager, docId);
+                        getRequestDetails(requestId, userId, requestUserId, isManager, docId, loadingPanel);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-
                 }
                 else{
                     Toast.makeText(Map.this, "Oops! This request isn't available", Toast.LENGTH_SHORT).show();
@@ -390,20 +393,15 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         ContextCompat.startForegroundService(Map.this, serviceIntent);
     }
 
-
-
-
-
-
-
     public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         stopService(serviceIntent);
     }
 
-    public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
+    public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId, RelativeLayout loadingPanel) throws InterruptedException {
+        loadingPanel.setVisibility(View.VISIBLE);
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getRequestDetails/";
+            String urlString = IPv4_Address+"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -480,7 +478,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void setLastTimeSeenMap(String userId, String time) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/setLastTimeSeenMap/";
+            String urlString = IPv4_Address+"setLastTimeSeenMap/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -532,9 +530,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void checkIfToStartNotificationService(String userId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = "http://"+IPv4_Address+":8000/getIsNotificationsTurnedOn/";
-            //Wireless LAN adapter Wi-Fi:
-            // IPv4 Address
+            String urlString = IPv4_Address+"getIsNotificationsTurnedOn/";
             URL url = null;
             try {
                 url = new URL(urlString);
