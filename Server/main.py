@@ -4,13 +4,21 @@ import uvicorn
 from fastapi import FastAPI, Request
 import orjson
 import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import credentials, db, firestore
+from google.cloud.firestore import GeoPoint
 
+# Use Firebase Real Time db
 cred = credentials.Certificate("serviceAccountKey.json")
 
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://giveandtake-31249-default-rtdb.firebaseio.com'
 })
+
+# Use Cloud Firestore db
+credFs = credentials.Certificate('serviceAccountKey.json')
+
+dbFs = firestore.client()
+
 app = FastAPI()
 
 #remember to connect to Wireless LAN adapter Wi-Fi:  IPv4 Address. . . . . . . . . . . : 10.0.0.3 for example
@@ -26,6 +34,7 @@ async def submit(request: Request):
     body.decode("utf-8")
     data = orjson.loads(body)
     userId= data['userId']
+    isManager = data['isManager']
     requestId = data['requestId']
     subject = data['subject']
     contactDetails= data['contactDetails']
@@ -47,6 +56,16 @@ async def submit(request: Request):
         'latitude': float(locationLat),
         'longitude': float(locationLang)
     })
+
+    # add marker to cloud FS
+    data= {}
+    data["geoPoint"]= GeoPoint(float(locationLat), float(locationLang))
+    data["requestId"] = requestId
+    data["userId"]= userId
+    data["isManager"] = isManager
+    data["creationTime"] = creationTime
+    dbFs.collection("MapsData").add(data)
+
     return 'success'
 
 
@@ -73,8 +92,10 @@ async def delete(request: Request):
             print(joinerId)
             db.reference("reportedRequests").child(requestId).delete()
             users_ref.child(joinerId).child("requestsUserJoined").child(requestId).delete()
-  #  db.reference("MapsData").document(docId).delete(); # deletes marker from markersDb
 
+    # deletes marker from markersDb Cloud Fire Store
+    dbFs.collection("MapsData").document(docId).delete()
+    
     return 'success'
 
 @app.post('/report/')

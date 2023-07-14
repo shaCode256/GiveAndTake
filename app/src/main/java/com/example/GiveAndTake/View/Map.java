@@ -291,7 +291,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                                     BitmapDescriptor handIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand", 85, 85));
                                     BitmapDescriptor starIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("star_icon", 85, 85));
                                     for (QueryDocumentSnapshot doc : value) {
-                                        if (doc.get("geoPoint") != null) {
+                                        if (doc.get("geoPoint") != null && doc.get("geoPoint") instanceof GeoPoint) {
+                                            System.out.println("requestId: "+doc.getString("requestId"));
                                             //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
                                             GeoPoint geoPoint= doc.getGeoPoint("geoPoint");
                                             assert geoPoint != null;

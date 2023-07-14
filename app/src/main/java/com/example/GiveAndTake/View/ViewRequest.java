@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -175,7 +174,6 @@ public class ViewRequest extends AppCompatActivity {
     }
 
     public void deleteRequest(String userId, String requestId, String docId, String isManager) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         new Thread(() -> {
             String urlString = IPv4_Address+"delete/";
             URL url = null;
@@ -218,8 +216,6 @@ public class ViewRequest extends AppCompatActivity {
                         is, Charsets.UTF_8));
                 System.out.println("yes:" + result);
                 if (result.equals("\"success\"")) {
-                    //removes marker from map
-                    db.collection("MapsData").document(docId).delete(); //deletes from markersDb
                     Intent mapIntent = new Intent(ViewRequest.this, Map.class);
                     mapIntent.putExtra("userId", userId);
                     mapIntent.putExtra("isManager", isManager);

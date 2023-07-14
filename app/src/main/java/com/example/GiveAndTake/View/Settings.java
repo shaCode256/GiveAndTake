@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -22,7 +21,6 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.json.JSONException;
@@ -37,7 +35,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Settings extends AppCompatActivity {
-    private FirebaseAuth auth;
     String IPv4_Address= "http://10.0.0.3:8000/";
     @SuppressLint("MissingPermission")
     @Override
@@ -54,7 +51,6 @@ public class Settings extends AppCompatActivity {
         Button useCurrLocationBtn= findViewById(R.id.btn_use_curr_location);
         Button backToMapBtn= findViewById(R.id.backToMap);
         Button applyKmBtn= findViewById(R.id.applyKmBtn);
-        auth= FirebaseAuth.getInstance();
         Intent thisIntent= getIntent();
         String userId = thisIntent.getStringExtra("userId");
         String isManager= thisIntent.getStringExtra("isManager");

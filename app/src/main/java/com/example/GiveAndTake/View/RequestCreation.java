@@ -26,11 +26,6 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -51,8 +46,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
-
     String IPv4_Address= "http://10.0.0.3:8000/";
     @SuppressLint("MissingPermission")
     @Override
@@ -267,6 +260,7 @@ public class RequestCreation extends AppCompatActivity {
                 json.put("subject", subject);
                 json.put("contactDetails", contactDetails);
                 json.put("userId", userId);
+                json.put("isManager", isManager);
                 json.put("creationTime", creationTime);
                 json.put("locationLat", locationLat);
                 json.put("locationLang", locationLang);
@@ -287,30 +281,6 @@ public class RequestCreation extends AppCompatActivity {
                         is, Charsets.UTF_8));
                 System.out.println("yes:" + result);
                 if (result.equals("\"success\"")) {
-                    //add marker
-                    GeoPoint geoPointRequest = new GeoPoint(Double.valueOf(locationLat), Double.valueOf(locationLang));
-                    HashMap<String, Object> user = new HashMap<>();
-                    user.put("geoPoint", geoPointRequest);
-                    user.put("requestId", requestId);
-                    user.put("userId", requestUserId);
-                    user.put("isManager", isManager);
-                    user.put("creationTime", creationTime);
-                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            markersDb.collection("MapsData")
-                                    .add(user)
-                                    .addOnSuccessListener(documentReference -> {
-                                    })
-                                    .addOnFailureListener(e -> {
-                                    });
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
                     Intent myIntent = new Intent(RequestCreation.this, Map.class);
                     myIntent.putExtra("userId", userId);
                     myIntent.putExtra("isManager", isManager);
