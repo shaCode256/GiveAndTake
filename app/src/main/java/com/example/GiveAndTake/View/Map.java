@@ -468,6 +468,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 viewRequestIntent.putExtra("docId", docId);
                 viewRequestIntent.putExtra("requestId", requestId);
                 viewRequestIntent.putExtra("creationTime", creationTime);
+                Map.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        loadingPanel.setVisibility(View.GONE);
+                    }
+                });
                 startActivity(viewRequestIntent);
             } catch (IOException e) {
                 System.out.println("error3");
