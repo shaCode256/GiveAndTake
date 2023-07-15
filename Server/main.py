@@ -435,6 +435,25 @@ async def getJoinedRequests(request: Request):
     print(requestsInfo)
     return requestsInfo
 
+@app.post('/getDoesPhoneExist/')
+async def getDoesPhoneExist(request: Request):
+    print('enter getDoesPhoneExist')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    phone= data['phone']
+    users_ref = db.reference('users/')
+    phone_user = users_ref.child(phone).get()  # as a dict
+    boolExist= False
+    if phone_user != None:
+        boolExist= True
+    print(type(boolExist))
+    print(boolExist)
+    if boolExist:
+        return "true"
+    else:
+        return "false"
+
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
 

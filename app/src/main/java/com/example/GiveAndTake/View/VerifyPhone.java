@@ -15,6 +15,8 @@ import com.example.giveandtake.Presenter.RegisterUser;
 import com.example.giveandtake.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -26,6 +28,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhone extends AppCompatActivity {
@@ -35,6 +47,9 @@ public class VerifyPhone extends AppCompatActivity {
     String verificationID;
     ProgressBar bar;
     String fullNameTxt;
+
+    String IPv4_Address= "http://10.0.0.3:8000/";
+
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
     @Override
@@ -150,6 +165,50 @@ public class VerifyPhone extends AppCompatActivity {
             Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
             startActivity(loginIntent);
     }
+
+    public void checkIfPhoneExist(String phone) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = IPv4_Address+"getDoesPhoneExist/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("phone", phone);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String isExist= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("isNotificationTurnedOn? "+isExist);
+                //  latch.countDown();
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
 
 }
 
