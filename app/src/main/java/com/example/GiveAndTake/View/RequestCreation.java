@@ -231,7 +231,7 @@ public class RequestCreation extends AppCompatActivity {
 
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
         new Thread(() -> {
-            String urlString = IPv4_Address;
+            String urlString = IPv4_Address+"postRequest/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
 

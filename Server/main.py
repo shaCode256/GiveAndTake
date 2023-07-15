@@ -26,10 +26,11 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return "Hello World"
+    return "Hello World, Give And Take server is responding."
 
-@app.post('/')
+@app.post('/postRequest/')
 async def submit(request: Request):
+    print('enter /postRequest')
     body = await request.body()
     body.decode("utf-8")
     data = orjson.loads(body)
