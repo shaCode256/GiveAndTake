@@ -46,7 +46,7 @@ public class ViewMyRequests extends ListActivity {
         super.onCreate(icicle);
         setContentView(R.layout.activity_view_my_requests);
         RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
-        loadingPanel.setVisibility(View.GONE);
+        loadingPanel.setVisibility(View.VISIBLE);
         Button btnShowMyOpenRequests = findViewById(R.id.showMyOpenRequestsBtn);
         Button btnShowRequestsIJoined = findViewById(R.id.showRequestsIJoinedBtn);
         Button btnBlockUser = findViewById(R.id.blockUser);
@@ -84,15 +84,19 @@ public class ViewMyRequests extends ListActivity {
         btnShowMyOpenRequests.setOnClickListener(view -> {
             addMyOpenRequests(view);
             //TODO: pass the isManager. or retrieve it in map
-            btnShowMyOpenRequests.setVisibility(View.GONE);
-            btnShowRequestsIJoined.setVisibility(View.VISIBLE);
+            if(!listItems.isEmpty()) {
+                btnShowMyOpenRequests.setVisibility(View.GONE);
+                btnShowRequestsIJoined.setVisibility(View.VISIBLE);
+            }
         });
 
         btnShowRequestsIJoined.setOnClickListener(view -> {
             addRequestsUserJoined(view);
             //TODO: pass the isManager. or retrieve it in map
-            btnShowMyOpenRequests.setVisibility(View.VISIBLE);
-            btnShowRequestsIJoined.setVisibility(View.GONE);
+            if(!listItems.isEmpty()) {
+                btnShowMyOpenRequests.setVisibility(View.VISIBLE);
+                btnShowRequestsIJoined.setVisibility(View.GONE);
+            }
         });
 
         btnBlockUser.setOnClickListener(view -> {

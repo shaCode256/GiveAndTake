@@ -41,7 +41,7 @@ public class ManageUsers extends ListActivity {
         super.onCreate(icicle);
         setContentView(R.layout.activity_manage_users);
         RelativeLayout loadingPanel= findViewById(R.id.loadingPanel);
-        loadingPanel.setVisibility(View.GONE);
+        loadingPanel.setVisibility(View.VISIBLE);
         Button btnShowUsers= findViewById(R.id.showBtn);
         ListView usersList= findViewById(android.R.id.list);
         adapter= new ArrayAdapter<>(this,
@@ -61,7 +61,9 @@ public class ManageUsers extends ListActivity {
 
         btnShowUsers.setOnClickListener(view -> {
             addItems(view);
-            btnShowUsers.setVisibility(View.GONE);
+            if(!listItems.isEmpty()) {
+                btnShowUsers.setVisibility(View.GONE);
+            }
         });
 
         usersList.setOnItemClickListener((parent, view, position, id) -> {

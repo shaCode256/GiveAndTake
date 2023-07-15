@@ -63,7 +63,9 @@ public class ViewReportedRequests extends ListActivity {
         btnShowReportedRequests.setOnClickListener(view -> {
             addReportedRequests(view);
             //TODO: pass the isManager. or retrieve it in map
-            btnShowReportedRequests.setVisibility(View.GONE);
+            if(!listItems.isEmpty()) {
+                btnShowReportedRequests.setVisibility(View.GONE);
+            }
         });
 
         requestsList.setOnItemClickListener((parent, view, position, id) -> {
