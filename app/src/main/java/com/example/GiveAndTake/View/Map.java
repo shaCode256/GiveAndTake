@@ -1,7 +1,5 @@
 package com.example.giveandtake.View;
 
-import static android.content.ContentValues.TAG;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -14,7 +12,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,10 +41,7 @@ import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -196,7 +190,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         });
     }
 
-
     public Bitmap resizeBitmap(String drawableName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getPackageName()));
         //TODO: Try to fix Warning:(149, 89) Use of this function is discouraged because resource reflection makes it
@@ -204,6 +197,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         // to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier("bar", "foo", null)`).
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
     }
+
 
     @SuppressLint("PotentialBehaviorOverride")
     @Override
@@ -216,6 +210,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         Intent thisIntent = getIntent();
         double goToLongLocation= thisIntent.getDoubleExtra("goToLongLocation", -999);
         double goToLatLocation= thisIntent.getDoubleExtra("goToLatLocation", -999);
+        try {
+            getMapsDataDocs(mMap);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         // initializing our search view.
         searchView = findViewById(R.id.idSearchView);
 
@@ -224,6 +223,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         // adding on query listener for our search view.
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -238,29 +238,27 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 List<Address> addressList = null;
 
                 // checking if the entered location is null or not.
-                if (location != null || location.equals("")) {
-                    // on below line we are creating and initializing a geo coder.
-                    Geocoder geocoder = new Geocoder(Map.this);
-                    try {
-                        // on below line we are getting location from the
-                        // location name and adding that location to address list.
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                // on below line we are creating and initializing a geo coder.
+                Geocoder geocoder = new Geocoder(Map.this);
+                try {
+                    // on below line we are getting location from the
+                    // location name and adding that location to address list.
+                    addressList = geocoder.getFromLocationName(location, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                    if(addressList!= null && addressList.size()!=0) {
-                        // on below line we are getting the location
-                        // from our list a first position.
-                        Address address = addressList.get(0);
+                if(addressList!= null && addressList.size()!=0) {
+                    // on below line we are getting the location
+                    // from our list a first position.
+                    Address address = addressList.get(0);
 
-                        // on below line we are creating a variable for our location
-                        // where we will add our locations latitude and longitude.
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    // on below line we are creating a variable for our location
+                    // where we will add our locations latitude and longitude.
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
-                        // below line is to animate camera to that position.
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                    }
+                    // below line is to animate camera to that position.
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 }
                 return false;
             }
@@ -278,54 +276,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
         }
-
-        try {
-            getMapsDataDocs();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        new Thread(){
-            @Override
-            public void run(){
-                //Listen to multiple documents in a collection. adds markers of the requests in the db (docs)
-                db.collection("MapsData")
-                        .addSnapshotListener((value, e) -> {
-                                    if (e != null) {
-                                        Log.w(TAG, "Listen failed.", e);
-                                        return;
-                                    }
-                                    assert value != null;
-                                    BitmapDescriptor handIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand", 85, 85));
-                                    BitmapDescriptor starIcon= BitmapDescriptorFactory.fromBitmap(resizeBitmap("star_icon", 85, 85));
-                                    for (QueryDocumentSnapshot doc : value) {
-                                        if (doc.get("geoPoint") != null && doc.get("geoPoint") instanceof GeoPoint) {
-                                            System.out.println("requestId: "+doc.getString("requestId"));
-                                            //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
-                                            GeoPoint geoPoint= doc.getGeoPoint("geoPoint");
-                                            assert geoPoint != null;
-                                            LatLng location = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                                            String requestId= doc.getString("requestId");
-                                            String requestUserId= doc.getString("userId");
-                                            String isManager= doc.getString("isManager");
-                                            String creationTime= doc.getString("creationTime");
-                                            //to check if requestUseId is manager: change the icon
-                                            BitmapDescriptor selectedIcon= handIcon;
-                                            takenRequestsIds.add(requestId);
-                                            if(isManager!=null && isManager.equals("1")) {
-                                                selectedIcon= starIcon;
-                                            }
-                                            Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(selectedIcon).snippet(creationTime));
-                                            assert newMarker != null;
-                                            newMarker.setTag(requestUserId);
-                                            markersHashmap.put(requestId,newMarker);
-                                            markersRequestToDocId.put(requestId, doc.getId());
-                                        }
-                                    }
-                                }
-                        );
-            }
-        }.run();
 
         try {
             checkIfToStartNotificationService(thisIntent.getStringExtra("userId"));
@@ -388,7 +338,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public void startNotificationService() {
-        System.out.println("yayyy");
         stopNotificationService();
         Intent serviceIntent = new Intent(this, NotificationService.class);
         Intent thisIntent = getIntent();
@@ -451,12 +400,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                System.out.println("details received: "+stringRequestDetails);
                 // Removing first and last character
                 // of a string using substring() method
                 details = stringRequestDetails.split("\\|\\|##");
-                System.out.println("string array: ");
-                System.out.println(Arrays.toString(details));
                 isRunning=false;
                 String requestSubject= details[1];
                 String requestBody= details[0].substring(1);
@@ -532,7 +478,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 stringRequestDetails= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                System.out.println("details received: "+stringRequestDetails);
                 isRunning=false;
             } catch (IOException e) {
                 System.out.println("error3");
@@ -581,7 +526,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 InputStream is = conn.getInputStream();
                 isNotificationsTurnedOn= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                System.out.println("isNotificationTurnedOn? "+isNotificationsTurnedOn);
                 if(isNotificationsTurnedOn.equals("\"1\"")){
                     new Thread(() -> {
                         startNotificationService();
@@ -600,7 +544,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         }).start();
     }
 
-    public void getMapsDataDocs() throws InterruptedException {
+    public void getMapsDataDocs(GoogleMap mMap) throws InterruptedException {
         new Thread(() -> {
             String urlString = IPv4_Address+"getMapsDataDocs/";
             URL url = null;
@@ -634,14 +578,48 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
             try {
                 InputStream is = conn.getInputStream();
-                String MapsDataDocs= CharStreams.toString(new InputStreamReader(
+                String info= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                System.out.println("getMapsDataDocs:  "+MapsDataDocs);
-                //JSONArray abc= new JSONArray(MapsDataDocs);
-                //System.out.println("abc:  "+abc);
+                info= info.substring(2,info.length()-2);
+                for (String docStr:
+                        info.split(("\\|\\|##"))) {
+                    if (docStr.startsWith("\",\"")) {
+                        docStr = docStr.substring(3);
+                    }
+                    JSONObject doc = new JSONObject(docStr);
+                    BitmapDescriptor handIcon = BitmapDescriptorFactory.fromBitmap(resizeBitmap("hand", 85, 85));
+                    BitmapDescriptor starIcon = BitmapDescriptorFactory.fromBitmap(resizeBitmap("star_icon", 85, 85));
+                    //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
+                    String geoPointStr = (String) doc.get("geoPoint");
+                    String[] geoPointParse = geoPointStr.split(",");
+                    LatLng location = new LatLng(Double.parseDouble(geoPointParse[0]), Double.parseDouble(geoPointParse[1]));
+                    String requestId = doc.getString("requestId");
+                    String requestUserId = doc.getString("userId");
+                    String isManager = doc.getString("isManager");
+                    String creationTime = doc.getString("creationTime");
+                    //to check if requestUseId is manager: change the icon
+                    BitmapDescriptor selectedIcon = handIcon;
+                    takenRequestsIds.add(requestId);
+                    if (isManager.equals("1")) {
+                        selectedIcon = starIcon;
+                    }
+                    BitmapDescriptor finalSelectedIcon = selectedIcon;
+                    Map.this.runOnUiThread(() -> {
+                    Marker newMarker = mMap.addMarker(new MarkerOptions().position(location).title(requestId).icon(finalSelectedIcon).snippet(creationTime));
+                    assert newMarker != null;
+                    newMarker.setTag(requestUserId);
+                    markersHashmap.put(requestId, newMarker);
+                    try {
+                        markersRequestToDocId.put(requestId, (String) doc.get("id"));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    });
+                }
+                } catch (JSONException e) {
+                throw new RuntimeException(e);
             } catch (IOException e) {
-                System.out.println("error3");
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }).start();
     }

@@ -475,10 +475,11 @@ async def getMapsDataDocs(request: Request):
     for doc in docs:
         #print(f"{doc.id} => {doc.to_dict()}")
         dictDoc= doc.to_dict()
-        dictDoc['geoPoint']= str(dictDoc.get('geoPoint').latitude)+','+str(dictDoc.get('geoPoint').latitude)
-        docsList.append(dictDoc)
-        print(dictDoc)
-    return json.dumps(docsList)
+        dictDoc['geoPoint']= str(dictDoc.get('geoPoint').latitude)+','+str(dictDoc.get('geoPoint').longitude)
+        dictDoc['id']= str(doc.id)
+        docsList.append(str(dictDoc)+"||##")
+    print(str(docsList))
+    return docsList
 
 
 
