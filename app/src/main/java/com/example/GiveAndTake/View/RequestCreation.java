@@ -162,12 +162,6 @@ public class RequestCreation extends AppCompatActivity {
                             creationTime = LocalDateTime.now().toString();
                         }
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
-                        HashMap<String, Object> user = new HashMap<>();
-                        user.put("geoPoint", geoPointRequest);
-                        user.put("requestId", setRequestId);
-                        user.put("userId", requestUserId);
-                        user.put("isManager", isManager);
-                        user.put("creationTime", creationTime);
                         String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
                        //  //Add by server

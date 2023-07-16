@@ -45,6 +45,24 @@ async def submit(request: Request):
     body= data['body']
     print(userId)
     users_ref = db.reference('users/')
+
+    # check if a marker with same coordinates already exists, if so assign a different close free location
+    coordinate_offset = 0.00002
+    positions = []
+
+    docs = dbFs.collection("MapsData").stream()
+    for doc in docs:
+        #print(f"{doc.id} => {doc.to_dict()}")
+        positions.append(doc.to_dict().get('geoPoint'))
+
+    newGeoPoint= GeoPoint(float(locationLat), float(locationLang))
+    while (newGeoPoint in positions):
+        locationLang*= (1+coordinate_offset)
+        newGeoPoint = GeoPoint(float(locationLat), float(locationLang))
+
+    locationLat= newGeoPoint.latitude
+    locationLang= newGeoPoint.longitude
+
     request_ref = users_ref.child(userId).child("requestId").child(requestId)
     request_ref.update({
         'subject': subject,
@@ -444,15 +462,25 @@ async def getDoesPhoneExist(request: Request):
     phone= data['phone']
     users_ref = db.reference('users/')
     phone_user = users_ref.child(phone).get()  # as a dict
-    boolExist= False
     if phone_user != None:
-        boolExist= True
-    print(type(boolExist))
-    print(boolExist)
-    if boolExist:
         return "true"
     else:
         return "false"
+
+@app.post('/getMapsDataDocs/')
+async def getMapsDataDocs(request: Request):
+    print('enter getMapsDataDocs')
+    docs = dbFs.collection("MapsData").stream()
+    docsList= []
+    for doc in docs:
+        #print(f"{doc.id} => {doc.to_dict()}")
+        dictDoc= doc.to_dict()
+        dictDoc['geoPoint']= str(dictDoc.get('geoPoint').latitude)+','+str(dictDoc.get('geoPoint').latitude)
+        docsList.append(dictDoc)
+        print(dictDoc)
+    return json.dumps(docsList)
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)

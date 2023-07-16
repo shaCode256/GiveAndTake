@@ -47,6 +47,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -277,6 +278,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
         }
+
+        try {
+            getMapsDataDocs();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         new Thread(){
             @Override
             public void run(){
@@ -585,6 +593,52 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     }).start();
                 }
                 //  latch.countDown();
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void getMapsDataDocs() throws InterruptedException {
+        new Thread(() -> {
+            String urlString = IPv4_Address+"getMapsDataDocs/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Map.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            }
+            try {
+                InputStream is = conn.getInputStream();
+                String MapsDataDocs= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                System.out.println("getMapsDataDocs:  "+MapsDataDocs);
+                //JSONArray abc= new JSONArray(MapsDataDocs);
+                //System.out.println("abc:  "+abc);
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
