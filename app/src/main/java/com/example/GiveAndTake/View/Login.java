@@ -52,7 +52,7 @@ public class Login extends AppCompatActivity {
             databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String numericRegex = "[0-9]+";
+                    String numericRegex = "\\d+";
                     String emailRegex= "^(.+)@(\\S+)$" ;
                     if (phoneTxt.matches(emailRegex)){
                         auth.signInWithEmailAndPassword(phoneTxt , passwordTxt).addOnCompleteListener(task -> {

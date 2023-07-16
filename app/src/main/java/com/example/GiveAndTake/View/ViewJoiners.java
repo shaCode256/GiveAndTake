@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class ViewJoiners extends ListActivity {
@@ -91,11 +92,7 @@ public class ViewJoiners extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewJoiners.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewJoiners.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewJoiners.this.runOnUiThread(() -> Toast.makeText(ViewJoiners.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -109,7 +106,7 @@ public class ViewJoiners extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

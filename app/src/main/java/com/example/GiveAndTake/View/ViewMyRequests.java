@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,38 +121,36 @@ public class ViewMyRequests extends ListActivity {
             String [] details= requestInfo.split("\\|");
             String requestId= details[1].replaceAll("\\D", "");
             String docId = markersRequestToDocId.get(requestId);
-            if (requestId != null) {
-                String managerWatching = thisIntent.getStringExtra("managerWatching");
-                if (managerWatching != null && managerWatching.equals("1") && openOrJoinedFlag == 1) {
-                    //it's a manager watching another user's joined requests
-                    //requestUserId= the user the manager views id
+            String managerWatching = thisIntent.getStringExtra("managerWatching");
+            if (managerWatching != null && managerWatching.equals("1") && openOrJoinedFlag == 1) {
+                //it's a manager watching another user's joined requests
+                //requestUserId= the user the manager views id
+                try {
+                    getFinal1(requestId, userId, requestUserId, isManager, docId);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else {
+                if (openOrJoinedFlag == 1 && managerWatching == null) {
+                    //  it's the viewer itself watching it's joined list
                     try {
-                        getFinal1(requestId, userId, requestUserId, isManager, docId);
+                        getFinal2(requestId, userId, requestUserId, isManager, docId);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
-                else {
-                    if (openOrJoinedFlag == 1 && managerWatching == null) {
-                        //  it's the viewer itself watching it's joined list
-                        try {
-                            getFinal2(requestId, userId, requestUserId, isManager, docId);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    else{
-                        try {
-                            getRequestDetails(requestId, userId, requestUserId, isManager, docId);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                else{
+                    try {
+                        getRequestDetails(requestId, userId, requestUserId, isManager, docId);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                 }
-
-                //else, it's open requests of a user, that the user opened, and it's requestUserId
-                //TODO: fix this messy implementation
             }
+
+            //else, it's open requests of a user, that the user opened, and it's requestUserId
+            //TODO: fix this messy implementation
         });
     }
 
@@ -189,11 +188,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -206,7 +201,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException | JSONException e) {
@@ -246,11 +241,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -263,7 +254,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException | JSONException e) {
@@ -302,11 +293,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -320,7 +307,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("blockUnblock", blockUnblock);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -352,11 +339,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -371,7 +354,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -389,8 +372,6 @@ public class ViewMyRequests extends ListActivity {
                 // of a string using substring() method
                 String [] details = stringRequestDetails.split("\\|\\|##");
                 System.out.println("string array: ");
-                requestUserId.replaceAll("\"", "");
-                userId.replaceAll("\"", "");
                 System.out.println(Arrays.toString(details));
                 String requestSubject= details[1];
                 String requestBody= details[0].substring(1);
@@ -398,15 +379,15 @@ public class ViewMyRequests extends ListActivity {
                 String requestLatitude= details[4];
                 String requestLongitude= details[3];
                 String creationTime= details[5].substring(1,details[5].length()-1);
-                contactDetails.replaceAll("\"", "");
+                contactDetails= contactDetails.replaceAll("\"", "");
                 Intent viewRequestIntent = new Intent(ViewMyRequests.this, ViewRequest.class);
                 viewRequestIntent.putExtra("requestSubject", requestSubject);
                 viewRequestIntent.putExtra("requestBody", requestBody);
-                viewRequestIntent.putExtra("contactDetails", contactDetails.replaceAll("\"", ""));
+                viewRequestIntent.putExtra("contactDetails", (contactDetails.replaceAll("\"", "")));
                 viewRequestIntent.putExtra("requestLatitude", requestLatitude);
                 viewRequestIntent.putExtra("requestLongitude", requestLongitude);
-                viewRequestIntent.putExtra("requestUserId", requestUserId);
-                viewRequestIntent.putExtra("userId", userId);
+                viewRequestIntent.putExtra("requestUserId", (requestUserId.replaceAll("\"", "")));
+                viewRequestIntent.putExtra("userId", (userId.replaceAll("\"", "")));
                 viewRequestIntent.putExtra("isManager", isManager);
                 viewRequestIntent.putExtra("docId", docId);
                 viewRequestIntent.putExtra("requestId", requestId);
@@ -430,11 +411,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -449,7 +426,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -490,11 +467,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -509,7 +482,7 @@ public class ViewMyRequests extends ListActivity {
                 json.put("requestUserId", requestUserId.replaceAll("\"", ""));
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

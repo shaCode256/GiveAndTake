@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,11 +104,7 @@ public class ViewReportedRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewReportedRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewReportedRequests.this.runOnUiThread(() -> Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -122,7 +119,7 @@ public class ViewReportedRequests extends ListActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -180,11 +177,7 @@ public class ViewReportedRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewReportedRequests.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewReportedRequests.this.runOnUiThread(() -> Toast.makeText(ViewReportedRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -196,7 +189,7 @@ public class ViewReportedRequests extends ListActivity {
                 JSONObject json = new JSONObject();
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

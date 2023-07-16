@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class Settings extends AppCompatActivity {
     String IPv4_Address= "http://10.0.0.3:8000/";
@@ -65,9 +66,7 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        turnOnAutoDetectLocationBtn.setOnClickListener(view -> {
-            turnOnOffAutoDetectLocation(userId, "1");
-        });
+        turnOnAutoDetectLocationBtn.setOnClickListener(view -> turnOnOffAutoDetectLocation(userId, "1"));
 
         useSpecifiedLocationBtn.setOnClickListener(view -> {
             // get data from EditTexts into String variables
@@ -102,14 +101,10 @@ public class Settings extends AppCompatActivity {
             startActivity(newIntent);
         });
 
-        turnOnNotificationsBtn.setOnClickListener(view -> {
-                    sendTurnOnOffNotifications(userId, "1");
-                }
+        turnOnNotificationsBtn.setOnClickListener(view -> sendTurnOnOffNotifications(userId, "1")
         );
 
-        turnOffNotificationsBtn.setOnClickListener(view -> {
-            sendTurnOnOffNotifications(userId, "0");
-        });
+        turnOffNotificationsBtn.setOnClickListener(view -> sendTurnOnOffNotifications(userId, "0"));
 
         useCurrLocationBtn.setOnClickListener(view -> {
             // get curr location
@@ -151,11 +146,7 @@ public class Settings extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Settings.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Settings.this.runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -170,7 +161,7 @@ public class Settings extends AppCompatActivity {
                 json.put("longitude", location.getLongitude());
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -204,11 +195,7 @@ public class Settings extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Settings.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Settings.this.runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -222,7 +209,7 @@ public class Settings extends AppCompatActivity {
                 json.put("onOff", onOff);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -256,11 +243,7 @@ public class Settings extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Settings.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Settings.this.runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -275,7 +258,7 @@ public class Settings extends AppCompatActivity {
                 json.put("longitude", location.getLongitude());
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -309,11 +292,7 @@ public class Settings extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Settings.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Settings.this.runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -327,7 +306,7 @@ public class Settings extends AppCompatActivity {
                 json.put("onOff", onOff);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -361,11 +340,7 @@ public class Settings extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Settings.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Settings.this.runOnUiThread(() -> Toast.makeText(Settings.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -379,7 +354,7 @@ public class Settings extends AppCompatActivity {
                 json.put("distance", distance);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

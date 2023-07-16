@@ -38,6 +38,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhone extends AppCompatActivity {
@@ -166,7 +167,7 @@ public class VerifyPhone extends AppCompatActivity {
             startActivity(loginIntent);
     }
 
-    public void checkIfPhoneExist(String phone) throws InterruptedException {
+    public void checkIfPhoneExist(String phone) {
         new Thread(() -> {
             String urlString = IPv4_Address+"getDoesPhoneExist/";
             URL url = null;
@@ -187,7 +188,7 @@ public class VerifyPhone extends AppCompatActivity {
                 json.put("phone", phone);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

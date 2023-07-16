@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class ViewRequest extends AppCompatActivity {
     String IPv4_Address= "http://10.0.0.3:8000/";
@@ -163,9 +164,7 @@ public class ViewRequest extends AppCompatActivity {
             startActivity(viewJoinersIntent);
         });
 
-        btnReportRequest.setOnClickListener(v -> {
-            reportRequest(requestId,userId, requestUserId);
-        });
+        btnReportRequest.setOnClickListener(v -> reportRequest(requestId,userId, requestUserId));
 
         btnUnReportRequest.setOnClickListener(v -> {
             //unreport request by server
@@ -182,11 +181,7 @@ public class ViewRequest extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewRequest.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewRequest.this.runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't delete the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -201,7 +196,7 @@ public class ViewRequest extends AppCompatActivity {
                 json.put("docId", docId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -239,11 +234,7 @@ public class ViewRequest extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewRequest.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't report the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewRequest.this.runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't report the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -258,7 +249,7 @@ public class ViewRequest extends AppCompatActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -291,11 +282,7 @@ public class ViewRequest extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewRequest.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't unreport the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewRequest.this.runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't unreport the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -309,7 +296,7 @@ public class ViewRequest extends AppCompatActivity {
                 json.put("userId", userId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -342,11 +329,7 @@ public class ViewRequest extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewRequest.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't join the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewRequest.this.runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't join the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -361,7 +344,7 @@ public class ViewRequest extends AppCompatActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -394,11 +377,7 @@ public class ViewRequest extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewRequest.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ViewRequest.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ViewRequest.this.runOnUiThread(() -> Toast.makeText(ViewRequest.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -413,7 +392,7 @@ public class ViewRequest extends AppCompatActivity {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

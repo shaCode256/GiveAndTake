@@ -52,8 +52,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -230,7 +230,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 // on below line we are getting the
                 // location name from search view.
 
-                String location= "";
+                String location;
                 location = searchView.getQuery().toString();
 
                 // below line is to create a list of address
@@ -368,11 +368,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Map.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -387,7 +383,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 json.put("requestUserId", requestUserId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -422,11 +418,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 viewRequestIntent.putExtra("docId", docId);
                 viewRequestIntent.putExtra("requestId", requestId);
                 viewRequestIntent.putExtra("creationTime", creationTime);
-                Map.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        loadingPanel.setVisibility(View.GONE);
-                    }
-                });
+                Map.this.runOnUiThread(() -> loadingPanel.setVisibility(View.GONE));
                 startActivity(viewRequestIntent);
             } catch (IOException e) {
                 System.out.println("error3");
@@ -447,11 +439,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Map.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -465,7 +453,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 json.put("time", time);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -496,11 +484,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Map.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -513,7 +497,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 json.put("userId", userId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -527,14 +511,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 isNotificationsTurnedOn= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
                 if(isNotificationsTurnedOn.equals("\"1\"")){
-                    new Thread(() -> {
-                        startNotificationService();
-                    }).start();
+                    new Thread(this::startNotificationService).start();
                 }
                 else{
-                    new Thread(() -> {
-                        stopNotificationService();
-                    }).start();
+                    new Thread(this::stopNotificationService).start();
                 }
                 //  latch.countDown();
             } catch (IOException e) {
@@ -553,11 +533,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                Map.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -569,7 +545,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 JSONObject json = new JSONObject();
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
@@ -616,9 +592,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     }
                     });
                 }
-                } catch (JSONException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+                } catch (JSONException | IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();

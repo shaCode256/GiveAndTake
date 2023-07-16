@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,8 +35,6 @@ public class ManageUsers extends ListActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
     ArrayList<String> usersInfo= new ArrayList<>();
-    HashMap<String, String> usersInfoToId= new HashMap<>();
-
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -99,11 +98,7 @@ public class ManageUsers extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ManageUsers.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ManageUsers.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ManageUsers.this.runOnUiThread(() -> Toast.makeText(ManageUsers.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -116,7 +111,7 @@ public class ManageUsers extends ListActivity {
                 json.put("request", "request");
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {

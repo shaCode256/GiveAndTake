@@ -26,7 +26,6 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.json.JSONException;
@@ -39,8 +38,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -53,9 +52,7 @@ public class RequestCreation extends AppCompatActivity {
 
         //TODO: what happens when we create a request in the same place?
         Intent thisIntent = getIntent();
-        FirebaseFirestore markersDb = FirebaseFirestore.getInstance();
         String userId = thisIntent.getStringExtra("userId");
-        String requestUserId = thisIntent.getStringExtra("requestUserId");
         String isManager = thisIntent.getStringExtra("isManager");
         String clickedLat = thisIntent.getStringExtra("clickedLat");
         String clickedLong = thisIntent.getStringExtra("clickedLong");
@@ -90,27 +87,25 @@ public class RequestCreation extends AppCompatActivity {
                 List<Address> addressList = null;
 
                 // checking if the entered location is null or not.
-                if (location != null || location.equals("")) {
-                    // on below line we are creating and initializing a geo coder.
-                    Geocoder geocoder = new Geocoder(RequestCreation.this);
-                    try {
-                        // on below line we are getting location from the
-                        // location name and adding that location to address list.
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if(addressList!= null && addressList.size()!=0) {
+                // on below line we are creating and initializing a geo coder.
+                Geocoder geocoder = new Geocoder(RequestCreation.this);
+                try {
+                    // on below line we are getting location from the
+                    // location name and adding that location to address list.
+                    addressList = geocoder.getFromLocationName(location, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(addressList!= null && addressList.size()!=0) {
 
-                        // on below line we are getting the location
-                        // from our list a first position.
-                        Address address = addressList.get(0);
+                    // on below line we are getting the location
+                    // from our list a first position.
+                    Address address = addressList.get(0);
 
-                        // on below line we are creating a variable for our location
-                        // where we will add our locations latitude and longitude.
-                        longitudeInput.setText(String.valueOf(address.getLongitude()));
-                        latitudeInput.setText(String.valueOf(address.getLatitude()));
-                    }
+                    // on below line we are creating a variable for our location
+                    // where we will add our locations latitude and longitude.
+                    longitudeInput.setText(String.valueOf(address.getLongitude()));
+                    latitudeInput.setText(String.valueOf(address.getLatitude()));
                 }
                 return false;
             }
@@ -162,10 +157,9 @@ public class RequestCreation extends AppCompatActivity {
                             creationTime = LocalDateTime.now().toString();
                         }
                         GeoPoint geoPointRequest = new GeoPoint(doubleLatitude, doubleLongitude);
-                        String finalSetRequestId = setRequestId;
                         String finalCreationTime = creationTime;
                        //  //Add by server
-                        postRequest(finalSetRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, requestUserId, isManager, markersDb);
+                        postRequest(setRequestId, bodyTxt, userId, subjectTxt, contactDetailsTxt, String.valueOf(geoPointRequest.getLatitude()), String.valueOf(geoPointRequest.getLongitude()), finalCreationTime, isManager);
                     } else {
                         Toast.makeText(RequestCreation.this, "Please fill in valid longitude (-180 to 180) and latitude (-90 to 90)", Toast.LENGTH_SHORT).show();
                     }
@@ -223,7 +217,7 @@ public class RequestCreation extends AppCompatActivity {
     }
 
 
-    public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String requestUserId, String isManager, FirebaseFirestore markersDb) {
+    public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String isManager) {
         new Thread(() -> {
             String urlString = IPv4_Address+"postRequest/";
             //Wireless LAN adapter Wi-Fi:
@@ -235,11 +229,7 @@ public class RequestCreation extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                RequestCreation.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                RequestCreation.this.runOnUiThread(() -> Toast.makeText(RequestCreation.this, "Server is down, can't upload new request. please contact Shavit", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -260,7 +250,7 @@ public class RequestCreation extends AppCompatActivity {
                 json.put("locationLang", locationLang);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             } catch (IOException e) {
