@@ -46,22 +46,22 @@ async def submit(request: Request):
     print(userId)
     users_ref = db.reference('users/')
 
-    # check if a marker with same coordinates already exists, if so assign a different close free location
-    coordinate_offset = 0.00002
-    positions = []
-
-    docs = dbFs.collection("MapsData").stream()
-    for doc in docs:
-        #print(f"{doc.id} => {doc.to_dict()}")
-        positions.append(doc.to_dict().get('geoPoint'))
-
-    newGeoPoint= GeoPoint(float(locationLat), float(locationLang))
-    while (newGeoPoint in positions):
-        locationLang*= (1+coordinate_offset)
-        newGeoPoint = GeoPoint(float(locationLat), float(locationLang))
-
-    locationLat= newGeoPoint.latitude
-    locationLang= newGeoPoint.longitude
+    # # check if a marker with same coordinates already exists, if so assign a different close free location
+    # coordinate_offset = 0.00002
+    # positions = []
+    #
+    # docs = dbFs.collection("MapsData").stream()
+    # for doc in docs:
+    #     #print(f"{doc.id} => {doc.to_dict()}")
+    #     positions.append(doc.to_dict().get('geoPoint'))
+    #
+    # newGeoPoint= GeoPoint(float(locationLat), float(locationLang))
+    # while (newGeoPoint in positions):
+    #     locationLang*= (1+coordinate_offset)
+    #     newGeoPoint = GeoPoint(float(locationLat), float(locationLang))
+    #
+    # locationLat= newGeoPoint.latitude
+    # locationLang= newGeoPoint.longitude
 
     request_ref = users_ref.child(userId).child("requestId").child(requestId)
     request_ref.update({
