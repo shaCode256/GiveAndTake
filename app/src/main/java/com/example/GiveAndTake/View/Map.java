@@ -40,7 +40,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,7 +64,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     static String [] details;
     boolean isRunning= true;
-    FirebaseFirestore db;
 
     //  CountDownLatch latch = new CountDownLatch(1);
 
@@ -96,7 +94,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         ImageView logOutBtn= findViewById(R.id.log_out_btn);
         ImageView settingsBtn= findViewById(R.id.btn_settings);
         ImageView manageUsersBtn= findViewById(R.id.manage_users_btn);
-        db = FirebaseFirestore.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
