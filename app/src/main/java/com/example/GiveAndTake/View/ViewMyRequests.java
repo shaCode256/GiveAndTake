@@ -103,6 +103,7 @@ public class ViewMyRequests extends ListActivity {
         btnBlockUser.setOnClickListener(view -> {
             try {
                 blockUnblockUser(requestUserId, "1");
+                Toast.makeText(ViewMyRequests.this, "Blocked user successfully", Toast.LENGTH_SHORT).show();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -111,6 +112,7 @@ public class ViewMyRequests extends ListActivity {
         btnUnblockUser.setOnClickListener(view -> {
             try {
                 blockUnblockUser(requestUserId, "0");
+                Toast.makeText(ViewMyRequests.this, "Unblocked user successfully", Toast.LENGTH_SHORT).show();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -339,7 +341,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -411,7 +413,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -467,7 +469,7 @@ public class ViewMyRequests extends ListActivity {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
+                ViewMyRequests.this.runOnUiThread(() -> Toast.makeText(ViewMyRequests.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
