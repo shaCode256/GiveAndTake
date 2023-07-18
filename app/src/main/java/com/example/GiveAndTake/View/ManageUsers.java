@@ -30,7 +30,7 @@ import java.util.HashMap;
 
 public class ManageUsers extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -89,7 +89,7 @@ public class ManageUsers extends ListActivity {
 
     public void addToUsersInfo() throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getUsers/";
+            String urlString = server_url +"getUsers/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;

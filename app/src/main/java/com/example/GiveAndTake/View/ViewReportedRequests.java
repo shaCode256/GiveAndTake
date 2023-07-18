@@ -33,7 +33,7 @@ public class ViewReportedRequests extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
 
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
@@ -95,7 +95,7 @@ public class ViewReportedRequests extends ListActivity {
 
     public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getRequestDetails/";
+            String urlString = server_url +"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -167,7 +167,7 @@ public class ViewReportedRequests extends ListActivity {
 
     public void addToReportsInfo() throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getReportedRequests/";
+            String urlString = server_url +"getReportedRequests/";
             //Wireless LAN adapter Wi-Fi:
             System.out.println("inAddToJoiners");
             // IPv4 Address

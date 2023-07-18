@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,7 +219,7 @@ public class RequestCreation extends AppCompatActivity {
 
     public void postRequest(String requestId, String body, String userId, String subject, String contactDetails, String locationLat, String locationLang, String creationTime, String isManager) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"postRequest/";
+            String urlString = server_url +"postRequest/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
 

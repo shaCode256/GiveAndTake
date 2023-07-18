@@ -32,7 +32,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class ViewRequest extends AppCompatActivity {
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,7 +174,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void deleteRequest(String userId, String requestId, String docId, String isManager) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"delete/";
+            String urlString = server_url +"delete/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -227,7 +227,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void reportRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"report/";
+            String urlString = server_url +"report/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -275,7 +275,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void unReportRequest(String requestId, String userId) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"unReport/";
+            String urlString = server_url +"unReport/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -322,7 +322,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void joinRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"join/";
+            String urlString = server_url +"join/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -370,7 +370,7 @@ public class ViewRequest extends AppCompatActivity {
 
     public void unJoinRequest(String requestId, String userId, String requestUserId) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"unJoin/";
+            String urlString = server_url +"unJoin/";
             URL url = null;
             try {
                 url = new URL(urlString);

@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class ViewMyRequests extends ListActivity {
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();
@@ -179,7 +179,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void addToMyOpenRequestsInfo(String requestUserId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getOpenRequests/";
+            String urlString = server_url +"getOpenRequests/";
             System.out.println("inAddToOpenRequests");
             // IPv4 Address
             URL url = null;
@@ -231,7 +231,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void addToRequestsUserJoined(String requestUserId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getJoinedRequests/";
+            String urlString = server_url +"getJoinedRequests/";
             //Wireless LAN adapter Wi-Fi:
             System.out.println("inAddToRequestsUserJoined");
             // IPv4 Address
@@ -284,7 +284,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void blockUnblockUser(String userId, String blockUnblock) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"blockUnblockUser/";
+            String urlString = server_url +"blockUnblockUser/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -330,7 +330,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getRequestDetails/";
+            String urlString = server_url +"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -403,7 +403,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void getFinal1(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getFinal1/";
+            String urlString = server_url +"getFinal1/";
             System.out.println("inget1");
             URL url = null;
             try {
@@ -458,7 +458,7 @@ public class ViewMyRequests extends ListActivity {
 
     public void getFinal2(String requestId, String userId, String requestUserId, String isManager, String docId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getFinal2/";
+            String urlString = server_url +"getFinal2/";
             System.out.println("inget2");
             // IPv4 Address
             URL url = null;

@@ -60,7 +60,7 @@ import java.util.Objects;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
-    String IPv4_Address= "http://10.0.0.3:8000/";
+    String server_url = "http://10.0.0.3:8000/";
     private GoogleMap mMap;
     static String [] details;
     boolean isRunning= true;
@@ -356,7 +356,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     public void getRequestDetails(String requestId, String userId, String requestUserId, String isManager, String docId, RelativeLayout loadingPanel) throws InterruptedException {
         loadingPanel.setVisibility(View.VISIBLE);
         new Thread(() -> {
-            String urlString = IPv4_Address+"getRequestDetails/";
+            String urlString = server_url +"getRequestDetails/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -427,7 +427,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void setLastTimeSeenMap(String userId, String time) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"setLastTimeSeenMap/";
+            String urlString = server_url +"setLastTimeSeenMap/";
             //Wireless LAN adapter Wi-Fi:
             // IPv4 Address
             URL url = null;
@@ -474,7 +474,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void checkIfToStartNotificationService(String userId) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getIsNotificationsTurnedOn/";
+            String urlString = server_url +"getIsNotificationsTurnedOn/";
             URL url = null;
             try {
                 url = new URL(urlString);
@@ -523,7 +523,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void getMapsDataDocs(GoogleMap mMap) throws InterruptedException {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getMapsDataDocs/";
+            String urlString = server_url +"getMapsDataDocs/";
             URL url = null;
             try {
                 url = new URL(urlString);
