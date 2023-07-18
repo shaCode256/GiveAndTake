@@ -326,7 +326,7 @@ public class Settings extends AppCompatActivity {
                 showServerDownToast();
             }
         }).start();
-        Toast.makeText(Settings.this, "Set use curr location successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(Settings.this, "Set auto detect location successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void sendKmDistance(String userId, String distance) {

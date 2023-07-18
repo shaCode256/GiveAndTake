@@ -111,6 +111,7 @@ public class NotificationService extends Service {
     private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance, HashMap<String, HashMap<LatLng, String>> markersHashmap, String autoDetectLocation, GeoPoint specificLocation) {
         AtomicReference<Location> setLocation= new AtomicReference<>();
                     if (autoDetectLocation!= null && autoDetectLocation.equals("1") || specificLocation == null) {
+                        System.out.println("autoDetect is On");
                         if (
                                 ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -134,6 +135,7 @@ public class NotificationService extends Service {
                         }
                     }
                     else {
+                        System.out.println("autoDetect is Off");
                         //get the specific location
                         Location location = new Location(LocationManager.GPS_PROVIDER);
                         location.setLongitude(specificLocation.getLongitude());
@@ -260,7 +262,6 @@ public class NotificationService extends Service {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -288,6 +289,8 @@ public class NotificationService extends Service {
                 InputStream is = conn.getInputStream();
                 String isAutoDetectLocation= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
+                isAutoDetectLocation= isAutoDetectLocation.substring(1,isAutoDetectLocation.length()-1);
+                System.out.println("isAutoDetectLocation: "+isAutoDetectLocation);
                 getSpecificLocation(userId, isAutoDetectLocation);
                 }
             catch (IOException | InterruptedException e) {

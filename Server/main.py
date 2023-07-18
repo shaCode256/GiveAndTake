@@ -336,7 +336,7 @@ async def getDistance(request: Request):
     data = orjson.loads(body)
     userId = data['userId']
     users_ref = db.reference('users/')
-    distance = str(    users_ref.child(userId).child("settings").child("notifications").child("distance").get())
+    distance = str(users_ref.child(userId).child("settings").child("notifications").child("distance").get())
     print("distance is: "+distance)
     return distance
 
