@@ -6,12 +6,18 @@ import orjson
 import firebase_admin
 from firebase_admin import credentials, db, firestore
 from google.cloud.firestore import GeoPoint
+from firebase_admin import auth
+
+
+import re
+
+emailRegex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
 
 # Use Firebase Real Time db
 cred = credentials.Certificate("serviceAccountKey.json")
 
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://giveandtake-31249-default-rtdb.firebaseio.com'
+    'databaseURL': 'https://giveandtake-31249-default-rtdb.firebaseio.com',
 })
 
 # Use Cloud Firestore db
@@ -351,6 +357,29 @@ async def blockUnblockUser(request: Request):
     users_ref = db.reference('users/')
     users_ref.child(userId).child("isBlocked").set(blockUnblock);
 
+@app.post('/getIsBlocked/')
+async def getIsBlocked(request: Request):
+    print('enter getIsBlocked')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    return users_ref.child(userId).child("isBlocked").get()
+
+@app.post('/getIsPhoneVerified/')
+async def getIsPhoneVerified(request: Request):
+    print('enter getIsPhoneVerified')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    return users_ref.child(userId).child("isPhoneVerified").get()
+
+
+
+
 @app.post('/getFinal1/')
 async def getFinal1(request: Request):
     print('enter getFinal1')
@@ -519,7 +548,74 @@ async def getMapsDataDocs(request: Request):
     print(str(docsList))
     return docsList
 
+@app.post('/login/')
+async def login(request: Request):
+    print('Enter log in')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    emailOrPhone= data['email']
+    password= data['password']
+    users_ref = db.reference('users/')
 
+    #if it's an email:
+    if isEmail(emailOrPhone):
+        try:
+            login = auth.sign_in_with_email_and_password(emailOrPhone, password)
+            if auth.currentUser.emailVerified:
+                print("verify phone now")
+                return "verify phone now"
+            else:
+                print("email is not verified")
+                return("email is not verified")
+        except Exception as e:
+            exception = str(e)
+            return exception
+
+    if emailOrPhone.isnumeric() and users_ref.child(emailOrPhone) is not None:
+        if users_ref.child(emailOrPhone).child("isBlocked").get() is "0":
+            email= users_ref.child(emailOrPhone).child("email").get()
+            try:
+                login = auth.sign_in_with_email_and_password(email, password)
+                if auth.currentUser.emailVerified:
+                    if users_ref.child(emailOrPhone).child("isPhoneVerified").get() is "1":
+                        print("success, returning is manager value")
+                        return users_ref.child(emailOrPhone).child("isManager").get()
+                    else:
+                        return("Please log in with email and verify your phone.")
+            except Exception as e:
+                exception = str(e)
+                print(exception)
+                return exception
+        else:
+            return "blocked"
+    else:
+        return "Wrong details. try again?"
+    return "error! contact admin"
+
+#Signup Function
+@app.post('/register/')
+async def register(request: Request):
+    print('Enter Register')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    email= data['email']
+    password= data['password']
+    try:
+        user = auth.create_user_with_email_and_password(email, password)
+        firebase_admin.auth.generate_email_verification_link(email, action_code_settings=None, app=None)
+    except Exception as e:
+        exception = str(e)
+        return exception
+    return
+
+
+def isEmail(email):
+    if re.fullmatch(emailRegex, email):
+      return True
+    else:
+      return False
 
 if __name__ == "__main__":
     uvicorn.run(app, host="10.0.0.3", port=8000)
