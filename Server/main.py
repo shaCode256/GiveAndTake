@@ -302,6 +302,44 @@ async def getIsNotificationsTurnedOn(request: Request):
     notificationsTurnedOn = str(users_ref.child(userId).child("settings").child("notifications").child("turnedOn").get())
     return notificationsTurnedOn
 
+@app.post('/getIsAutoDetectLocation/')
+async def getIsAutoDetectLocation(request: Request):
+    print('enter getIsAutoDetectLocation')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    isOn = str(users_ref.child(userId).child("settings").child("notifications").child("autoDetectLocation").get())
+    print("isOn: "+isOn)
+    return isOn
+
+@app.post('/getSpecificLocation/')
+async def getSpecificLocation(request: Request):
+    print('enter getSpecificLocation')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    location_lat = str(users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('latitude').get())
+    location_long = str(users_ref.child(userId).child("settings").child("notifications").child("specificLocation").child('longitude').get())
+    location= location_lat+","+location_long
+    print("location is: "+location)
+    return location
+
+@app.post('/getDistance/')
+async def getDistance(request: Request):
+    print('enter getDistance')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    userId = data['userId']
+    users_ref = db.reference('users/')
+    distance = str(    users_ref.child(userId).child("settings").child("notifications").child("distance").get())
+    print("distance is: "+distance)
+    return distance
+
 @app.post('/blockUnblockUser/')
 async def blockUnblockUser(request: Request):
     print('enter getIsNotificationsTurnedOn')

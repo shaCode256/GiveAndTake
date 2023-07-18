@@ -1,7 +1,5 @@
 package com.example.giveandtake.Service;
 
-import static android.content.ContentValues.TAG;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -11,10 +9,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -26,15 +22,21 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -48,9 +50,10 @@ public class NotificationService extends Service {
     String userId= "";
     String isManager="";
     String lastTimeSeenMapStr;
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
 
-    public void onCreate(Intent intent, int flags, int startId) {
+    String server_url = "http://10.0.0.3:8000/";
+
+    public void onCreate(int startId) {
         super.onCreate();
         Intent mapIntent = new Intent(this, Map.class);
         mapIntent.putExtra("userId", userId);
@@ -93,47 +96,21 @@ public class NotificationService extends Service {
         TimerTask myTask = new TimerTask () {
             @Override
             public void run() {
-                HashMap<String, HashMap<LatLng, String>> markersHashmap = new HashMap<>();
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("MapsData")
-                        .addSnapshotListener((value, e) -> {
-                                    if (e != null) {
-                                        Log.w(TAG, "Listen failed.", e);
-                                        return;
-                                    }
-                                    assert value != null;
-                                    for (QueryDocumentSnapshot doc : value) {
-                                        if (doc.get("geoPoint") != null) {
-                                            //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
-                                            GeoPoint geoPoint = doc.getGeoPoint("geoPoint");
-                                            assert geoPoint != null;
-                                            LatLng markerLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                                            String requestId = doc.getString("requestId");
-                                       //     String requestUserId = doc.getString("userId");
-                                            String creationTime = doc.getString("creationTime");
-                                            //to check if requestUseId is manager: change the icon
-                                            markersHashmap.put(requestId, new HashMap<>());
-                                            markersHashmap.get(requestId).put(markerLocation, creationTime);
-                                        }
-                                    }
-                                }
-                        );
-                createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f, markersHashmap);
+                try {
+                    getIsAutoDetectLocation(userId); //start chain process: get isAutoDetectlocation, specified distance, location, start searching
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         };
-        myTimer.scheduleAtFixedRate(myTask, 0l, 1 * (60*1000)); // Runs every 1 min
+        myTimer.scheduleAtFixedRate(myTask, 0L, (60 * 1000)); // Runs every 1 min
         return START_NOT_STICKY;
     }
 
     @SuppressLint("MissingPermission")
-    private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance, HashMap<String, HashMap<LatLng, String>> markersHashmap) {
+    private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance, HashMap<String, HashMap<LatLng, String>> markersHashmap, String autoDetectLocation, GeoPoint specificLocation) {
         AtomicReference<Location> setLocation= new AtomicReference<>();
-        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(userId).child("settings").child("notifications").child("autoDetectLocation").getValue()!=null) {
-                    String autoDetectLocation = snapshot.child(userId).child("settings").child("notifications").child("autoDetectLocation").getValue().toString();
-                    if (autoDetectLocation.equals("1") || snapshot.child(userId).child("settings").child("notifications").child("specificLocation").getValue() == null) {
+                    if (autoDetectLocation!= null && autoDetectLocation.equals("1") || specificLocation == null) {
                         if (
                                 ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -147,52 +124,25 @@ public class NotificationService extends Service {
                                     .addOnSuccessListener(location -> {
                                         if (location != null) {
                                             setLocation.set(location);
-                                            if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
-                                                float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
-                                                showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
-                                            }
-                                            else{
-                                                if(setLocation.get()!=null) {
-                                                    showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
-                                                }
-                                            }
-                                        } else {
-                                            Toast.makeText(NotificationService.this, "Can't use your location. turn on location services or enable location tracking in clicking on this app-> settings -> permissions -> location -> all the time", Toast.LENGTH_LONG).show();                                        }
+                                            float distanceSpecified= distance *1000;
+                                            showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
+                                        }
+                                        else {
+                                            Toast.makeText(NotificationService.this, "Can't use your location. turn on location services or enable location tracking in clicking on this app-> settings -> permissions -> location -> all the time", Toast.LENGTH_LONG).show();
+                                        }
                                     });
                         }
                     }
-                    else{
-                        //get the specific location2
-                        String specifiedLatitudeStr = snapshot.child(userId).child("settings").child("notifications").child("specificLocation").child("latitude").getValue().toString();
-                        String specifiedLongitudeStr = snapshot.child(userId).child("settings").child("notifications").child("specificLocation").child("longitude").getValue().toString();
-                        Location location= new Location(LocationManager.GPS_PROVIDER);
-                        location.setLongitude(Float.parseFloat(specifiedLatitudeStr));
-                        location.setLatitude(Float.parseFloat(specifiedLongitudeStr));
+                    else {
+                        //get the specific location
+                        Location location = new Location(LocationManager.GPS_PROVIDER);
+                        location.setLongitude(specificLocation.getLongitude());
+                        location.setLatitude(specificLocation.getLatitude());
                         setLocation.set(location);
-                        if(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue()!=null){
-                            float distanceSpecified= Float.parseFloat(snapshot.child(userId).child("settings").child("notifications").child("distance").getValue().toString()) *1000;
-                            showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
-                        }
-                        else{
-                            if(setLocation.get()!=null) {
-                                showMarkersClose(setLocation.get(), distance, lastTimeSeenMapStr, userId, isManager, markersHashmap);
-                            }
-                        }
+                        float distanceSpecified = distance * 1000;
+                        showMarkersClose(setLocation.get(), distanceSpecified, lastTimeSeenMapStr, userId, isManager, markersHashmap);
                     }
-
-
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-
     }
-
     private void showMarkersClose(Location location, float distance, String lastTimeSeenMapStr, String userId, String isManager,   HashMap<String, HashMap<LatLng, String>> markersHashmap) {
         //Listen to multiple documents in a collection. adds markers of the requests in the db (docs)
         for(HashMap<LatLng, String> marker : markersHashmap.values()) {
@@ -207,8 +157,7 @@ public class NotificationService extends Service {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
                 LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 LocalDateTime lastTimeSeenMap = LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (location!=null && markerLocation!=null && location.distanceTo(markerLocation) <= distance &&
-                        markerDateTime.isAfter(lastTimeSeenMap)) {
+                if (location != null && location.distanceTo(markerLocation) <= distance && markerDateTime.isAfter(lastTimeSeenMap)) {
                     // Create an explicit intent for an Activity in your app
                     Intent mapIntent = new Intent(this, Map.class);
                     mapIntent.putExtra("userId", userId);
@@ -239,4 +188,162 @@ public class NotificationService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    public void getMapsDataDocs(String isAutoDetectLocation, GeoPoint specificLocation) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = server_url +"getMapsDataDocs/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+             //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
+            }
+            HttpURLConnection conn = null;
+            try {
+                assert url != null;
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            }
+            try {
+                assert conn != null;
+                InputStream is = conn.getInputStream();
+                HashMap<String, HashMap<LatLng, String>> markersHashmap = new HashMap<>();
+                String info= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                info= info.substring(2,info.length()-2);
+                for (String docStr:
+                        info.split(("\\|\\|##"))) {
+                    if (docStr.startsWith("\",\"")) {
+                        docStr = docStr.substring(3);
+                    }
+                    JSONObject doc = new JSONObject(docStr);
+                    //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
+                    String geoPointStr = (String) doc.get("geoPoint");
+                    String[] geoPointParse = geoPointStr.split(",");
+                    LatLng location = new LatLng(Double.parseDouble(geoPointParse[0]), Double.parseDouble(geoPointParse[1]));
+                    String requestId = doc.getString("requestId");
+                    String creationTime = doc.getString("creationTime");
+                        //TODO: add a check id geoPoint is an instance of GeoPoint class! throws exception if not.
+                    GeoPoint geoPoint = new GeoPoint(location.latitude, location.longitude);
+                    LatLng markerLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                        //to check if requestUseId is manager: change the icon
+                    markersHashmap.put(requestId, new HashMap<>());
+                    markersHashmap.get(requestId).put(markerLocation, creationTime);
+                    createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f, markersHashmap, isAutoDetectLocation, specificLocation);
+                }
+            } catch (JSONException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    public void getIsAutoDetectLocation(String userId) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = server_url +"getIsAutoDetectLocation/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
+            }
+            HttpURLConnection conn = null;
+            try {
+                assert url != null;
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                assert conn != null;
+                InputStream is = conn.getInputStream();
+                String isAutoDetectLocation= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                getSpecificLocation(userId, isAutoDetectLocation);
+                }
+            catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    public void getSpecificLocation(String userId, String isAutoDetectLocation) throws InterruptedException {
+        new Thread(() -> {
+            String urlString = server_url +"getSpecificLocation/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
+            }
+            HttpURLConnection conn = null;
+            try {
+                assert url != null;
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                assert conn != null;
+                InputStream is = conn.getInputStream();
+                String location= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                location= location.substring(1,location.length()-2);
+                String [] locationArray= location.split(",");
+                GeoPoint specificLocation = new GeoPoint(Double.parseDouble(locationArray[0]), Double.parseDouble(locationArray[1]));
+                getMapsDataDocs(isAutoDetectLocation, specificLocation);
+                }
+             catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+
+
 }
