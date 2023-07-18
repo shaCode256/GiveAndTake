@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.giveandtake.R;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,9 +21,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class Login extends AppCompatActivity {
+
+    String server_url = "http://10.0.0.3:8000/";
 
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
     private FirebaseAuth auth;
@@ -140,4 +155,85 @@ public class Login extends AppCompatActivity {
             }
         }).addOnFailureListener(e -> Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+
+
+    public void login(String email, String password) {
+        new Thread(() -> {
+            String urlString = server_url +"login/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Server is down, can't unjoin the request. Please contact admin", Toast.LENGTH_SHORT).show());
+            }
+            HttpURLConnection conn = null;
+            try {
+                assert url != null;
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("email", email);
+                json.put("password", password);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert conn != null;
+                InputStream is = conn.getInputStream();
+                String result = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                switch (result) {
+                    case "1":
+                    case "0":  //success. login the user
+                        //log the user in
+                        Intent thisIntent = new Intent(Login.this, Map.class);
+                        thisIntent.putExtra("userId", email);
+                        thisIntent.putExtra("isManager", result);
+                        startActivity(thisIntent);
+                        finish();
+                        break;
+                    case "verify phone now":  //phone isn't verified
+                        Toast.makeText(Login.this, "Please verify your phone", Toast.LENGTH_SHORT).show();
+                        Intent verifyPhoneIntent = new Intent(Login.this, VerifyPhone.class);
+                        verifyPhoneIntent.putExtra("emailTxt", email);
+                        startActivity(verifyPhoneIntent);
+                        finish();
+                        break;
+                    case "email is not verified":  //email isn't verified
+                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Please click on the verification link sent to your email or click forgot password", Toast.LENGTH_SHORT).show());
+                        break;
+                    case "blocked":
+                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show());
+                        break;
+                    default:  //other error, coming from server
+                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, result, Toast.LENGTH_SHORT).show());
+                        break;
+                }
+            } catch (IOException e) {
+                System.out.println("error3");
+                e.printStackTrace();
+                showServerDownToast();
+            }
+        }).start();
+    }
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(Login.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
+    }
+
 }
