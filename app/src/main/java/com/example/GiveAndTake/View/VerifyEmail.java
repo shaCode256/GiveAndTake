@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.giveandtake.R;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
