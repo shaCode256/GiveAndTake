@@ -109,14 +109,22 @@ public class Login extends AppCompatActivity {
                     case "0":  //success. login the user
                         //log the user in
                         System.out.println("isManager: "+result);
-                        Intent thisIntent = new Intent(Login.this, Map.class);
-                        thisIntent.putExtra("userId", email);
-                        thisIntent.putExtra("isManager", result);
-                        startActivity(thisIntent);
+                        Intent mapIntent = new Intent(Login.this, Map.class);
+                        mapIntent.putExtra("userId", email);
+                        mapIntent.putExtra("isManager", result);
+                        startActivity(mapIntent);
                         finish();
                         break;
                     case "phone is not verified, verified email":  //phone isn't verified
                         Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Please log in with email and verify your phone.", Toast.LENGTH_SHORT).show());
+                        break;
+                    case "verify phone now":  //phone isn't verified
+                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Success, please enter phone now", Toast.LENGTH_SHORT).show());
+                        System.out.println("isManager: "+result);
+                        Intent verifyPhoneIntent  = new Intent(Login.this, VerifyPhone.class);
+                        verifyPhoneIntent.putExtra("emailTxt", email);
+                        startActivity(verifyPhoneIntent);
+                        finish();
                         break;
                     case "email is not verified":  //email isn't verified
                         Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Please click on the verification link sent to your email or click forgot password", Toast.LENGTH_SHORT).show());
