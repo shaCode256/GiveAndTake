@@ -17,3 +17,4 @@ wrapt
 uvloop
 orjson
 firebase-admin
+pyrebase

@@ -1,4 +1,3 @@
-import json
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -6,9 +5,7 @@ import orjson
 import firebase_admin
 from firebase_admin import credentials, db, firestore
 from google.cloud.firestore import GeoPoint
-from firebase_admin import auth
-
-
+import pyrebase
 import re
 
 emailRegex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
@@ -19,6 +16,16 @@ cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://giveandtake-31249-default-rtdb.firebaseio.com',
 })
+
+firebaseConfig = {  'apiKey': 'AIzaSyA34H_HU1h_5mmXss6qRnQVBZfveA0eAn4',
+                  'authDomain': "giveandtake-31249.firebaseio.com",
+                  'databaseURL': "https://giveandtake-31249-default-rtdb.firebaseio.com",
+                  'projectId': "giveandtake-31249",
+                  'storageBucket': "giveandtake-31249.appspot.com"
+                  }
+
+firebase=pyrebase.initialize_app(firebaseConfig)
+auth=firebase.auth()
 
 # Use Cloud Firestore db
 credFs = credentials.Certificate('serviceAccountKey.json')
@@ -560,9 +567,11 @@ async def login(request: Request):
 
     #if it's an email:
     if isEmail(emailOrPhone):
+        print("hi")
         try:
             login = auth.sign_in_with_email_and_password(emailOrPhone, password)
-            if auth.currentUser.emailVerified:
+            acc_info = auth.get_account_info(login)
+            if firebase.auth().currentUser.emailVerified:
                 print("verify phone now")
                 return "verify phone now"
             else:
@@ -576,22 +585,34 @@ async def login(request: Request):
         if users_ref.child(emailOrPhone).child("isBlocked").get() is "0":
             email= users_ref.child(emailOrPhone).child("email").get()
             try:
-                login = auth.sign_in_with_email_and_password(email, password)
-                if auth.currentUser.emailVerified:
+                user = auth.sign_in_with_email_and_password(email, password)
+                # before the 1 hour expiry:
+                user = auth.refresh(user['refreshToken'])
+                # now we have a fresh token
+                token= user['idToken']
+                acc_info = (auth.get_account_info(token))
+                print(acc_info)
+                isEmailVerified= acc_info['users'][0]['emailVerified']
+                if isEmailVerified:
                     if users_ref.child(emailOrPhone).child("isPhoneVerified").get() is "1":
                         print("success, returning is manager value")
                         return users_ref.child(emailOrPhone).child("isManager").get()
                     else:
-                        return("Please log in with email and verify your phone.")
+                        return("phone is not verified, verified email")
+                else:
+                    return("email is not verified")
             except Exception as e:
-                exception = str(e)
-                print(exception)
-                return exception
+                if hasattr(e, 'message'):
+                    print(e.message)
+                    return str(e.message)
+                else:
+                    print(e)
+                    return str(e)
         else:
             return "blocked"
     else:
         return "Wrong details. try again?"
-    return "error! contact admin"
+    return "Enter a valid phone number or Email"
 
 #Signup Function
 @app.post('/register/')
@@ -603,8 +624,8 @@ async def register(request: Request):
     email= data['email']
     password= data['password']
     try:
-        user = auth.create_user_with_email_and_password(email, password)
-        firebase_admin.auth.generate_email_verification_link(email, action_code_settings=None, app=None)
+        user= auth.create_user_with_email_and_password(email, password)
+        auth.send_email_verification(user['idToken'])
     except Exception as e:
         exception = str(e)
         return exception
