@@ -1,11 +1,9 @@
 package com.example.giveandtake.Presenter;
 
 import com.example.giveandtake.Model.User;
-import com.google.firebase.database.DatabaseReference;
 
 public class RegisterUser {
-
-    public void registerUser(String emailTxt, String phoneTxt, String fullNameTxt, DatabaseReference databaseReference) {
+    public void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
         User user = new User();
         user.setEmail(emailTxt);
         user.setIsBlocked("0");
@@ -16,7 +14,6 @@ public class RegisterUser {
             } else {
                 user.setIsManager("0");
             }
-            databaseReference.child("users").child(phoneTxt).setValue(user);
     }
 
 }

@@ -1,6 +1,4 @@
 package com.example.giveandtake.View;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +9,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.giveandtake.Presenter.RegisterUser;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.giveandtake.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,11 +22,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,9 +44,7 @@ public class VerifyPhone extends AppCompatActivity {
     ProgressBar bar;
     String fullNameTxt;
 
-    String IPv4_Address= "http://10.0.0.3:8000/";
-
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://giveandtake-31249-default-rtdb.firebaseio.com/");
+    String server_url = "http://10.0.0.3:8000/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,24 +126,9 @@ public class VerifyPhone extends AppCompatActivity {
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(VerifyPhone.this, "Phone verified Successfully", Toast.LENGTH_SHORT).show();
-                            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    //check if phone is not registered before
-                                    if(snapshot.hasChild(phone.getText().toString())){
-                                        Toast.makeText(VerifyPhone.this, "Phone is already registered", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else{
-                                        Intent thisIntent= getIntent();
-                                        String emailTxt= thisIntent.getStringExtra("emailTxt");
-                                        registerUser(emailTxt, phone.getText().toString(), fullNameTxt);
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
+                            Intent thisIntent= getIntent();
+                            String emailTxt= thisIntent.getStringExtra("emailTxt");
+                            addUserToDb(emailTxt, String.valueOf(phone.getText()), fullNameTxt);
                         }
                         else{
                             Toast.makeText(VerifyPhone.this, "Wrong code", Toast.LENGTH_SHORT).show();
@@ -159,33 +137,31 @@ public class VerifyPhone extends AppCompatActivity {
                 });
     }
 
-    private void registerUser(String emailTxt, String phoneTxt, String fullNameTxt) {
-            RegisterUser registerUserPresenter= new RegisterUser();
-            registerUserPresenter.registerUser(emailTxt, phoneTxt, fullNameTxt, databaseReference);
-            Toast.makeText(VerifyPhone.this, "User is successfully registered, \nnow log in with your phone!", Toast.LENGTH_SHORT).show();
-            Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
-            startActivity(loginIntent);
-    }
 
-    public void checkIfPhoneExist(String phone) {
+    public void addUserToDb(String email, String phone, String name) {
         new Thread(() -> {
-            String urlString = IPv4_Address+"getDoesPhoneExist/";
+            String urlString = server_url +"addUserToDb/";
             URL url = null;
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
+                VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
+                assert url != null;
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setDoOutput(true);
                 JSONObject json = new JSONObject();
+                json.put("email", email);
+                json.put("name", name);
                 json.put("phone", phone);
+
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
@@ -198,18 +174,40 @@ public class VerifyPhone extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
+                assert conn != null;
                 InputStream is = conn.getInputStream();
-                String isExist= CharStreams.toString(new InputStreamReader(
+                String result = CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                System.out.println("isNotificationTurnedOn? "+isExist);
-                //  latch.countDown();
+                System.out.println("result is: "+ result);
+                result = result.replaceAll("\"", "");
+                switch (result) {
+                    case "Phone already is registered.":
+                        VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Phone already is registered. please contact admin.", Toast.LENGTH_LONG).show());
+                        break;
+                    case "success":
+                        VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Successfully registered! Now, please log in with your phone.", Toast.LENGTH_LONG).show());
+                        break;
+                    default:  //other error, coming from server
+                        String finalResult = result;
+                        VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, finalResult, Toast.LENGTH_SHORT).show());
+                        break;
+                }
+                Intent loginIntent = new Intent(VerifyPhone.this, Login.class);
+                startActivity(loginIntent);
+                finish();
             } catch (IOException e) {
                 System.out.println("error3");
                 e.printStackTrace();
+                showServerDownToast();
             }
         }).start();
     }
 
+
+    public void showServerDownToast()
+    {
+        runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Server is down, can't perform the request. Please contact admin", Toast.LENGTH_SHORT).show());
+    }
 
 }
 

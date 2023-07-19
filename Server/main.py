@@ -657,6 +657,39 @@ async def resetPassword(request: Request):
         return exception
 
 
+#Add User to DB Function
+@app.post('/addUserToDb/')
+async def addUserToDb(request: Request):
+    print('Enter resetPassword')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    #collect data from client, after verifying phone by OTP
+    email= data['email']
+    name= data['name']
+    phone= data['phone']
+    isPhoneVerified = "1"
+    isBlocked = "0"
+    isManager= "0"
+    if str(email).endswith("manager.com"):
+        isManager=1
+    #add to db
+
+    users_ref = db.reference('users/')
+
+    if users_ref.child(phone).get() != None:
+        return "Phone already is registered."
+    else:
+        users_ref.child(phone).child("email").set(email)
+        users_ref.child(phone).child("fullName").set(name)
+        users_ref.child(phone).child("isBlocked").set(isBlocked)
+        users_ref.child(phone).child("isManager").set(isManager)
+        users_ref.child(phone).child("isPhoneVerified").set(isPhoneVerified)
+        return "success"
+
+
+
+
 
 def isEmail(email):
     if re.fullmatch(emailRegex, email):
