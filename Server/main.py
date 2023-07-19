@@ -629,7 +629,24 @@ async def register(request: Request):
     except Exception as e:
         exception = str(e)
         return exception
-    return
+
+
+#Reset Password Function
+@app.post('/resetPassword/')
+async def resetPassword(request: Request):
+    print('Enter resetPassword')
+    body = await request.body()
+    body.decode("utf-8")
+    data = orjson.loads(body)
+    email= data['email']
+    try:
+        user= auth.send_password_reset_email(email)
+        return "Reset Password Email was successfully sent. please click the link in your inbox."
+    except Exception as e:
+        exception = str(e)
+        print(exception)
+        return exception
+
 
 
 def isEmail(email):
