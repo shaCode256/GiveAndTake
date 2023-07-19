@@ -27,8 +27,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class VerifyEmail extends AppCompatActivity {
-    private FirebaseAuth auth;
-
     String server_url = "http://10.0.0.3:8000/";
 
     @Override
@@ -40,7 +38,6 @@ public class VerifyEmail extends AppCompatActivity {
         EditText conPassword= findViewById(R.id.conPassword);
         Button registerBtn= findViewById(R.id.registerBtn);
         TextView loginNowBtn= findViewById(R.id.loginNow);
-        auth= FirebaseAuth.getInstance();
 
         registerBtn.setOnClickListener(view -> {
             String emailTxt = email.getText().toString();
@@ -62,18 +59,10 @@ public class VerifyEmail extends AppCompatActivity {
             Toast.makeText(VerifyEmail.this, "please enter password.", Toast.LENGTH_SHORT).show();
         }
         else if (emailTxt.endsWith("gmail.com") || emailTxt.endsWith("@msmail.ariel.ac.il")) {
-            auth.createUserWithEmailAndPassword(emailTxt, passwordTxt).addOnSuccessListener(authResult -> {
-                auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(VerifyEmail.this, "please check email for verification.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(VerifyEmail.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }).addOnFailureListener(e -> Toast.makeText(VerifyEmail.this, e.getMessage(), Toast.LENGTH_SHORT).show());
-
+                register(emailTxt, passwordTxt);
         } else {
             Toast.makeText(VerifyEmail.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();
+            register(emailTxt, passwordTxt);
         }
     }
 
@@ -114,8 +103,14 @@ public class VerifyEmail extends AppCompatActivity {
                 InputStream is = conn.getInputStream();
                 String result = CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
-                if(result.equals("success")){
-
+                result= result.replaceAll("\"", "");
+                String finalResult = result;
+                runOnUiThread(() -> Toast.makeText(VerifyEmail.this, finalResult, Toast.LENGTH_SHORT).show());
+                if (result.equals("Success. Please check email for verification.")){
+                    //go to log in with your email now
+                    Intent thisIntent = new Intent(VerifyEmail.this, Login.class);
+                    startActivity(thisIntent);
+                    finish();
                 }
             } catch (IOException e) {
                 System.out.println("error3");

@@ -567,11 +567,17 @@ async def login(request: Request):
 
     #if it's an email:
     if isEmail(emailOrPhone):
-        print("hi")
         try:
-            login = auth.sign_in_with_email_and_password(emailOrPhone, password)
-            acc_info = auth.get_account_info(login)
-            if firebase.auth().currentUser.emailVerified:
+            email= emailOrPhone
+            user = auth.sign_in_with_email_and_password(email, password)
+            # before the 1 hour expiry:
+            user = auth.refresh(user['refreshToken'])
+            # now we have a fresh token
+            token = user['idToken']
+            acc_info = (auth.get_account_info(token))
+            print(acc_info)
+            isEmailVerified = acc_info['users'][0]['emailVerified']
+            if isEmailVerified:
                 print("verify phone now")
                 return "verify phone now"
             else:
@@ -583,7 +589,8 @@ async def login(request: Request):
 
     if emailOrPhone.isnumeric() and users_ref.child(emailOrPhone) is not None:
         if users_ref.child(emailOrPhone).child("isBlocked").get() is "0":
-            email= users_ref.child(emailOrPhone).child("email").get()
+            phone= emailOrPhone
+            email= users_ref.child(phone).child("email").get()
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
                 # before the 1 hour expiry:
@@ -626,8 +633,10 @@ async def register(request: Request):
     try:
         user= auth.create_user_with_email_and_password(email, password)
         auth.send_email_verification(user['idToken'])
+        return "Success. Please check email for verification."
     except Exception as e:
         exception = str(e)
+        print(exception)
         return exception
 
 
@@ -640,7 +649,7 @@ async def resetPassword(request: Request):
     data = orjson.loads(body)
     email= data['email']
     try:
-        user= auth.send_password_reset_email(email)
+        auth.send_password_reset_email(email)
         return "Reset Password Email was successfully sent. please click the link in your inbox."
     except Exception as e:
         exception = str(e)
