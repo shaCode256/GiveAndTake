@@ -61,7 +61,6 @@ public class VerifyEmail extends AppCompatActivity {
                 register(emailTxt, passwordTxt);
         } else {
             Toast.makeText(VerifyEmail.this, "Can register only with ariel university or admin email", Toast.LENGTH_SHORT).show();
-            register(emailTxt, passwordTxt);
         }
     }
 
