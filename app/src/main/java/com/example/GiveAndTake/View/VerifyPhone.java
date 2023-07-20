@@ -44,7 +44,7 @@ public class VerifyPhone extends AppCompatActivity {
     ProgressBar bar;
     String fullNameTxt;
 
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +188,11 @@ public class VerifyPhone extends AppCompatActivity {
                         VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Successfully registered! Now, please log in with your phone.", Toast.LENGTH_LONG).show());
                         break;
                     default:  //other error, coming from server
+                        if (result.contains("message")){
+                            result = result.substring(result.indexOf("message"), result.indexOf("domain"));
+                            result= result.replaceAll("\"", "");
+                            result= result.replaceAll("/","");
+                        }
                         String finalResult = result;
                         VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, finalResult, Toast.LENGTH_SHORT).show());
                         break;

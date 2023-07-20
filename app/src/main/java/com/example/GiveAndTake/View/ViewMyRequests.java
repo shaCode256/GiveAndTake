@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class ViewMyRequests extends ListActivity {
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems= new ArrayList<>();

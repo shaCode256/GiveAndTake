@@ -30,7 +30,7 @@ import java.util.HashMap;
 
 public class ManageUsers extends ListActivity {
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
     ArrayList<String> listItems= new ArrayList<>();
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;

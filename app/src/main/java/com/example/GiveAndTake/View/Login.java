@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Login extends AppCompatActivity {
 
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,10 +130,15 @@ public class Login extends AppCompatActivity {
                         Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "Please click on the verification link sent to your email or click forgot password", Toast.LENGTH_SHORT).show());
                         break;
                     case "blocked":
-                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "You are blocked. contact the management", Toast.LENGTH_SHORT).show());
+                        Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "You are blocked, or not registered. contact management or register", Toast.LENGTH_SHORT).show());
                         break;
                     default:  //other error, coming from server
-                        String finalResult = result;
+                        if (result.contains("message")){
+                            result = result.substring(result.indexOf("message"), result.indexOf("domain"));
+                            result= result.replaceAll("\"", "");
+                            result= result.replaceAll("/","");
+                        }
+                        String finalResult= result;
                         Login.this.runOnUiThread(() -> Toast.makeText(Login.this, finalResult, Toast.LENGTH_SHORT).show());
                         break;
                 }

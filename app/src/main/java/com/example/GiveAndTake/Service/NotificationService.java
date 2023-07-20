@@ -51,7 +51,7 @@ public class NotificationService extends Service {
     String isManager="";
     String lastTimeSeenMapStr;
 
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
 
     public void onCreate(int startId) {
         super.onCreate();

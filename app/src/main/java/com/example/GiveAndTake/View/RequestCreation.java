@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RequestCreation extends AppCompatActivity {
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {

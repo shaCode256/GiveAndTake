@@ -26,7 +26,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class VerifyEmail extends AppCompatActivity {
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +103,11 @@ public class VerifyEmail extends AppCompatActivity {
                 String result = CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
                 result= result.replaceAll("\"", "");
+                if (result.contains("message")){
+                    result = result.substring(result.indexOf("message"), result.indexOf("domain"));
+                    result= result.replaceAll("\"", "");
+                    result= result.replaceAll("/","");
+                }
                 String finalResult = result;
                 runOnUiThread(() -> Toast.makeText(VerifyEmail.this, finalResult, Toast.LENGTH_SHORT).show());
                 if (result.equals("Success. Please check email for verification.")){

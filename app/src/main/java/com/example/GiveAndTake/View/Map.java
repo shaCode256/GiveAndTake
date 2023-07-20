@@ -60,7 +60,7 @@ import java.util.Objects;
 
 public class Map extends FragmentActivity implements OnMapReadyCallback {
     String stringRequestDetails="";
-    String server_url = "http://10.0.0.3:8000/";
+   String server_url= "https://giveandtake-server.df.r.appspot.com/";
     private GoogleMap mMap;
     static String [] details;
     boolean isRunning= true;
