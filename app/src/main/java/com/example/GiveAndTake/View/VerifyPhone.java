@@ -188,6 +188,7 @@ public class VerifyPhone extends AppCompatActivity {
                         VerifyPhone.this.runOnUiThread(() -> Toast.makeText(VerifyPhone.this, "Successfully registered! Now, please log in with your phone.", Toast.LENGTH_LONG).show());
                         break;
                     default:  //other error, coming from server
+                        result= result.replaceAll("\"", "");
                         if (result.contains("message")){
                             result = result.substring(result.indexOf("message"), result.indexOf("domain"));
                             result= result.replaceAll("\"", "");

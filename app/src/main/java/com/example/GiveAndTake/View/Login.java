@@ -133,6 +133,7 @@ public class Login extends AppCompatActivity {
                         Login.this.runOnUiThread(() -> Toast.makeText(Login.this, "You are blocked, or not registered. contact management or register", Toast.LENGTH_SHORT).show());
                         break;
                     default:  //other error, coming from server
+                        result= result.replaceAll("\"", "");
                         if (result.contains("message")){
                             result = result.substring(result.indexOf("message"), result.indexOf("domain"));
                             result= result.replaceAll("\"", "");
