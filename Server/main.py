@@ -630,7 +630,7 @@ async def login(request: Request):
                 print("email is not verified")
                 return ("email is not verified")
         except Exception as e:
-            exception = clean_excpetion(str(e))
+            exception = clean_exception(e)
             return exception
 
     if emailOrPhone.isnumeric() and users_ref.child(emailOrPhone) is not None:
@@ -655,7 +655,7 @@ async def login(request: Request):
                 else:
                     return ("email is not verified")
             except Exception as e:
-                exception = clean_excpetion(str(e))
+                exception = clean_exception(e)
                 return exception
         else:
             return "blocked" #or not exist
@@ -678,7 +678,7 @@ async def register(request: Request):
         auth.send_email_verification(user['idToken'])
         return "Success. Please check email for verification."
     except Exception as e:
-        exception = clean_excpetion(str(e))
+        exception = clean_exception(e)
         return exception
 
 
@@ -694,7 +694,7 @@ async def resetPassword(request: Request):
         auth.send_password_reset_email(email)
         return "Reset Password Email was successfully sent. please click the link in your inbox."
     except Exception as e:
-        exception = clean_excpetion(e)
+        exception = clean_exception(e)
         return exception
 
 
@@ -729,7 +729,8 @@ async def addUserToDb(request: Request):
         return "success"
 
 
-def clean_excpetion(e):
+def clean_exception(e):
+    e= str(e)
     if e.find('message') is not -1:
         index = e.find('message')
         e = e[index+7:]
