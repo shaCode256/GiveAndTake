@@ -138,7 +138,7 @@ public class ViewRequest extends AppCompatActivity {
         btnDeleteRequest.setOnClickListener(v -> {
             //delete request by server
             if(requestId!=null) {
-                deleteRequest(userId, requestId, docId, isManager);
+                deleteRequest(userId, requestUserId, requestId, docId, isManager);
             }
         });
 
@@ -172,7 +172,7 @@ public class ViewRequest extends AppCompatActivity {
         });
     }
 
-    public void deleteRequest(String userId, String requestId, String docId, String isManager) {
+    public void deleteRequest(String userId, String requestUserId, String requestId, String docId, String isManager) {
         new Thread(() -> {
             String urlString = server_url +"delete/";
             URL url = null;
@@ -192,7 +192,7 @@ public class ViewRequest extends AppCompatActivity {
                 conn.setDoOutput(true);
                 JSONObject json = new JSONObject();
                 json.put("requestId", requestId);
-                json.put("userId", userId);
+                json.put("requestUserId", requestUserId);
                 json.put("docId", docId);
                 String jsonInputString = json.toString();
                 try (OutputStream os = conn.getOutputStream()) {
