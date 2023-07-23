@@ -8,7 +8,7 @@ that allows users to open and maintain requests, watch open requests of others, 
 Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our product allows users to manage the requests on a targeted system to Ariel students only, enabling wide distribution and location filtering by combining requests management and a map.
 
 <img src="Give And Take-poster.png" width="1000" height="350">
-<img src="readme_pictures/maps_for_admin.jpeg" width="200" height="350">
+<img src="readme_pictures/maps_for_admin.jpg" width="200" height="350">
 
 ## Features:
 
