@@ -47,7 +47,7 @@ Unlike traditional social/map apps sites such as WhatsApp or Google Maps, our pr
     
 15) Search bar on map to navigate to requested location by address.
 
-<img src="readme_pictures/login.jpeg" width="200" height="350">
+<img src="readme_pictures/login.jpg" width="200" height="350">
 <img src="readme_pictures/watch_request.jpeg" width="200" height="350">
 
 ## Installation
