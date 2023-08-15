@@ -118,9 +118,11 @@ public class NotificationService extends Service {
                         if (
                                 ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                        ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+
                         ) {
-                            System.out.println("no location permissions");
+                            System.out.println("no location | notification permissions ");
                         } else {
                             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(NotificationService.this);
                             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
