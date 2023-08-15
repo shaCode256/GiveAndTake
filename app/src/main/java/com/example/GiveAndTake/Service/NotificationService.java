@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -69,8 +70,8 @@ public class NotificationService extends Service {
                 .setContentIntent(MapIntent)
                 .setAutoCancel(true);
         startForeground(1, builder.build());
+        System.out.println("start foreground 1");
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -91,13 +92,14 @@ public class NotificationService extends Service {
                 .setContentIntent(pendingMapIntent)
                 .setAutoCancel(true);
         //        startForeground(2, builder.build());
+        System.out.println("start foreground 2");
         startForeground(1, builder.build());
         Timer myTimer = new Timer ();
         TimerTask myTask = new TimerTask () {
             @Override
             public void run() {
                 try {
-                    getIsAutoDetectLocation(userId); //start chain process: get isAutoDetectlocation, specified distance, location, start searching
+                    getIsAutoDetectLocation(userId); //start chain process: get isAutoDetectlocation, location, specified distance, start searching
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -106,6 +108,7 @@ public class NotificationService extends Service {
         myTimer.scheduleAtFixedRate(myTask, 0L, (60 * 1000)); // Runs every 1 min
         return START_NOT_STICKY;
     }
+
 
     @SuppressLint("MissingPermission")
     private void createNotification(String userId, String isManager, String lastTimeSeenMapStr, float distance, HashMap<String, HashMap<LatLng, String>> markersHashmap, String autoDetectLocation, GeoPoint specificLocation) {
@@ -117,7 +120,7 @@ public class NotificationService extends Service {
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                                         ContextCompat.checkSelfPermission(NotificationService.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
                         ) {
-                            Toast.makeText(NotificationService.this, "please enable location permissions", Toast.LENGTH_SHORT).show();
+                            System.out.println("no location permissions");
                         } else {
                             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(NotificationService.this);
                             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -157,25 +160,25 @@ public class NotificationService extends Service {
             String markerCreationTime= marker.get(markerPosition);
                 //convert string to time
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && markerCreationTime!=null) {
-                LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                LocalDateTime lastTimeSeenMap = LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                if (location != null && location.distanceTo(markerLocation) <= distance && markerDateTime.isAfter(lastTimeSeenMap)) {
-                    // Create an explicit intent for an Activity in your app
-                    Intent mapIntent = new Intent(this, Map.class);
-                    mapIntent.putExtra("userId", userId);
-                    mapIntent.putExtra("isManager", isManager);
-                    mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent MapIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
-                            .setSmallIcon(R.drawable.star_icon)
-                            .setContentTitle("New Requests!")
-                            .setContentText("in your area!")
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            // Set the intent that will fire when the user taps the notification
-                            .setContentIntent(MapIntent)
-                            .setAutoCancel(true);
-                    startForeground(1, builder.build());
-                }
+                    LocalDateTime markerDateTime = LocalDateTime.parse(markerCreationTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    LocalDateTime lastTimeSeenMap = LocalDateTime.parse(lastTimeSeenMapStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    if (location != null && location.distanceTo(markerLocation) <= distance && markerDateTime.isAfter(lastTimeSeenMap)) {
+                        // Create an explicit intent for an Activity in your app
+                        Intent mapIntent = new Intent(this, Map.class);
+                        mapIntent.putExtra("userId", userId);
+                        mapIntent.putExtra("isManager", isManager);
+                        mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent MapIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "My notification")
+                                .setSmallIcon(R.drawable.star_icon)
+                                .setContentTitle("New Requests!")
+                                .setContentText("in your area!")
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                // Set the intent that will fire when the user taps the notification
+                                .setContentIntent(MapIntent)
+                                .setAutoCancel(true);
+                        startForeground(1, builder.build());
+                    }
             }
             }
         }
@@ -191,7 +194,7 @@ public class NotificationService extends Service {
         return null;
     }
 
-    public void getMapsDataDocs(String isAutoDetectLocation, GeoPoint specificLocation) throws InterruptedException {
+    public void getMapsDataDocs(String isAutoDetectLocation, GeoPoint specificLocation, float distanceKm) {
         new Thread(() -> {
             String urlString = server_url +"getMapsDataDocs/";
             URL url = null;
@@ -200,7 +203,7 @@ public class NotificationService extends Service {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-             //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
+             //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -244,8 +247,8 @@ public class NotificationService extends Service {
                     LatLng markerLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                         //to check if requestUseId is manager: change the icon
                     markersHashmap.put(requestId, new HashMap<>());
-                    markersHashmap.get(requestId).put(markerLocation, creationTime);
-                    createNotification(userId, isManager, lastTimeSeenMapStr, 20000000000000000f, markersHashmap, isAutoDetectLocation, specificLocation);
+                    Objects.requireNonNull(markersHashmap.get(requestId)).put(markerLocation, creationTime);
+                    createNotification(userId, isManager, lastTimeSeenMapStr, distanceKm, markersHashmap, isAutoDetectLocation, specificLocation);
                 }
             } catch (JSONException | IOException e) {
                 throw new RuntimeException(e);
@@ -308,7 +311,7 @@ public class NotificationService extends Service {
             } catch (MalformedURLException e) {
                 System.out.println("error1");
                 e.printStackTrace();
-                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't proccess the request. Please contact admin", Toast.LENGTH_SHORT).show());
+                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
             }
             HttpURLConnection conn = null;
             try {
@@ -338,10 +341,61 @@ public class NotificationService extends Service {
                         is, Charsets.UTF_8));
                 location= location.substring(1,location.length()-2);
                 String [] locationArray= location.split(",");
-                GeoPoint specificLocation = new GeoPoint(Double.parseDouble(locationArray[0]), Double.parseDouble(locationArray[1]));
-                getMapsDataDocs(isAutoDetectLocation, specificLocation);
+                try {
+                    GeoPoint specificLocation = new GeoPoint(Double.parseDouble(locationArray[0]), Double.parseDouble(locationArray[1]));
+                    getDistance(userId, isAutoDetectLocation, specificLocation);
                 }
-             catch (IOException | InterruptedException e) {
+                catch(Exception e){
+                    System.out.println("problem with specific location: "+e);
+                }
+                }
+             catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    public void getDistance(String userId, String isAutoDetectLocation, GeoPoint specificLocation) {
+        new Thread(() -> {
+            String urlString = server_url +"getDistance/";
+            URL url = null;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                System.out.println("error1");
+                e.printStackTrace();
+                //   Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Server is down, can't process the request. Please contact admin", Toast.LENGTH_SHORT).show());
+            }
+            HttpURLConnection conn = null;
+            try {
+                assert url != null;
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                JSONObject json = new JSONObject();
+                json.put("userId", userId);
+                String jsonInputString = json.toString();
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("error2");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                assert conn != null;
+                InputStream is = conn.getInputStream();
+                String distanceStr= CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                float distanceKm= Float.parseFloat(distanceStr.substring(1,distanceStr.length()-1));
+                getMapsDataDocs(isAutoDetectLocation, specificLocation, distanceKm);
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();

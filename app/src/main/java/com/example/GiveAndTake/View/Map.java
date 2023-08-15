@@ -199,6 +199,14 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        if (
+                ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(Map.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Map.this.runOnUiThread(() -> Toast.makeText(Map.this, "Please enable location permissions", Toast.LENGTH_SHORT).show());
+            ActivityCompat.requestPermissions(Map.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 90);
+        }
         mMap = googleMap;
         double lat= 32.107193634412475;
         double lang= 35.20542059093714;
@@ -508,9 +516,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                 isNotificationsTurnedOn= CharStreams.toString(new InputStreamReader(
                         is, Charsets.UTF_8));
                 if(isNotificationsTurnedOn.equals("\"1\"")){
+                    System.out.println("turn on notification");
                     new Thread(this::startNotificationService).start();
                 }
                 else{
+                    System.out.println("turn off notification");
                     new Thread(this::stopNotificationService).start();
                 }
                 //  latch.countDown();
